@@ -1,0 +1,35 @@
+#ifndef WINDOW_H
+#define WINDOW_H
+
+#include "core/glx.h"
+#include "events/event.h"
+
+//this is used to generalise the window process so that the application is not entirely
+//dependent on glfw. The variables are passed onto glfw if called upon by the library.
+
+typedef void (*EventCallbackFn)(Event* );
+
+typedef struct
+{
+	const char* title;
+	unsigned int width, height;
+	int xpos, ypos;
+	bool VSync;
+	
+	EventCallbackFn EventCallback;
+} Window;
+
+REN_API void setVSync(bool );
+
+extern void* GetNativeWindow();
+REN_API unsigned int getWindowWidth();
+REN_API unsigned int getWindowHeight();
+
+REN_API Window* create_window(); 
+REN_API void update_window();
+REN_API void close_window();
+
+REN_API void SetEventCallback(EventCallbackFn );
+REN_API void load_icon(const char* path);
+
+#endif

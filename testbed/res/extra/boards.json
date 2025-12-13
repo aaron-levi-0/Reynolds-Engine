@@ -1,0 +1,30 @@
+
+{
+    "easy": {
+        "width": 504,
+        "height": 504,
+        "grid_width": 450,
+        "grid_height": 450,
+        "tiles_x": 9,
+        "tiles_y": 9,
+        "num_bombs": 9
+    },
+    "intermediate": {
+        "width": 1054,
+        "height": 1054,
+        "grid_width": 1000,
+        "grid_height": 1000,
+        "tiles_x": 20,
+        "tiles_y": 20,
+        "num_bombs": 40
+    },
+    "hard": {
+        "width": 1554,
+        "height": 854,
+        "grid_width": 1500,
+        "grid_height": 800,
+        "tiles_x": 30,
+        "tiles_y": 16,
+        "num_bombs": 99
+    }
+}

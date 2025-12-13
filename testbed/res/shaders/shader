@@ -1,0 +1,44 @@
+#shader vertex
+#version 460 core
+
+layout (location = 0) in vec2  	position;
+layout (location = 1) in vec2  	tex_coords;
+layout (location = 2) in float 	tex_index;
+layout (location = 3) in vec4 	colour;
+
+uniform mat4 u_ProjectionView;
+
+out vec2 	v_texcoord;
+out float	v_index;
+out vec4	v_colour;
+
+void main()
+{
+	gl_Position = u_ProjectionView * vec4(position, 0.0, 1.0);
+	v_texcoord  = tex_coords;
+	v_index = tex_index;
+	v_colour = colour;
+}
+
+#shader fragment
+#version 460 core
+
+in vec2 	v_texcoord;
+in float	v_index;
+in vec4		v_colour;
+
+uniform sampler2D u_textures[32];
+
+out vec4 colour;
+
+void main()
+{
+	int index = int(v_index);
+	
+	if(index == 0)
+	{
+		colour = v_colour;
+	} else {
+		colour = texture(u_textures[index], v_texcoord);
+	}
+}
