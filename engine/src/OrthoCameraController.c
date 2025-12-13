@@ -8,7 +8,19 @@
 OrthographicCameraController controller;
 
 float camera_rotation = 0.0f;
-float original_ar, minimum_zoom = 0.0f, maximum_zoom = 0.0f;
+float original_ar, minimum_zoom = 0.0f, maximum_zoom = 0.0f, left_bounds = 0.0f, right_bounds = 0.0f;
+
+void setLateralLimits(float left, float right)
+{
+	left_bounds = left;
+	right_bounds = right;
+}
+
+static void checkLateralLimits(OrthoCamera* camera)
+{
+	camera -> position[0] = MAX(left_bounds, camera -> position[0]);
+	camera -> position[0] = MIN(right_bounds, camera -> position[0]);
+}
 
 void setZoomLimits(float min_zoom, float max_zoom)
 {
@@ -125,6 +137,8 @@ void onUpdate(float ts)
 			camera -> position[0] -= camera_translation_speed * ts;	
 	}
 	
+	checkLateralLimits(camera);
+
 	controller.camera_translation_speed = controller.zoom_level;
 	setOrthoPosition(camera -> position, true);
 }	

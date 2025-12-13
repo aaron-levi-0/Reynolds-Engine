@@ -51,10 +51,25 @@ void place_mines()
     }
 }
 
+void delete_board() 
+{
+	ASSERT_LOG(board.board, "Attempting to free board memory which doesn't exist!");
+	ASSERT_LOG(board.reveal_state, "Attempting to free board memory which doesn't exist!");
+
+	free(board.board[0]);
+	free(board.reveal_state[0]);
+	
+	free(board.board);
+	free(board.reveal_state);
+	
+	board.board 		= NULL;
+	board.reveal_state 	= NULL;
+}
+
 void init_board_state(uint32_t* configs)
 {
-	if(board.board)
-		free(board.board);
+	if(board.board || board.reveal_state)
+		delete_board();
 	
 	board.width = *configs++, 		board.height = *configs++;
 	board.grid_width = *configs++,	board.grid_height = *configs++;
@@ -138,19 +153,4 @@ void reset_board()
   
 	REYNOLDS_VERBOSE("Resetting board: %d rows, %d cols", board.tiles_y, board.tiles_x);
 	place_mines();
-}
-
-void delete_board() 
-{
-	ASSERT_LOG(board.board, "Attempting to free board memory which doesn't exist!");
-	ASSERT_LOG(board.reveal_state, "Attempting to free board memory which doesn't exist!");
-
-	free(board.board[0]);
-	free(board.reveal_state[0]);
-	
-	free(board.board);
-	free(board.reveal_state);
-	
-	board.board 		= NULL;
-	board.reveal_state 	= NULL;
 }

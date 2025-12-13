@@ -29,7 +29,7 @@ CD ..\build_files
 
 REM Report build result
 IF %ERRORLEVEL% NEQ 0 (
-    ECHO %esc%[38;5;1mBuild failed!%esc%[0m
+    ECHO %esc%[38;5;1mBuild failed.%esc%[0m
 ) ELSE (
-    ECHO %esc%[38;5;2mBuild succeeded!%esc%[0m
+    ECHO %esc%[38;5;2mBuild succeeded.%esc%[0m
 )

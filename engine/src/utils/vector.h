@@ -3,6 +3,8 @@
 
 #include <stddef.h>
 
+/* A dynamic array for structures, similar to the vector template in c++ */
+
 typedef struct {
     void* data;       // Pointer to the array of elements
     size_t size;      // Number of elements in the vector

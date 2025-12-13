@@ -31,6 +31,7 @@ REN_API void enable_zoom(bool );
 REN_API void enable_camera(bool );
 
 REN_API void setZoomLimits(float , float );
+REN_API void setLateralLimits(float , float );
 REN_API float getZoomLevel();
 REN_API float getAspectRatio();
 REN_API float* getCameraPosition();

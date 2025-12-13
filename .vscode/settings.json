@@ -1,0 +1,87 @@
+{
+    "todohighlight.isEnable": true,
+    "todohighlight.keywords": [
+        {
+            "text": "TO-DO:",
+            "color": "#FFA500",
+            "backgroundColor": "#333333"
+        },
+        {
+            "text": "HACK:",
+            "color": "#ff6600",
+            "backgroundColor": "#333333"
+        },
+        {
+            "text": "NOTE:",
+            "color": "#87CEEB",
+            "backgroundColor": "#333333"
+        },
+        {
+            "text": "UNCLEAR:",
+            "color": "pink",
+            "backgroundColor": "#444444"
+        }
+    ],
+    "todohighlight.defaultStyle": {
+        "color": "red",
+        "backgroundColor": "#ffab00",
+        "overviewRulerColor": "rgba(0,0,0,0)",
+        "isWholeLine": false,
+    },
+
+    "files.associations": {
+        "format": "cpp",
+        "app_input.h": "c",
+        "display.h": "c",
+        "game_logic.h": "c",
+        "common.h": "c",
+        "glx.h": "c",
+        "engine.h": "c",
+        "version.h": "c",
+        "renderer.h": "c",
+        "orthocameracontroller.h": "c",
+        "file_handling.h": "c",
+        "input.h": "c",
+        "window.h": "c",
+        "stb_image.h": "c",
+        "mouse_event.h": "c",
+        "key_event.h": "c",
+        "app_event.h": "c",
+        "glew.h": "c",
+        "glfw3.h": "c",
+        "defines.h": "c",
+        "shader.h": "c",
+        "cstdint": "c",
+        "stddef.h": "c",
+        "stdint.h": "c",
+        "system_error": "c",
+        "logging.h": "c",
+        "platform.h": "c",
+        "texture.h": "c",
+        "orthographiccamera.h": "c",
+        "buffer.h": "c",
+        "array": "c",
+        "string": "c",
+        "string_view": "c",
+        "span": "c",
+        "initializer_list": "c",
+        "string.h": "c",
+        "vector.h": "c",
+        "algorithm": "c",
+        "charconv": "c",
+        "compare": "c",
+        "functional": "c",
+        "tuple": "c",
+        "type_traits": "c",
+        "utility": "c",
+        "variant": "c",
+        "event.h": "c",
+        "board.h": "c",
+        "stdbool.h": "c",
+        "time.h": "c",
+        "layers.h": "c",
+        "timestep.h": "c",
+        "numbers": "c",
+        "cstdlib": "c"
+    }
+}

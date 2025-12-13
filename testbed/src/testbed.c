@@ -10,21 +10,6 @@
 const char* ICON_PATH 	= "../testbed/res/extra/minesweeper.png";
 const char* SHADER_PATH = "../testbed/res/shaders/shader";
 
-bool Running 	= true;
-bool Minimised 	= false;
-
-LayerStack* stack = NULL;
-
-extern void onWindowClose();
-
-void onEvent(Event* e)
-{
-	VALIDATE(e);
-	VALIDATE(!e -> handled);
-	handle_layer_events(stack, e);
-	e -> handled = true;
-}
-
 int main()
 {
 	set_log_level(LOG_LEVEL_VERBOSE);
@@ -64,6 +49,7 @@ int main()
 	float aspect_ratio = (float)getWindowWidth()/(float)getWindowHeight();
 	createOrthoCameraController(aspect_ratio);
 	setZoomLimits(0.25f, 1.0f);
+
 	invert_camera(true);
 	enable_camera(false);
 
@@ -97,6 +83,9 @@ int main()
 			{
 				enable_camera(true);
 				enable_rotation(false);
+
+				setLateralLimits(-0.5f, 0.5f);
+				
 			}
 			scene_controller(&st_render);
 					
@@ -107,7 +96,7 @@ int main()
 			}
 			
 			EndBatch(&st_render);
-			FlushBatch(&st_render); //combine both and name 'ExitBatch'
+			FlushBatch(&st_render); //combine both and name 'ExitBatch' or 'ExecuteBatch'
 		}
 		
         update_window();
@@ -130,13 +119,4 @@ int main()
 		delete_board();
 	
     return 0;
-}
-
-void onWindowClose(Event* e)
-{
-	if(e -> type == WindowClose)
-	{
-		Running = false;
-		destroy_layer_stack(stack);
-	}
 }

@@ -29,82 +29,81 @@ const int BUTTON_BOUNDS[][4] = {
 	[RESTART_BUTTON] 	= {380, 586, 616, 677} 
 };
 
-static void toBoardSpace(double* xpos, double* ypos) 
+static void screen_to_world(double sx, double sy, float* out_world_xy)
 {
-    float board_width  = (float)getBoardWidth();
-    float board_height = (float)getBoardHeight();
-    
-    *xpos = *xpos * board_width / (float)getWindowWidth();
-    *ypos = *ypos * board_height / (float)getWindowHeight();
+    // 1) pixels -> NDC
+    float w = (float)getWindowWidth();
+    float h = (float)getWindowHeight();
+
+    float ndc_x = (float)( (2.0 * sx) / w - 1.0 );
+    float ndc_y = (float)( 1.0 - (2.0 * sy) / h ); // y flipped (top-left -> NDC)
+
+    // 2) NDC -> world via inverse(PV)
+    mat4 invPV;
+    glm_mat4_inv(getPVMat(), invPV);
+
+    vec4 clip = { ndc_x, ndc_y, 0.0f, 1.0f };
+    vec4 world;
+    glm_mat4_mulv(invPV, clip, world);
+
+    // Ortho camera: w should be 1, but divide anyway for safety
+    float iw = (world[3] != 0.0f) ? (1.0f / world[3]) : 1.0f;
+
+    out_world_xy[0] = world[0] * iw;
+    out_world_xy[1] = world[1] * iw;
 }
 
-static void applyZoom(double* xpos, double* ypos, float zoom_factor) 
+void getGridIndices(double mouse_px_x, double mouse_px_y, int* grid_coords)
 {
-    *xpos /= zoom_factor;
-    *ypos /= zoom_factor;
-}
+    // Convert mouse to the same world space that DrawQuad uses
+    float world_xy[2];
+    screen_to_world(mouse_px_x, mouse_px_y, world_xy);
 
-static void calculateGridOffsets(double* grid_offset_x, double* grid_offset_y, float zoom_factor) 
-{
-    float board_width  = (float)getBoardWidth();
-    float board_height = (float)getBoardHeight();
-    float grid_width   = (float)getGridWidth();
-    float grid_height  = (float)getGridHeight();
+    // Pull the same config + norms used by draw_board() in display.c
+    float* pos  = getConfigPosition();
+    float* size = getConfigSize();
 
-    float* camera_pos = getCameraPosition();
-    float* position_offset = getConfigPosition();
+    float norm_grid_offset_x, norm_grid_offset_y;
+    float norm_tile_size_x,  norm_tile_size_y;
+    float norm_spacing_x,    norm_spacing_y;
 
-    double grid_translation_x = (1.0f + position_offset[0] - camera_pos[0]) * board_width / 2.0f - (1.0f + position_offset[0]) * grid_width / 2.0f;
-    double grid_translation_y = (1.0f + position_offset[1] + camera_pos[1]) * board_height / 2.0f;
+    calc_norms(size, (float*[]){
+        &norm_grid_offset_x, &norm_grid_offset_y,
+        &norm_tile_size_x,   &norm_tile_size_y,
+        &norm_spacing_x,     &norm_spacing_y
+    });
 
-    *grid_offset_x = ((board_width - grid_width) / 2.0 + grid_translation_x) / zoom_factor;
-    *grid_offset_y = ((board_height - grid_height) / 2.0 + grid_translation_y) / zoom_factor;
-}
+    const int cols = (int)getBoardCols();
+    const int rows = (int)getBoardRows();
 
-static void calculateTileSize(double* tile_size_x, double* tile_size_y, float zoom_factor) 
-{
-    float grid_width  = (float)getGridWidth();
-    float grid_height = (float)getGridHeight();
-    float tiles_x     = (float)getBoardCols();
-    float tiles_y     = (float)getBoardRows();
-    float* size_offset = getConfigSize();
-    
-    *tile_size_x = (size_offset[0] / 2.0f) * grid_width / (zoom_factor * tiles_x);
-    *tile_size_y = (size_offset[1] / 2.0f) * grid_height / (zoom_factor * tiles_y);
-}
+    const float step_x = norm_tile_size_x + norm_spacing_x;
+    const float step_y = norm_tile_size_y + norm_spacing_y;
 
-void getGridIndices(double xpos, double ypos, int* grid_coords) 
-{
-    REYNOLDS_DEBUG("xpos: %f, ypos: %f", xpos, ypos);
+    // This matches your rendering placement:
+    // x = pos.x + norm_grid_offset_x + norm_spacing_x + j*step_x
+    // y = -pos.y - norm_grid_offset_y - i*step_y (with i starting at 1)
+    const float origin_x = pos[0] + norm_grid_offset_x + norm_spacing_x;
+    const float origin_y = -pos[1] - norm_grid_offset_y;
 
-    float zoom_factor = getZoomLevel();
-    
-    toBoardSpace(&xpos, &ypos);
-    applyZoom(&xpos, &ypos, 1.0f);
+    const float rel_x = world_xy[0] - origin_x;
+    const float rel_y = origin_y - world_xy[1]; // because y decreases as row increases
 
-    double grid_offset_x, grid_offset_y;
-    calculateGridOffsets(&grid_offset_x, &grid_offset_y, 1.0f);
-    
-    double tile_size_x, tile_size_y;
-    calculateTileSize(&tile_size_x, &tile_size_y, 1.0f);
+    if (rel_x < 0.0f || rel_y < 0.0f) { grid_coords[0] = -1; grid_coords[1] = -1; return; }
 
-    // Adjust mouse position relative to grid
-    double adjustedX = xpos - grid_offset_x;
-    double adjustedY = ypos - grid_offset_y;
+    const int gx = (int)floorf(rel_x / step_x);
+    const int gy = (int)floorf(rel_y / step_y);
 
-    // Check if the mouse is out of bounds
-    float tiles_x = (float)getBoardCols();
-    float tiles_y = (float)getBoardRows();
-    if (adjustedX < 0 || adjustedX >= tile_size_x * tiles_x ||
-        adjustedY < 0 || adjustedY >= tile_size_y * tiles_y) {
-        grid_coords[0] = -1; // Out of bounds
-        grid_coords[1] = -1;
-        return;
+    if (gx < 0 || gx >= cols || gy < 0 || gy >= rows) { grid_coords[0] = -1; grid_coords[1] = -1; return; }
+
+    // Optional: reject clicks on grid-line spacing (so lines don’t “count” as tiles)
+    const float in_cell_x = rel_x - (float)gx * step_x;
+    const float in_cell_y = rel_y - (float)gy * step_y;
+    if (in_cell_x > norm_tile_size_x || in_cell_y > norm_tile_size_y) {
+        grid_coords[0] = -1; grid_coords[1] = -1; return;
     }
 
-    // Calculate grid coordinates
-    grid_coords[0] = (int)(adjustedX / tile_size_x);
-    grid_coords[1] = (int)(adjustedY / tile_size_y);
+    grid_coords[0] = gx;
+    grid_coords[1] = gy;
 }
 
 
@@ -189,7 +188,7 @@ static void mouse_during_options(double xpos, double ypos)
 static void mouse_during_play(double xpos, double ypos, bool right_click )
 {
 	int grid_coords[2];
-	int gridX, gridY;
+	int16_t gridX, gridY;
 	
 	getGridIndices(xpos, ypos, grid_coords);
 	REYNOLDS_DEBUG("Zoom level: %f", 1/getZoomLevel());

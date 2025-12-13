@@ -8,6 +8,7 @@
 #include "renderer/renderer.h"
 
 #include "OrthoCameraController.h"
+#include "entry.h"
 
 REN_API void vendor_dependencies();
 

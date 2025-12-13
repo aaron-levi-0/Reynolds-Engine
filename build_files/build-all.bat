@@ -7,16 +7,20 @@ REM Colour codes
 ECHO Building everything...
 
 CALL build.bat
-IF %ERRORLEVEL% NEQ 0 (echo Error:%ERRORLEVEL% && exit)
+IF %ERRORLEVEL% NEQ 0 GOTO ERROR0
 
 CD ../testbed
 CALL build.bat
+IF %ERRORLEVEL% NEQ 0 GOTO ERROR1
 CD ../build_files
 
-IF %ERRORLEVEL% NEQ 0 (echo Error:%ERRORLEVEL% && exit)
+ECHO %esc%[38;5;2mAll assemblies built successfully.%esc%[0m
+EXIT /B 0
 
-IF %ERRORLEVEL% NEQ 0 (
-    ECHO %esc%[38;5;1mOne or more builds failed.%esc%[0m
-) ELSE (
-    ECHO %esc%[38;5;2mAll assemblies built successfully.%esc%[0m
-)
+:ERROR0
+ECHO %esc%[38;5;1mEngine build failed.%esc%[0m
+EXIT /B 0
+
+:ERROR1
+CD ../build_files
+ECHO %esc%[38;5;1mTestbed build failed.%esc%[0m

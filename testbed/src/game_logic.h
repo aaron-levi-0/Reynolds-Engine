@@ -10,8 +10,8 @@ extern bool lose;
 
 //functions
 extern int valid_tile(int , int );
-extern void reveal_tile(uint8_t , uint8_t );
-extern bool valid_flag(int, int );
+extern void reveal_tile(int , int );
+extern bool valid_flag(int , int );
 extern bool check_win();
 
 #endif

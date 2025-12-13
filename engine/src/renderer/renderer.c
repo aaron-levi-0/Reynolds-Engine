@@ -125,7 +125,7 @@ void MallocDraw(struct Renderer* renderer)
 	delete_buffer_layout();
 
 	/* Index Buffer */
-	unsigned int indicies[MAX_INDICIES];
+	uint32_t indicies[MAX_INDICIES];
 	size_t offset = 0;
 	
 	for (int i = 0; i < MAX_INDICIES; i+= 6)
@@ -238,7 +238,7 @@ void DrawQuad(struct Renderer* renderer, vec2 position, vec2 size, unsigned int 
 	/** 
 		Note to self, study pointers deeper. Creating a local Vertex pointer means that 
 		dereferencing of renderer only happens once instead of many times. **/
-    Vertex* QuadBufferPtr = renderer->QuadBufferPtr;
+    Vertex* QuadBufferPtr = renderer -> QuadBufferPtr;
 	
 	/* load data into renderer */
 	

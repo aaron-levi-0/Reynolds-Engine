@@ -5,7 +5,7 @@
 
 bool win = false, lose = false;
 
-void reveal_tile(int16_t x, int16_t y) 
+void reveal_tile(int x, int y)
 {
 	/* 	If a tile is closed, the function will mark it to be revealed. If the tile is a clear 
 		tile, a flood-fill algorithm is then implemented to reveal all neighbouring clear tiles
@@ -36,7 +36,7 @@ void reveal_tile(int16_t x, int16_t y)
     }
 }
 
-bool valid_flag(int16_t x, int16_t y)
+bool valid_flag(int x, int y)
 {	
 	/* 	Checks to see if the tile chosen is a valid tile to flag. If the tile
 		is already flagged, it is marked as unflagged.

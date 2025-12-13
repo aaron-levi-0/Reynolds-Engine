@@ -29,7 +29,7 @@ void vector_resize(Vector* vec)
 
     if (vec-> size >= vec-> capacity) 
 	{
-        vec-> capacity *= VEC_GROWTH_FACTOR;
+        vec-> capacity *= VEC_GROWTH_FACTOR;    //TO-DO: Investigate ways to grow vector, maybe double until after 3 allocations then switch to 1.5 growth
         vec-> data = realloc(vec-> data, vec-> capacity * vec-> elem_size);
 
         if (!vec-> data) 
