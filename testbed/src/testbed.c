@@ -2,10 +2,12 @@
 
 #include "common.h"
 #include <engine.h>
+#include <time.h>
 
 #include "board.h"
 #include "game_logic.h"
 #include "display.h"
+#include "gamestate.h"
 
 const char* ICON_PATH 	= "../testbed/res/extra/minesweeper.png";
 const char* SHADER_PATH = "../testbed/res/shaders/shader";
@@ -39,12 +41,16 @@ int main()
 	/* Initialise and load stack defined renderer */
 	struct Renderer st_render; 
 	
+	GameState state = {0};
+	state.scene 	= MENU;
+
 	setShaderPath(SHADER_PATH);
 
 	render_init(&st_render);
 	MallocDraw(&st_render);	
 	
 	init_textures();
+	init_scenes();
 	
 	float aspect_ratio = (float)getWindowWidth()/(float)getWindowHeight();
 	createOrthoCameraController(aspect_ratio);
@@ -59,7 +65,8 @@ int main()
 	bool handled = false;
 	
 	float timestep;
-	
+	srand(time(NULL));
+
 	/* Loop until the user closes the window */
     while (Running)
     {	
@@ -67,6 +74,9 @@ int main()
 		resetStats();
 		render_clear();
 		
+		if (state.game_state == PLAY)
+    		state.win = check_win(&state);
+
 		if(!Minimised)
 		{
 			setMat4("u_ProjectionView", getPVMat());
@@ -74,12 +84,12 @@ int main()
 			BeginBatch(&st_render);
 			
 			setMousePos();
-			MouseInput();
-			KeyInput();
+			MouseInput(&state);
+			KeyInput(&state);
 
 			update_layers(stack, timestep);
 			
-			if(game_state == PLAY)
+			if(state.game_state == PLAY)
 			{
 				enable_camera(true);
 				enable_rotation(false);
@@ -87,12 +97,12 @@ int main()
 				setLateralLimits(-0.5f, 0.5f);
 				
 			}
-			scene_controller(&st_render);
+			scene_controller(&state, &st_render);
 					
-			if(win || lose)
+			if(state.win || state.lose)
 			{
-				game_state = GAME_OVER;
-				game_over_overlay = !win;
+				state.game_state = GAME_OVER;
+				state.game_over_overlay = ! state.win;
 			}
 			
 			EndBatch(&st_render);
@@ -115,8 +125,8 @@ int main()
 	FreeDraw(&st_render);
 	close_window();
 	
-	if(getBoardState())
-		delete_board();
+	if(state.board)
+		delete_board(&state);
 	
     return 0;
 }

@@ -4,20 +4,12 @@
 #include <stdbool.h>
 #include <renderer/renderer.h>
 
+#include "gamestate.h"
 /* Manages the display of the game to the user. */
-
-//variables
-extern bool game_over_overlay;
-extern int 	game_state;
-extern int 	scene;
-extern int 	board_disp;
-extern bool	init_state;
 
 //functions
 extern void init_textures();
-extern void scene_controller(struct Renderer* );
-
-extern float* getConfigPosition();
-extern float* getConfigSize();
-
+extern void init_scenes();
+extern void scene_controller(GameState* , struct Renderer* );
+extern void calc_norms(GameState* , float* [] );
 #endif

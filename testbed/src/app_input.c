@@ -53,28 +53,27 @@ static void screen_to_world(double sx, double sy, float* out_world_xy)
     out_world_xy[1] = world[1] * iw;
 }
 
-void getGridIndices(double mouse_px_x, double mouse_px_y, int* grid_coords)
+void getGridIndices(GameState* s, double mouse_px_x, double mouse_px_y, int* grid_coords)
 {
     // Convert mouse to the same world space that DrawQuad uses
     float world_xy[2];
     screen_to_world(mouse_px_x, mouse_px_y, world_xy);
 
     // Pull the same config + norms used by draw_board() in display.c
-    float* pos  = getConfigPosition();
-    float* size = getConfigSize();
 
     float norm_grid_offset_x, norm_grid_offset_y;
     float norm_tile_size_x,  norm_tile_size_y;
     float norm_spacing_x,    norm_spacing_y;
 
-    calc_norms(size, (float*[]){
+    calc_norms(s, (float*[]){
         &norm_grid_offset_x, &norm_grid_offset_y,
         &norm_tile_size_x,   &norm_tile_size_y,
         &norm_spacing_x,     &norm_spacing_y
     });
 
-    const int cols = (int)getBoardCols();
-    const int rows = (int)getBoardRows();
+	const float* pos 	= s -> config_pos;
+    const int cols	 	= s -> tiles_x;
+    const int rows 		= s -> tiles_y;
 
     const float step_x = norm_tile_size_x + norm_spacing_x;
     const float step_y = norm_tile_size_y + norm_spacing_y;
@@ -107,22 +106,22 @@ void getGridIndices(double mouse_px_x, double mouse_px_y, int* grid_coords)
 }
 
 
-void KeyInput()
+void KeyInput(GameState* s)
 {
 	/* Function handles keyboard input for the game */
 	
-	if(isKeyPressed(GLFW_KEY_R) && game_state == PLAY)
+	if(isKeyPressed(GLFW_KEY_R) && s -> game_state == PLAY)
 	{		
-		game_state = RESTART;
+		s -> game_state = RESTART;
 
-	} else if (isKeyPressed(GLFW_KEY_M) && (scene == OPTIONS || game_state == PLAY))
+	} else if (isKeyPressed(GLFW_KEY_M) && (s -> scene == OPTIONS || s -> game_state == PLAY))
 	{
 		REYNOLDS_DEBUG("@instance: scene switched to menu");
-		scene 		= MENU;
-		game_state 	= NONE;			
-		win 		= false;
-		lose 		= false;
-		init_state	= true;
+		s -> scene 		= MENU;
+		s -> game_state = NONE;			
+		s -> win 		= false;
+		s -> lose 		= false;
+		s -> init_state	= true;
 	}
 }
 
@@ -143,101 +142,100 @@ static bool click_bounds(double xpos, double ypos, const int* bounds)
 
 					/* MOUSE LOGIC FOR EACH SCENE */
 
-static void mouse_during_menu(double xpos, double ypos)
+static void mouse_during_menu(GameState* s, double xpos, double ypos)
 {
 	if(click_bounds(xpos, ypos, BUTTON_BOUNDS[PLAY_BUTTON]))
-		scene = OPTIONS;
+		s -> scene = OPTIONS;
 }
 
-static void mouse_during_options(double xpos, double ypos)
+static void mouse_during_options(GameState* s, double xpos, double ypos)
 {
 	unsigned int config[CONFIG_NUM];
 	
 	if(click_bounds(xpos, ypos, BUTTON_BOUNDS[EASY]))
 	{
-		game_state = PLAY;
-		scene = EASY_BOARD;
+		s -> game_state = PLAY;
+		s -> scene 		= EASY_BOARD;
 		
 		ASSERT_LOG(load_board_config(BOARD_CONFIG_PATH, "easy", config), "Could not load board config.");
 		
-		init_state = true;
-		init_board_state(config);
+		s -> init_state = true;
+		init_board_state(s, config);
 		
 	} else if(click_bounds(xpos, ypos, BUTTON_BOUNDS[INTERMEDIATE]))
 	{			
-		game_state = PLAY;
-		scene = INTER_BOARD;
+		s -> game_state = PLAY;
+		s -> scene 		= INTER_BOARD;
 		
 		ASSERT_LOG(load_board_config(BOARD_CONFIG_PATH, "intermediate", config), "Could not load board config.");
 		
-		init_state = true;
-		init_board_state(config);
+		s -> init_state = true;
+		init_board_state(s, config);
 							
 	} else if(click_bounds(xpos, ypos, BUTTON_BOUNDS[HARD]))
 	{					
-		game_state = PLAY;
-		scene = HARD_BOARD;
+		s -> game_state = PLAY;
+		s -> scene 		= HARD_BOARD;
 		
 		ASSERT_LOG(load_board_config(BOARD_CONFIG_PATH, "hard", config), "Could not load board config.");
 		
-		init_state = true;
-		init_board_state(config);
+		s -> init_state = true;
+		init_board_state(s, config);
 	}
 }
 
-static void mouse_during_play(double xpos, double ypos, bool right_click )
+static void mouse_during_play(GameState* s, double xpos, double ypos, bool right_click )
 {
 	int grid_coords[2];
 	int16_t gridX, gridY;
 	
-	getGridIndices(xpos, ypos, grid_coords);
-	REYNOLDS_DEBUG("Zoom level: %f", 1/getZoomLevel());
+	getGridIndices(s, xpos, ypos, grid_coords);
 	gridX = grid_coords[0], gridY = grid_coords[1];
 	
-	if(valid_tile(gridX, gridY))
+	if(valid_tile(s, gridX, gridY))
 	{
-		int** reveal_state = getRevealState();
+		int** reveal_state = s -> reveal_state;
 		VALIDATE_LOG(reveal_state, "Application trying to access non-existant board memory!");
 		
 		if(right_click)
 		{
 			// handle right click to flag tiles
-			if (valid_flag(gridX, gridY))
+			if (valid_flag(s, gridX, gridY))
 				reveal_state[gridY][gridX] = TILE_FLAGGED;
 			
 			REYNOLDS_DEBUG("@input: tile right clicked at: (%d, %d)", gridX, gridY);
 			
 		} else {
-			int** board = getBoardState();
+			int** board = s -> board;
 			VALIDATE_LOG(board, "Application trying to access non-existant board memory!");
 			
 			// handle left click to all tiles		
 			if(reveal_state[gridY][gridX] == TILE_UNFLAGGED)
 				reveal_state[gridY][gridX] = TILE_CLOSED;
 			
-			reveal_tile(gridX, gridY);
-			init_state = false;
+			reveal_tile(s, gridX, gridY);
+			s -> init_state = false;
 
-			lose = (board[gridY][gridX] == BOMB && reveal_state[gridY][gridX] == TILE_CLEARED);
+			s -> lose = (board[gridY][gridX] == BOMB && reveal_state[gridY][gridX] == TILE_CLEARED);
 			
 			REYNOLDS_DEBUG("@input: tile left clicked at: (%d, %d)", gridX, gridY);
 		}
 	} else REYNOLDS_DEBUG("@input: clicked out of bounds");	
 }
 
-static void mouse_during_end(double xpos, double ypos)
+static void mouse_during_end(GameState* s, double xpos, double ypos)
 {
 	if(click_bounds(xpos, ypos, BUTTON_BOUNDS[RESTART_BUTTON]))
 	{
-		game_state 	= RESTART;
-		init_state 	= true;
-		win 		= false;
-		lose 		= false;
+		s -> game_state = RESTART;
+		s -> init_state = true;
+		s -> win 		= false;
+		s -> lose 		= false;
 	}
 } 
 //
 
-static void click_logic(int instance, bool mouse_click)
+static void click_logic(GameState* s, int instance, bool mouse_click)
 {
 	/* Function handles mouse input for different scenes and states. */
 	
@@ -246,18 +244,18 @@ static void click_logic(int instance, bool mouse_click)
 		
 	// instance may be any enum from game_instance struct (now defunct)
 	if(instance & MENU)
-		mouse_during_menu(xpos, ypos);
+		mouse_during_menu(s, xpos, ypos);
 	else if(instance & OPTIONS)
-		mouse_during_options(xpos, ypos);
+		mouse_during_options(s, xpos, ypos);
 	else if(instance & PLAY)
-		mouse_during_play(xpos, ypos, mouse_click);
+		mouse_during_play(s, xpos, ypos, mouse_click);
 	else if(instance & GAME_OVER)
-		mouse_during_end(xpos, ypos);	
+		mouse_during_end(s, xpos, ypos);	
 }
 
 bool handled = false;
 
-void MouseInput() 
+void MouseInput(GameState* s) 
 {
 	/* Function handles mouse input for the game. */
 
@@ -266,12 +264,12 @@ void MouseInput()
 		if (isMouseButtonPressed(GLFW_MOUSE_BUTTON_LEFT)) 
 		{			
 			handled = true;
-			click_logic(scene | game_state, LEFT_CLICK);
+			click_logic(s, s -> scene | s -> game_state, LEFT_CLICK);
 		} 
 		else if (isMouseButtonPressed(GLFW_MOUSE_BUTTON_RIGHT)) 
 		{		
 			handled = true;
-			click_logic(game_state, RIGHT_CLICK);
+			click_logic(s, s -> game_state, RIGHT_CLICK);
 		}
 	}
 	

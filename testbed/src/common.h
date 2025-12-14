@@ -13,8 +13,6 @@
 
 #define NOT_USED		0
 #define BIT(x) 			(1 << x)
-#define MAX(x,y)		(x > y)? x:y
-#define MIN(x,y)		(x < y)? x:y
 
 #define CREATE_WIN 		create_window("Reynolds Engine", 970, 970)
 
