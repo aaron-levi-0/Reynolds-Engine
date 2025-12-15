@@ -29,7 +29,7 @@ SET defines=-DDEBUG_VERSION -DREN_IMPORT -DENABLE_RELATIVE_PATHS -DSRC_FOLDER=\"
 ECHO %esc%[38;5;255mBuilding %assembly%...
 ECHO:
 
-gcc %cFilenames% %compilerFlags% -o ..\bin\%assembly%.exe %defines% %includeFlags% %linkerFlags% ..\bin\engine.lib
+gcc %cFilenames% %compilerFlags% -o ..\bin\%assembly%.exe %defines% %includeFlags% %linkerFlags% ..\bin\libengine.dll.a
 
 IF %ERRORLEVEL% NEQ 0 (
     ECHO %esc%[38;5;1mBuild failed!%esc%[0m

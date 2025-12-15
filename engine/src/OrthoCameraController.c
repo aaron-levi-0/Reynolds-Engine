@@ -190,7 +190,7 @@ Layer create_camera_layer()
 {
 	  Layer camera_layer = {
         .name = "Camera Layer",
-		.id = CAMERA,
+		.id = LAYER_CAMERA,
         .onEvent = onEvent,
 		.update = onUpdate
     };

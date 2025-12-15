@@ -8,6 +8,7 @@
 #include "game_logic.h"
 #include "display.h"
 #include "gamestate.h"
+#include "gameplay_layer.h"
 
 const char* ICON_PATH 	= "../testbed/res/extra/minesweeper.png";
 const char* SHADER_PATH = "../testbed/res/shaders/shader";
@@ -20,15 +21,6 @@ int main()
 	Window* window = create_window("minesweeper.c", SCREEN_WIDTH, SCREEN_HEIGHT);
 	SetEventCallback(&onEvent);
 
-	stack = create_layer_stack();
-	Layer render_layer = create_render_layer();
-	Layer camera_layer = create_camera_layer();
-	Layer close_window_layer = {"Window Close Layer", .id = WINDOW_CLOSE, .onEvent = onWindowClose};
-
-	push_layer(stack, render_layer);
-	push_layer(stack, close_window_layer);
-	push_layer(stack, camera_layer);
-
 	//disable_layer_event(&camera_layer);
 	load_icon(ICON_PATH);
 	
@@ -37,21 +29,27 @@ int main()
 	ASSERT_LOG(err == GLEW_OK, "GLEW Error: %s", glewGetErrorString(err));
 	
 	vendor_dependencies();
-	
-	/* Initialise and load stack defined renderer */
-	struct Renderer st_render; 
+
+	setShaderPath(SHADER_PATH);	
 	
 	GameState state = {0};
 	state.scene 	= MENU;
+	state.init_state = true;
 
-	setShaderPath(SHADER_PATH);
+	/* Initialise and load stack defined renderer */
+	struct Renderer st_render; 
 
-	render_init(&st_render);
-	MallocDraw(&st_render);	
-	
-	init_textures();
-	init_scenes();
-	
+	stack = create_layer_stack();
+	Layer render_layer 			= create_render_layer(&st_render);
+	Layer camera_layer 			= create_camera_layer();
+	Layer gameplay_layer 		= create_gameplay_layer(&state);
+	Layer close_window_layer 	= {"Window Close Layer", .id = LAYER_WINDOW_CLOSE, .onEvent = onWindowClose};
+
+	push_layer(stack, render_layer);
+	push_layer(stack, close_window_layer);
+	push_layer(stack, gameplay_layer);
+	push_layer(stack, camera_layer);
+
 	float aspect_ratio = (float)getWindowWidth()/(float)getWindowHeight();
 	createOrthoCameraController(aspect_ratio);
 	setZoomLimits(0.25f, 1.0f);
@@ -73,9 +71,13 @@ int main()
 		timestep = get_delta_time();	
 		resetStats();
 		render_clear();
-		
-		if (state.game_state == PLAY)
-    		state.win = check_win(&state);
+
+		if(state.game_state == PLAY)
+		{
+			enable_camera(true);
+			enable_rotation(false);
+			setLateralLimits(-0.5f, 0.5f);
+		}
 
 		if(!Minimised)
 		{
@@ -83,27 +85,11 @@ int main()
 			
 			BeginBatch(&st_render);
 			
-			setMousePos();
 			MouseInput(&state);
 			KeyInput(&state);
 
 			update_layers(stack, timestep);
-			
-			if(state.game_state == PLAY)
-			{
-				enable_camera(true);
-				enable_rotation(false);
-
-				setLateralLimits(-0.5f, 0.5f);
-				
-			}
 			scene_controller(&state, &st_render);
-					
-			if(state.win || state.lose)
-			{
-				state.game_state = GAME_OVER;
-				state.game_over_overlay = ! state.win;
-			}
 			
 			EndBatch(&st_render);
 			FlushBatch(&st_render); //combine both and name 'ExitBatch' or 'ExecuteBatch'
@@ -122,7 +108,6 @@ int main()
 			handled = false;
     }
 	
-	FreeDraw(&st_render);
 	close_window();
 	
 	if(state.board)

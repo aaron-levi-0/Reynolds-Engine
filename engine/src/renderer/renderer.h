@@ -35,6 +35,8 @@ struct Renderer
 	
 	unsigned int texture_slots[MAX_TEXTURE_SLOTS];
 	unsigned int TextureSlotIndex;
+
+	bool initialised;
 };
 
 struct Statistics
@@ -47,14 +49,9 @@ struct Statistics
 
 extern void setClearColour(vec3 );
 extern void render_clear();
-REN_API Layer create_render_layer();
+REN_API Layer create_render_layer(struct Renderer* );
 
 void setShaderPath(const char* );
-
-extern void render_init(struct Renderer* );
-
-extern void MallocDraw(struct Renderer* );
-extern void FreeDraw(struct Renderer* );
 
 extern void BeginBatch(struct Renderer* );
 extern void EndBatch(struct Renderer* );

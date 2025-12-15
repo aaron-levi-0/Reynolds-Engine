@@ -31,43 +31,7 @@ static void setViewPort(uint32_t x, uint32_t y, uint32_t width, uint32_t height)
 	glViewport(x, y, width, height);
 }
 
-static void on_render_event(uint32_t width, uint32_t height)
-{
-	setViewPort(0, 0, width, height);
-}
-
-// Function to handle resize events
-static void onEvent(Event* e) 
-{
-    if (e->type == WindowResize) 
-	{
-        uint32_t width = getWindowWidth();
-        uint32_t height = getWindowHeight();
-
-        if (width == 0 || height == 0) 
-		{
-            // Window is minimized, skip rendering
-            REYNOLDS_DEBUG("@render layer: Window minimized.");
-            return;
-        }
-
-        // Update the renderer's viewport and projection
-        on_render_event(width, height);
-        REYNOLDS_VERBOSE("@render layer: Window resized to (%d, %d)", width, height);
-    }
-}
-
-// Function to create the render layer
-Layer create_render_layer() {
-    Layer render_layer = {
-        .name = "Base Render Layer",
-		.id = RENDER,
-        .onEvent = onEvent, // Handle resize events
-    };
-    return render_layer;
-}
-
-void render_init(struct Renderer* renderer)
+static void render_init(struct Renderer* renderer)
 {
 	// Enable blending
 	glEnable(GL_BLEND);
@@ -91,7 +55,7 @@ void render_init(struct Renderer* renderer)
 		renderer -> texture_slots[i] = 0;
 }
 
-void MallocDraw(struct Renderer* renderer)
+static void MallocDraw(struct Renderer* renderer)
 {
 	/*
 		Creates and resereves a vertex buffer to the GPU with the attribute structure defined. Attributes
@@ -164,7 +128,7 @@ void MallocDraw(struct Renderer* renderer)
 	setIntArray("u_textures", samplers, MAX_TEXTURE_SLOTS);
 }
 
-void FreeDraw(struct Renderer* renderer)
+static void FreeDraw(struct Renderer* renderer)
 {
 	/* Deletes all buffers and buffer pointers. */
 	
@@ -178,6 +142,61 @@ void FreeDraw(struct Renderer* renderer)
 		free(SHADER_PATH);
 	if(renderer -> QuadBuffer)
 		free(renderer -> QuadBuffer);
+}
+
+// Function to handle resize events
+static void onEvent(Event* e) 
+{
+    if (e->type == WindowResize) 
+	{
+        uint32_t width = getWindowWidth();
+        uint32_t height = getWindowHeight();
+
+        if (width == 0 || height == 0) 
+		{
+            // Window is minimized, skip rendering
+            REYNOLDS_DEBUG("@render layer: Window minimized.");
+            return;
+        }
+
+        // Update the renderer's viewport and projection
+        setViewPort(0, 0, width, height);
+        REYNOLDS_VERBOSE("@render layer: Window resized to (%d, %d)", width, height);
+    }
+}
+
+static void onUpdate(float dt) 
+{
+	// Currently, no per-frame update logic is needed for the render layer.
+
+	// if (getWindowWidth() == 0 || getWindowHeight() == 0) 
+	// {
+	// 	// Window is minimized, skip rendering
+	// 	return;
+	// }
+	return;
+}
+
+static void onDetach(void* renderer)
+{
+	struct Renderer* r = (struct Renderer*) renderer;
+	FreeDraw(r);
+}
+
+// Function to create the render layer
+Layer create_render_layer(struct Renderer* r) 
+{
+	render_init(r);
+	MallocDraw(r);
+    Layer render_layer = {
+        .name = "Render Layer",
+		.id = LAYER_RENDER,
+		.data = r,
+		//.update = onUpdate,
+        .onEvent = onEvent, // Handle resize events
+		.onDetatch = onDetach
+    };
+    return render_layer;
 }
 
 void BeginBatch(struct Renderer* renderer)

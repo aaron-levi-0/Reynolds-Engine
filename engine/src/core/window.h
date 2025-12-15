@@ -25,7 +25,7 @@ extern void* GetNativeWindow();
 REN_API unsigned int getWindowWidth();
 REN_API unsigned int getWindowHeight();
 
-REN_API Window* create_window(); 
+REN_API Window* create_window(const char* , unsigned int , unsigned int ); 
 REN_API void update_window();
 REN_API void close_window();
 

@@ -15,17 +15,6 @@ LayerStack* create_layer_stack()
     return stack;
 }
 
-// Function to destroy a layer stack
-void destroy_layer_stack(LayerStack* stack) 
-{
-    if(stack) 
-    {
-        free_vector(&stack -> layers);
-        free(stack);
-    }
-    REYNOLDS_ERROR("@layers: layer stack is NULL!");
-}
-
 // Function to push a layer onto the stack
 void push_layer(LayerStack* stack, Layer layer) 
 {
@@ -42,10 +31,31 @@ void pop_layer(LayerStack* stack)
         REYNOLDS_VERBOSE("@layers: layer stack is empty! Cannot pop more layers.");
         return;
     }
-    Layer* top_layer = (Layer*)vector_at(&stack -> layers, stack -> layers.size);
+
+    Layer* top_layer = (Layer*)vector_at(&stack -> layers, stack -> layers.size - 1);
     REYNOLDS_VERBOSE("@layers: popped layer: %s", top_layer -> name);
+    
+    if(top_layer -> onDetatch)
+        top_layer -> onDetatch(top_layer -> data);
+
     vector_pop_back(&stack -> layers); // Pop the layer from the vector
 }
+
+// Function to destroy a layer stack
+void destroy_layer_stack(LayerStack* stack) 
+{
+    if(stack) 
+    {
+        while(vector_size(&stack -> layers) > 0) 
+            pop_layer(stack);
+
+        free_vector(&stack -> layers);
+        free(stack);
+        return;
+    }
+    REYNOLDS_ERROR("@layers: layer stack is NULL!");
+}
+
 
 uint16_t layer_index(LayerStack* stack, Layer layer)
 {
@@ -56,9 +66,10 @@ uint16_t layer_index(LayerStack* stack, Layer layer)
         if(stack_layer -> id == layer.id)
             return index;
         
-        index++;
+        stack_layer++;
     }
-    REYNOLDS_WARN("@layers: layer index could not be resolved!")
+
+    REYNOLDS_WARN("@layers: layer index could not be resolved!");
     return 0;
 }
 

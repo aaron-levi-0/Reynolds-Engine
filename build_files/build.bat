@@ -14,16 +14,23 @@ REM echo "Files:" %cFilenames%
 
 REM Configuration
 SET assembly=engine
-SET compilerFlags=-g -shared -Wvarargs -Wall
+SET compilerFlags=-g -Wvarargs -Wall
 SET includeFlags=-Isrc -Ivendor
-SET linkerFlags=-lglfw3 -lopengl32 -lgdi32 -luser32 -lkernel32 -lglew32
+SET linkerFlags=-shared -lglfw3 -lopengl32 -lgdi32 -luser32 -lkernel32 -lglew32
 SET defines=-DDEBUG_VERSION -DREN_EXPORT -D_CRT_SECURE_NO_WARNINGS 
 
 ECHO %esc%[38;5;255mBuilding %assembly%%...
 ECHO:
 
-REM Compile the DLL and generate the import library
-gcc %cFilenames% %compilerFlags% -o ../bin/%assembly%.dll -Wl,--out-implib,../bin/%assembly%.lib %defines% %linkerFlags% %includeFlags%
+REM Link flags: make a DLL + link dependencies
+SET linkFlags=-shared -lglfw3 -lopengl32 -lgdi32 -luser32 -lkernel32 -lglew32 ^
+ -Wl,--out-implib,../bin/lib%assembly%.dll.a
+
+ECHO %esc%[38;5;255mBuilding %assembly%...
+ECHO:
+
+REM Build engine.dll and generate libengine.dll.a
+gcc %cFilenames% %compilerFlags% %defines% %includeFlags% %linkFlags% -o ../bin/%assembly%.dll
 
 CD ..\build_files
 
