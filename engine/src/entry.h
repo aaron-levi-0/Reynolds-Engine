@@ -9,5 +9,6 @@ extern bool         Minimised;
 
 extern void onEvent(Event* );
 extern void onWindowClose(Event* );
+REN_API void engine_init(const char* , int , int );
 
 #endif // ENTRY_H

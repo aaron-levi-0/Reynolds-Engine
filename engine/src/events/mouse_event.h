@@ -23,4 +23,5 @@ extern Event* createMouseButtonReleasedEvent(int );
 
 extern double getXOffset();
 extern double getYOffset();
-#endif
+
+#endif // MOUSE_EVENT_H

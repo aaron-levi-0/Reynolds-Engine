@@ -24,7 +24,7 @@ void push_layer(LayerStack* stack, Layer layer)
 }
 
 // Function to pop a layer from the stack
-void pop_layer(LayerStack* stack) 
+static void pop_layer(LayerStack* stack) 
 {
     if (vector_size(&stack -> layers) <= 0) 
     {

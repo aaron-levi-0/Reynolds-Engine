@@ -55,14 +55,14 @@
 #define REN_API __declspec(dllexport)
 #else
 #define REN_API __attribute__((visibility("default")))
-#endif
-#else
+#endif // _MSC_VER
+#else  // REN_EXPORT
 // Imports
 #ifdef _MSC_VER
 #define REN_API __declspec(dllimport)
 #else
 #define REN_API
-#endif
-#endif
+#endif // _MSC_VER
+#endif // NOT REN_EXPORT
 
-#endif
+#endif // DEFINES_H

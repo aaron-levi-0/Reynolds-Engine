@@ -13,7 +13,7 @@ typedef enum log_level {
 } log_level;
 
 REN_API void set_log_level(log_level level);
-extern void log_message(log_level level, const char* format, ...);
+REN_API void log_message(log_level level, const char* format, ...);
 
 #define LOG_VERBOSE_ENABLED 1
 #define LOG_DEBUG_ENABLED 1
@@ -74,4 +74,4 @@ extern void log_message(log_level level, const char* format, ...);
 
 #define REYNOLDS_ERROR(format, ...) log_message(LOG_LEVEL_ERROR, format, ##__VA_ARGS__);
 
-#endif
+#endif // LOGGING_H

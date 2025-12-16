@@ -3,13 +3,14 @@
 
 #include <cglm/version.h>
 
+#include "core/logging.h"
 #include "core/window.h"
+#include "core/layers.h"
 #include "core/timestep.h"
 #include "renderer/renderer.h"
-
 #include "OrthoCameraController.h"
 #include "entry.h"
 
 REN_API void vendor_dependencies();
 
-#endif
+#endif // ENGINE_H

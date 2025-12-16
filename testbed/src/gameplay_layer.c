@@ -1,9 +1,12 @@
 #include "gameplay_layer.h"
 
-#include "game_logic.h"     // check_win(...)
+#include <core/input.h>     // setMousePos()
+#include <entry.h>          // bool Minimised
+
 #include "common.h"
+#include "game_logic.h"     // check_win()
 #include "display.h"        // init_textures(), init_scenes()
-#include "core/input.h"     // MouseInput(), KeyInput()
+#include "app_input.h"      // MouseInput(), KeyInput()
 
 /*
     Since your LayerStack stores Layers BY VALUE (copies),
@@ -17,22 +20,16 @@ static void gameplay_update(float dt)
     if (!g_state) return;
 
     /*
-        One-time init hook. You already have init_state in GameState.
-        Use this for scene setup, board creation, etc.
-        Right now we just flip it off so you have a reliable “run once” spot.
-    */
-    if (g_state -> init_state)
-    {
-        init_textures();
-	    init_scenes();
-        g_state -> init_state = false;
-    }
-
-    /*
         Core game flow:
         - While playing: evaluate win condition
         - If win/lose becomes true: transition to GAME_OVER
     */
+
+    setMousePos();
+    MouseInput(g_state);
+    KeyInput(g_state);
+    scene_update(g_state);
+
     if (g_state -> game_state == PLAY)
     {
         g_state -> win = check_win(g_state);
@@ -45,22 +42,18 @@ static void gameplay_update(float dt)
     }
 }
 
-static void gameplay_onEvent(Event* e)
-{
-    setMousePos();
-    // MouseInput(&state);
-    // KeyInput(&state);
-}
-
 Layer create_gameplay_layer(GameState* state)
 {
     g_state = state;
 
+    state -> bg_colour[0] = 0.57f;
+	state -> bg_colour[1] = 0.51f;
+	state -> bg_colour[2] = 0.55f;
+
     Layer gameplay_layer = {
         .name   = "Gameplay Layer",
         .id     = LAYER_GAMEPLAY,  
-        .update = gameplay_update,
-        .onEvent= gameplay_onEvent
+        .update = gameplay_update
     };
 
     return gameplay_layer;

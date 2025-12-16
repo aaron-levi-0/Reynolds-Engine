@@ -14,19 +14,6 @@
 #define NOT_USED		0
 #define BIT(x) 			(1 << x)
 
-#define CREATE_WIN 		create_window("Reynolds Engine", 970, 970)
-
-#ifdef DEBUG_VERSION
-#define LOG(format, ...) printf("[LOG] " format "\n", ##__VA_ARGS__)
-#define LOG_VERBOSE(format, ...) printf("[LOG] Verbose: " format "\n", ##__VA_ARGS__)
-#else
-#define LOG(format, ...) 
-#define LOG_VERBOSE(format, ...) 
-#endif
-
-//verbose trigger
-#undef LOG_VERBOSE
-#define LOG_VERBOSE(format, ...) 
 
 #define ALL_BOARDS		448		//this is 0b11100000 or 448 as an integer
 

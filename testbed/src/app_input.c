@@ -121,7 +121,6 @@ void KeyInput(GameState* s)
 		s -> game_state = NONE;			
 		s -> win 		= false;
 		s -> lose 		= false;
-		s -> init_state	= true;
 	}
 }
 
@@ -159,7 +158,6 @@ static void mouse_during_options(GameState* s, double xpos, double ypos)
 		
 		ASSERT_LOG(load_board_config(BOARD_CONFIG_PATH, "easy", config), "Could not load board config.");
 		
-		s -> init_state = true;
 		init_board_state(s, config);
 		
 	} else if(click_bounds(xpos, ypos, BUTTON_BOUNDS[INTERMEDIATE]))
@@ -169,7 +167,6 @@ static void mouse_during_options(GameState* s, double xpos, double ypos)
 		
 		ASSERT_LOG(load_board_config(BOARD_CONFIG_PATH, "intermediate", config), "Could not load board config.");
 		
-		s -> init_state = true;
 		init_board_state(s, config);
 							
 	} else if(click_bounds(xpos, ypos, BUTTON_BOUNDS[HARD]))
@@ -179,7 +176,6 @@ static void mouse_during_options(GameState* s, double xpos, double ypos)
 		
 		ASSERT_LOG(load_board_config(BOARD_CONFIG_PATH, "hard", config), "Could not load board config.");
 		
-		s -> init_state = true;
 		init_board_state(s, config);
 	}
 }
@@ -214,7 +210,6 @@ static void mouse_during_play(GameState* s, double xpos, double ypos, bool right
 				reveal_state[gridY][gridX] = TILE_CLOSED;
 			
 			reveal_tile(s, gridX, gridY);
-			s -> init_state = false;
 
 			s -> lose = (board[gridY][gridX] == BOMB && reveal_state[gridY][gridX] == TILE_CLEARED);
 			
@@ -228,7 +223,6 @@ static void mouse_during_end(GameState* s, double xpos, double ypos)
 	if(click_bounds(xpos, ypos, BUTTON_BOUNDS[RESTART_BUTTON]))
 	{
 		s -> game_state = RESTART;
-		s -> init_state = true;
 		s -> win 		= false;
 		s -> lose 		= false;
 	}

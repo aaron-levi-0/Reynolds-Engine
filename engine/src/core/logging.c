@@ -10,14 +10,14 @@
 
 // ANSI escape codes for colors
 #define COLOUR_RESET "\033[0m"
-#define COLOUR_TIMESTAMP "\033[38;2;145;130;141m" // TrueColor for #91828d
+#define COLOUR_TIMESTAMP "\033[38;2;145;130;141m" // TrueColor for #91828D
 
-#define COLOUR_FATAL "\033[0;31m"    // Bold Red
-#define COLOUR_ERROR "\033[1;31m"    // Red
-#define COLOUR_WARN  "\033[0;33m"    // Yellow
-#define COLOUR_INFO  "\033[0;32m"    // Green
-#define COLOUR_DEBUG "\033[0;34m"    // Blue
-#define COLOUR_VERBOSE "\033[0;37m"  // White/Gray
+#define COLOUR_FATAL "\033[0;31m"    // Bold Red    #AA0000
+#define COLOUR_ERROR "\033[1;31m"    // Red         #FF5555
+#define COLOUR_WARN  "\033[0;33m"    // Yellow      #AAAA00
+#define COLOUR_INFO  "\033[0;32m"    // Green       #00AA00
+#define COLOUR_DEBUG "\033[0;34m"    // Blue        #0000AA
+#define COLOUR_VERBOSE "\033[0;37m"  // White/Gray  #AAAAAA
 
 uint8_t LOG_LEVEL = LOG_LEVEL_INFO;
 

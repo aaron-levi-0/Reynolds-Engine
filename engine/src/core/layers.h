@@ -35,7 +35,6 @@ extern LayerStack* create_layer_stack();
 extern void destroy_layer_stack(LayerStack* );
 
 extern void push_layer(LayerStack* , Layer );
-extern void pop_layer(LayerStack* );
 
 REN_API void enable_layer_event(Layer* );
 REN_API void disable_layer_event(Layer* );
@@ -44,4 +43,4 @@ extern void update_layers(LayerStack* , float);
 extern void render_layers(LayerStack* );
 extern void handle_layer_events(LayerStack* , Event* );
 
-#endif
+#endif // LAYERS_H

@@ -10,6 +10,9 @@
 //functions
 extern void init_textures();
 extern void init_scenes();
-extern void scene_controller(GameState* , struct Renderer* );
+extern void scene_update(GameState* );
+extern void scene_render(GameState* , struct Renderer* );
 extern void calc_norms(GameState* , float* [] );
+
+extern void unload_textures();
 #endif

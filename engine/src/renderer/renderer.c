@@ -3,7 +3,6 @@
 #include "core/window.h"
 #include "events/event.h"
 #include "renderer/buffer.h"
-#include "renderer/texture.h"
 
 struct Statistics stats = {0};
 
@@ -111,7 +110,7 @@ static void MallocDraw(struct Renderer* renderer)
 	
 	//1x1 white texture
 	init_asset_manager();
-	create_texture(renderer -> WhiteTexture);
+	create_texture(&renderer -> WhiteTexture);
 	renderer -> texture_slots[0] = renderer -> WhiteTexture;
 	setWhiteTexture(WHITE);
 	
@@ -163,18 +162,6 @@ static void onEvent(Event* e)
         setViewPort(0, 0, width, height);
         REYNOLDS_VERBOSE("@render layer: Window resized to (%d, %d)", width, height);
     }
-}
-
-static void onUpdate(float dt) 
-{
-	// Currently, no per-frame update logic is needed for the render layer.
-
-	// if (getWindowWidth() == 0 || getWindowHeight() == 0) 
-	// {
-	// 	// Window is minimized, skip rendering
-	// 	return;
-	// }
-	return;
 }
 
 static void onDetach(void* renderer)

@@ -2,6 +2,7 @@
 #define GAMESTATE_H
 #include <stdint.h>
 #include <stdbool.h>
+#include <cglm/cglm.h>
 
 // forward declare to avoid heavy includes
 struct Renderer;
@@ -13,7 +14,6 @@ typedef struct
     int game_state;
     bool win;
     bool lose;
-    bool init_state;
     bool game_over_overlay;
 
     // --- board config/state ---
@@ -26,9 +26,11 @@ typedef struct
     int** reveal_state;
 
     // current scene layout
-    float config_pos[2];
-    float config_size[2];
+    vec2 config_pos;
+    vec2 config_size;
     uint32_t config_texture;
+
+    vec3 bg_colour;
 
 } GameState;
 

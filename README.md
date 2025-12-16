@@ -15,11 +15,13 @@ A 2D Game Engine written in C
 * Adding Linux and MacOS support
 * Adding Vulkan support
 * Replacing vendor libraries such as CJSON and stb\_image with my own implementations
+* Entity Component System
+* Separate game related files from graphics process files. Don't want a game engine, want a multi-purpose graphics engine
 
 ## Known Bugs
 
-* "Layerstack is NULL" error before window instance closes
+* 
 
 ## Improvements
 
-* 
+* Sub-texture caching

@@ -32,4 +32,6 @@ REN_API void close_window();
 REN_API void SetEventCallback(EventCallbackFn );
 REN_API void load_icon(const char* path);
 
-#endif
+#define CREATE_WIN 	create_window("Reynolds Engine", 970, 970)
+
+#endif // WINDOW_H

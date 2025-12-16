@@ -37,4 +37,4 @@ REN_API float getAspectRatio();
 REN_API float* getCameraPosition();
 REN_API void invert_camera(bool );
 
-#endif
+#endif // ORTHOCAMERACONTROLLER_H

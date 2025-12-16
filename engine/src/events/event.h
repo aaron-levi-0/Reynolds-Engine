@@ -47,4 +47,4 @@ typedef struct Event {
 extern bool isInCategory(Event* , EventCategory );
 extern void setCurrentEvent(Event* );
 
-#endif
+#endif // EVENT_H

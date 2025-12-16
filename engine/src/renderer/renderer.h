@@ -4,8 +4,8 @@
 #include "core/glx.h"
 #include "core/layers.h"
 #include "renderer/shader.h"
+#include "renderer/texture.h"
 
-#define	MAX_TEXTURE_SLOTS	32
 #define	MAX_QUADS			1000
 #define	MAX_VERTICIES		4 * MAX_QUADS
 #define	MAX_INDICIES		6 * MAX_QUADS

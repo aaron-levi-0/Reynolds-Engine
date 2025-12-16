@@ -1,5 +1,6 @@
 #ifndef ORTHOGRAPHICCAMERA_H
 #define ORTHOGRAPHICCAMERA_H
+
 #include "core/glx.h"
 
 typedef struct {

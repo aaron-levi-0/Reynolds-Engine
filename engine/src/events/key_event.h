@@ -16,4 +16,4 @@ extern Event* createKeyReleasedEvent(int );
 
 extern int getRepeatCount(); //not working as repeat_count does not increment
 
-#endif
+#endif // KEY_EVENT_H

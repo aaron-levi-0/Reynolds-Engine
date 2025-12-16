@@ -17,4 +17,4 @@
 #include "core/defines.h"
 #include "core/logging.h"
 
-#endif
+#endif // GLX_H

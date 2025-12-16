@@ -26,17 +26,12 @@ REM Link flags: make a DLL + link dependencies
 SET linkFlags=-shared -lglfw3 -lopengl32 -lgdi32 -luser32 -lkernel32 -lglew32 ^
  -Wl,--out-implib,../bin/lib%assembly%.dll.a
 
-ECHO %esc%[38;5;255mBuilding %assembly%...
-ECHO:
-
 REM Build engine.dll and generate libengine.dll.a
 gcc %cFilenames% %compilerFlags% %defines% %includeFlags% %linkFlags% -o ../bin/%assembly%.dll
 
 CD ..\build_files
 
 REM Report build result
-IF %ERRORLEVEL% NEQ 0 (
-    ECHO %esc%[38;5;1mBuild failed.%esc%[0m
-) ELSE (
+IF %ERRORLEVEL% EQU 0 (
     ECHO %esc%[38;5;2mBuild succeeded.%esc%[0m
 )

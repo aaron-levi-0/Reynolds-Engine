@@ -21,4 +21,4 @@ extern size_t vector_size(const Vector* );
 extern void vector_pop_back(Vector* );
 extern void free_vector(Vector* );
 
-#endif
+#endif // VECTOR_H

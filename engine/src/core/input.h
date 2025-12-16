@@ -10,4 +10,4 @@ REN_API void setMousePos();
 REN_API double getMouseX();
 REN_API double getMouseY();
 
-#endif
+#endif // INPUT_H

@@ -21,7 +21,7 @@ static int hash(struct cache* c, const char* key) {
 }
 
 // Adds a key-value pair to the cache
-void cache_set(struct cache* c, const char* key, int value) {
+void cache_set(struct cache* c, const char* key, int data) {
     int index = hash(c, key);
     struct cache_entry* entry = c -> entries[index];
     while (entry) 
@@ -29,7 +29,7 @@ void cache_set(struct cache* c, const char* key, int value) {
         if (!strcmp(entry -> key, key)) 
 		{
             // Update the value if the key already exists
-            entry -> value = value;
+            entry -> data = data;
             return;
         }
         entry = entry -> next;
@@ -38,7 +38,7 @@ void cache_set(struct cache* c, const char* key, int value) {
     // Create a new entry if the key doesn't exist
     struct cache_entry* new_entry = malloc(sizeof(struct cache_entry));
     new_entry -> key = strdup(key);
-    new_entry -> value = value;
+    new_entry -> data = data;
     new_entry -> next = c -> entries[index];
     c -> entries[index] = new_entry;
 }
@@ -49,10 +49,27 @@ int cache_get(struct cache* c, const char* key) {
     struct cache_entry* entry = c -> entries[index];
     while (entry) 
 	{
-        if (!strcmp(entry -> key, key) == 0)
-            return entry -> value;
+        if (!strcmp(entry -> key, key))
+            return entry -> data;
         
         entry = entry -> next;
     }
     return -1;
+}
+
+void free_cache(struct cache* c) 
+{
+    for (int i = 0; i < c -> size; i++) 
+    {
+        struct cache_entry* entry = c -> entries[i];
+        while (entry) 
+        {
+            struct cache_entry* temp = entry;
+            entry = entry -> next;
+            free(temp -> key);
+            free(temp);
+        }
+    }
+    free(c -> entries);
+    free(c);
 }
