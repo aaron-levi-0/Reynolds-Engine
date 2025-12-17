@@ -14,6 +14,7 @@
     So we keep a module-static pointer to the GameState.
 */
 static GameState* g_state = NULL;
+static DisplayContext* context = NULL;
 
 static void gameplay_update(float dt)
 {
@@ -26,13 +27,13 @@ static void gameplay_update(float dt)
     */
 
     setMousePos();
-    MouseInput(g_state);
+    MouseInput(context, g_state);
     KeyInput(g_state);
-    scene_update(g_state);
+    scene_update(context, g_state);
 
     if (g_state -> game_state == PLAY)
     {
-        g_state -> win = check_win(g_state);
+        g_state -> win = check_win(context, g_state);
 
         if (g_state -> win || g_state -> lose)
         {
@@ -42,14 +43,10 @@ static void gameplay_update(float dt)
     }
 }
 
-Layer create_gameplay_layer(GameState* state)
+Layer create_gameplay_layer(DisplayContext* dc, GameState* state)
 {
     g_state = state;
-
-    state -> bg_colour[0] = 0.57f;
-	state -> bg_colour[1] = 0.51f;
-	state -> bg_colour[2] = 0.55f;
-
+    context = dc;
     Layer gameplay_layer = {
         .name   = "Gameplay Layer",
         .id     = LAYER_GAMEPLAY,  

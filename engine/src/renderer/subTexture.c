@@ -47,9 +47,9 @@ static SubTexture* get_subtex_struc(const Vector* entries, uint32_t textureID, u
 
 float* get_uv(const Vector* entries, uint32_t textureID, uint16_t cell_location[2])
 {
-    ASSERT_LOG(entries, "get_uv: invalid args");
+    //VALIDATE_LOG(entries, "get_uv: invalid args");
     SubTexture* st = get_subtex_struc(entries, textureID, cell_location);
-    return st ? st -> uv : NULL;
+    return st -> uv; //return another value if st doesnt exist
 }
 
 static void cell_to_px(uint32_t textureID, uint16_t sample_pos[2], vec2 sprite_size, vec2 cell_size, vec4 out_vec)

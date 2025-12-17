@@ -23,6 +23,8 @@ int main()
 	load_icon(ICON_PATH);
 	setShaderPath(SHADER_PATH);	
 
+	DisplayContext context = {0};
+
 	GameState state 	= {0};
 	state.scene 		= MENU;
 
@@ -33,7 +35,7 @@ int main()
 	stack = create_layer_stack();
 	Layer render_layer 			= create_render_layer(&st_render);
 	Layer camera_layer 			= create_camera_layer();
-	Layer gameplay_layer 		= create_gameplay_layer(&state);
+	Layer gameplay_layer 		= create_gameplay_layer(&context, &state);
 	Layer close_window_layer 	= {"Window Close Layer", .id = LAYER_WINDOW_CLOSE, .onEvent = onWindowClose};
 
 	push_layer(stack, render_layer);
@@ -58,8 +60,8 @@ int main()
 	float timestep;
 	srand(time(NULL));
 	
-	init_textures();
-	init_scenes();
+	init_display(&context);
+	init_scenes(&context, &state);
 
 	setClearColour((vec3){1.0f, 1.0f, 1.0f}); // NOTE: set to white #ffffff
 
@@ -86,7 +88,7 @@ int main()
 			BeginBatch(&st_render);
 
 			update_layers(stack, timestep);
-			scene_render(&state, &st_render);
+			scene_render(&st_render, &context, &state);
 			
 			EndBatch(&st_render);
 			FlushBatch(&st_render); //combine both and name 'ExitBatch' or 'ExecuteBatch'
@@ -107,7 +109,7 @@ int main()
 	
 	//** SHUTDOWN PHASE **//
 
-	unload_textures();
+	unload_textures(&context);
 	close_window();
 	
 	if(state.board)

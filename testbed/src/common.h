@@ -17,7 +17,7 @@
 
 #define ALL_BOARDS		448		//this is 0b11100000 or 448 as an integer
 
-enum tile_state {TILE_CLOSED, TILE_CLEARED, TILE_FLAGGED, TILE_UNFLAGGED};
+enum tile_state {IS_TILE_CLOSED, IS_TILE_CLEARED, IS_TILE_FLAGGED, IS_TILE_UNFLAGGED};
 enum game_state {NONE = BIT(0), PLAY = BIT(1), GAME_OVER = BIT(2), RESTART = BIT(3)};
 enum scene 		{MENU = BIT(4), OPTIONS = BIT(5), EASY_BOARD = BIT(6), INTER_BOARD = BIT(7), HARD_BOARD = BIT(8)};
 	

@@ -14,10 +14,10 @@
 
 /* Responsible for handling the game board's structure and operations. */
 
-extern int valid_tile(GameState*, int , int );
-extern void init_board_state(GameState* , const uint32_t* );
-extern void reset_board(GameState*);
-extern void delete_board(GameState*);
-extern void place_mines(GameState*);
+extern int  valid_tile(DisplayContext* dc, int x, int y);
+extern void init_board_state(DisplayContext* dc, GameState* s, const uint32_t* config);
+extern void reset_board(DisplayContext* dc, GameState* s);
+extern void delete_board(GameState* s);
+extern void place_mines(DisplayContext* dc, GameState* s);
 
 #endif

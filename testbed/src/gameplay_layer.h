@@ -4,6 +4,6 @@
 #include "core/layers.h"
 #include "gamestate.h"
 
-Layer create_gameplay_layer(GameState* );
+Layer create_gameplay_layer(DisplayContext* dc, GameState* s);
 
 #endif // GAMEPLAY_LAYER_H

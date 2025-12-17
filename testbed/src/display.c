@@ -8,52 +8,16 @@
 #include <OrthoCameraController.h>
 #include <renderer/subTexture.h>
 
-vec2 SPRITE_CELL_SIZE = { 46.0f, 46.0f }; 	//NOTE: texture map subtexture offset (in pixels)
-
 vec4 FULL_SAMPLE = {0.0f, 0.0f, 1.0f, 1.0f};
-
-Vector texture_register = {0};
-bool registerd = false;
-
-uint32_t menu_texture, options_texture;
-uint32_t easy_board, inter_board, hard_board;
-uint32_t board_pieces, button_restart, game_over, win_overlay;
-
-typedef struct { vec2 pos, size; uint32_t texture; } SceneConfig;
-SceneConfig scenes[3];
 
 enum choose_scene { EASY, INTERMEDIATE, HARD };
 #define DEFAULT	(INTERMEDIATE)
 
-void init_textures()
-{
-	subtex_init(&texture_register, MAX_TEXTURE_SLOTS);
-
-	easy_board		= load_texture("../testbed/res/board_easy.png", GL_LINEAR, GL_CLAMP_TO_EDGE);
-	inter_board		= load_texture("../testbed/res/board_classic.png", GL_LINEAR, GL_CLAMP_TO_EDGE);
-	hard_board		= load_texture("../testbed/res/board_expert.png", GL_LINEAR, GL_CLAMP_TO_EDGE);
-	menu_texture	= load_texture("../testbed/res/main_menu.png", GL_LINEAR, GL_CLAMP_TO_EDGE);
-	options_texture	= load_texture("../testbed/res/options.png", GL_LINEAR, GL_CLAMP_TO_EDGE);
-	board_pieces	= load_texture("../testbed/res/spritemap.png", GL_LINEAR, GL_CLAMP_TO_EDGE);
-	button_restart	= load_texture("../testbed/res/button_restart.png", GL_LINEAR, GL_CLAMP_TO_EDGE);
-	game_over		= load_texture("../testbed/res/game_over.png", GL_LINEAR, GL_CLAMP_TO_EDGE);
-	win_overlay		= load_texture("../testbed/res/win_overlay.png", GL_LINEAR, GL_CLAMP_TO_EDGE);
-}
-
-void init_scenes()
-{
-    scenes[EASY]         = (SceneConfig){{-0.5f,-0.5f},{1.0f,1.0f}, easy_board}; //TO-DO: stop zoom-in making tex blurry
-    scenes[INTERMEDIATE] = (SceneConfig){{-1.0f,-1.0f},{2.0f,2.0f}, inter_board};
-    scenes[HARD]         = (SceneConfig){{-0.75f,-0.4f},{1.5f,0.8f}, hard_board};
-}
-
-enum sprites { ONE_TILE = 1, TWO_TILE, THREE_TILE, FOUR_TILE, FIVE_TILE, 
+enum sprites { CLOSED_TILE = 0, ONE_TILE, TWO_TILE, THREE_TILE, FOUR_TILE, FIVE_TILE, 
 				SIX_TILE, SEVEN_TILE, EIGHT_TILE, NINE_TILE, FLAG_TILE, BOMB_TILE};
 
-vec2 sprite_size	= {1, 1};
-
 uint16_t sprite_cell[][2] = {
-	[TILE_CLOSED] 	= {0, 2},
+	[CLOSED_TILE] 	= {0, 2},
 	[ONE_TILE]		= {1, 2},
 	[TWO_TILE]		= {2, 2},
 	[FOUR_TILE]		= {0, 1},
@@ -67,16 +31,55 @@ uint16_t sprite_cell[][2] = {
 	[BOMB_TILE]		= {3, 0}
 }; //NOTE: sprite sheet sampling starts from bottom left TO-DO: fix order
 
-void calc_norms(GameState* s, float* params[]) 
+void init_display(DisplayContext* dc)
 {
-	float cols 			= (float)s -> tiles_x;
-	float rows 			= (float)s -> tiles_y;
-	float width 		= (float)s -> width;
-	float height 		= (float)s -> height;
-	float grid_width 	= (float)s -> grid_width;
-	float grid_height 	= (float)s -> grid_height;
+	subtex_init(&dc -> texture_register, MAX_TEXTURE_SLOTS);
+
+	dc -> easy_board		= load_texture("../testbed/res/board_easy.png", GL_LINEAR, GL_CLAMP_TO_EDGE);
+	dc -> inter_board		= load_texture("../testbed/res/board_classic.png", GL_LINEAR, GL_CLAMP_TO_EDGE);
+	dc -> hard_board		= load_texture("../testbed/res/board_expert.png", GL_LINEAR, GL_CLAMP_TO_EDGE);
+	dc -> menu_texture		= load_texture("../testbed/res/main_menu.png", GL_LINEAR, GL_CLAMP_TO_EDGE);
+	dc -> options_texture	= load_texture("../testbed/res/options.png", GL_LINEAR, GL_CLAMP_TO_EDGE);
+	dc -> board_pieces		= load_texture("../testbed/res/spritemap.png", GL_LINEAR, GL_CLAMP_TO_EDGE);
+	dc -> button_restart	= load_texture("../testbed/res/button_restart.png", GL_LINEAR, GL_CLAMP_TO_EDGE);
+	dc -> game_over			= load_texture("../testbed/res/game_over.png", GL_LINEAR, GL_CLAMP_TO_EDGE);
+	dc -> win_overlay		= load_texture("../testbed/res/win_overlay.png", GL_LINEAR, GL_CLAMP_TO_EDGE);
+
+	dc -> sprite_cell_size[0] = 46.0f; 	dc -> sprite_cell_size[1] = 46.0f;
+	dc -> sprite_size[0] = 1.0f; 		dc -> sprite_size[1] = 1.0f;
+
+	for (int id = CLOSED_TILE; id <= BOMB_TILE; id++) 
+	{
+		bool ok = subtex_register_cell(&dc -> texture_register,
+									dc -> board_pieces,
+									sprite_cell[id],
+									dc -> sprite_cell_size,
+									dc -> sprite_size);
+		VALIDATE_LOG(ok, "Could not register sprite id %d", id);
+	}
+
+	dc -> bg_colour[0] = 0.57f;
+	dc -> bg_colour[1] = 0.51f;
+	dc -> bg_colour[2] = 0.55f;
+}
+
+void init_scenes(DisplayContext* dc, GameState* s)
+{
+    s -> scenes[EASY]         = (SceneConfig){{-0.5f,-0.5f},{1.0f,1.0f}, dc -> easy_board}; //TO-DO: stop zoom-in making tex blurry
+    s -> scenes[INTERMEDIATE] = (SceneConfig){{-1.0f,-1.0f},{2.0f,2.0f}, dc -> inter_board};
+    s -> scenes[HARD]         = (SceneConfig){{-0.75f,-0.4f},{1.5f,0.8f}, dc -> hard_board};
+}
+
+void calc_norms(DisplayContext* dc, float* params[]) 
+{
+	float cols 			= (float)dc -> tiles_x;
+	float rows 			= (float)dc -> tiles_y;
+	float width 		= (float)dc -> width;
+	float height 		= (float)dc -> height;
+	float grid_width 	= (float)dc -> grid_width;
+	float grid_height 	= (float)dc -> grid_height;
 	
-	float* size = s -> config_size;
+	float* size = dc -> board_size;
 
 	// Grid and image parameters
 	float tile_size_x = grid_width/cols - (float)LINE_THICKNESS;  				// tile size in pixels
@@ -101,65 +104,54 @@ void calc_norms(GameState* s, float* params[])
 	**params 	= grid_world_spacing_y; //UNCLEAR: do i need all this here?
 }
 
-static void draw_piece(GameState* s, struct Renderer* renderer, uint32_t sprite_map, int x, int y, vec2 p_pos, vec2 p_size)
+static void draw_piece(struct Renderer* renderer, DisplayContext* dc, GameState* s,  int x, int y, vec2 pos, vec2 size)
 {
 	VALIDATE_LOG(renderer, "Attempting to draw on an uninitialised renderer!");
 	VALIDATE_LOG(s -> board, "Application trying to access non-existant board memory!");
 	VALIDATE_LOG(s -> reveal_state, "Application is trying to access non-existant board memory!");
-	VALIDATE_LOG(valid_tile(s, x, y), "Invalid board coordinates: (%d, %d)", x, y);
+	VALIDATE_LOG(valid_tile(dc, x, y), "Invalid board coordinates: (%d, %d)", x, y);
 
-	if(s -> reveal_state[y][x] == TILE_CLOSED || s -> reveal_state[y][x] == TILE_UNFLAGGED)
+	if(s -> reveal_state[y][x] == IS_TILE_CLOSED || s -> reveal_state[y][x] == IS_TILE_UNFLAGGED)
 	{	
-		registerd = subtex_register_cell(&texture_register, sprite_map, sprite_cell[TILE_CLOSED], SPRITE_CELL_SIZE, sprite_size);
-		VALIDATE_LOG(registerd, "Could not register subtexture!");
-		DrawQuad(renderer, p_pos, p_size, sprite_map, get_uv(&texture_register, sprite_map, sprite_cell[TILE_CLOSED]));
-		return;
+		DrawQuad(renderer, pos, size, dc -> board_pieces, get_uv(&dc -> texture_register, dc -> board_pieces, sprite_cell[CLOSED_TILE]));
 	}
 	
-	if(s -> reveal_state[y][x] == TILE_FLAGGED)
+	else if(s -> reveal_state[y][x] == IS_TILE_FLAGGED)
 	{
-		DrawQuad(renderer, p_pos, p_size, sprite_map, get_uv(&texture_register, sprite_map, sprite_cell[TILE_CLOSED]));
-		registerd = subtex_register_cell(&texture_register, sprite_map, sprite_cell[FLAG_TILE], SPRITE_CELL_SIZE, sprite_size);
-		VALIDATE_LOG(registerd, "Could not register subtexture!");
-		DrawQuad(renderer, p_pos, p_size, sprite_map, get_uv(&texture_register, sprite_map, sprite_cell[FLAG_TILE]));
+		DrawQuad(renderer, pos, size, dc -> board_pieces, get_uv(&dc -> texture_register, dc -> board_pieces, sprite_cell[CLOSED_TILE]));
+		DrawQuad(renderer, pos, size, dc -> board_pieces, get_uv(&dc -> texture_register, dc -> board_pieces, sprite_cell[FLAG_TILE]));
 	} 
 	else if(s -> board[y][x] != BOMB)
 	{
 		if(s -> board[y][x] == EMPTY) return;
-		registerd = subtex_register_cell(&texture_register, sprite_map, sprite_cell[s -> board[y][x]], SPRITE_CELL_SIZE, sprite_size);
-		VALIDATE_LOG(registerd, "Could not register subtexture!");
-		DrawQuad(renderer, p_pos, p_size, sprite_map, get_uv(&texture_register, sprite_map, sprite_cell[s -> board[y][x]]));
+		DrawQuad(renderer, pos, size, dc -> board_pieces, get_uv(&dc -> texture_register, dc -> board_pieces, sprite_cell[s -> board[y][x]]));
 	}
 	else
-	{
-		registerd = subtex_register_cell(&texture_register, sprite_map, sprite_cell[BOMB_TILE], SPRITE_CELL_SIZE, sprite_size);
-		VALIDATE_LOG(registerd, "Could not register subtexture!");
-		DrawQuad(renderer, p_pos, p_size, sprite_map, get_uv(&texture_register, sprite_map, sprite_cell[BOMB_TILE]));
-	}	
+		DrawQuad(renderer, pos, size, dc -> board_pieces, get_uv(&dc -> texture_register, dc -> board_pieces, sprite_cell[BOMB_TILE]));
 }
 
 //This is an overlay that tells the user that the game is now complete and gives them the option to restart
-static void draw_overlay(struct Renderer* renderer, bool game_over_overlay) 
+static void draw_overlay(struct Renderer* renderer, DisplayContext* dc, GameState* s) 
 {	
 	// Dimensions for the white box
 	vec2 boxPos = {-10.0f/23.0f, -0.5f};  // Centered on screen
 	vec2 boxSize = {20.0f/23.0f, 14.0f/23.0f};   // Size of the box
 	
-	if(game_over_overlay)
-		DrawQuad(renderer, boxPos, boxSize, game_over, FULL_SAMPLE);
+	if(s -> game_over_overlay) // if s -> game_over
+		DrawQuad(renderer, boxPos, boxSize, dc -> game_over, FULL_SAMPLE);
 	else
-		DrawQuad(renderer, boxPos, boxSize, win_overlay, FULL_SAMPLE);
+		DrawQuad(renderer, boxPos, boxSize, dc -> win_overlay, FULL_SAMPLE);
 	
 	// Dimensions for the button
 	vec2 buttonPos = {-5.0f/23.0f, -0.4f};
 	vec2 buttonSize = {10.0f/23.0f, 3.0f/23.0f};
-	DrawQuad(renderer, buttonPos, buttonSize, button_restart, FULL_SAMPLE);
+	DrawQuad(renderer, buttonPos, buttonSize, dc -> button_restart, FULL_SAMPLE);
 }
 
-static void draw_board(GameState* s, struct Renderer* renderer, uint32_t sprite_map)
+static void draw_board(struct Renderer* renderer, DisplayContext* dc, GameState* s)
 {
-	uint8_t rows = s -> tiles_y;
-	uint8_t cols = s -> tiles_x;
+	uint8_t rows = dc -> tiles_y;
+	uint8_t cols = dc -> tiles_x;
 	
 	VALIDATE_LOG(renderer, "Attempting to draw on an uninitialised renderer!");
 	
@@ -167,12 +159,12 @@ static void draw_board(GameState* s, struct Renderer* renderer, uint32_t sprite_
 	float norm_tile_size_x, 	norm_tile_size_y;						  
 	float norm_spacing_x, 		norm_spacing_y;
 	
-	calc_norms(s, (float* []){&norm_grid_offset_x, &norm_grid_offset_y, &norm_tile_size_x,
+	calc_norms(dc, (float* []){&norm_grid_offset_x, &norm_grid_offset_y, &norm_tile_size_x,
 			&norm_tile_size_y, &norm_spacing_x, &norm_spacing_y}); //tiling function
 	
 	float xpos, ypos;
 	
-	vec2 p_pos, p_size = {norm_tile_size_x, norm_tile_size_y};
+	vec2 piece_pos, piece_size = {norm_tile_size_x, norm_tile_size_y};
 
 	// Loop to render tiles
 	for (uint8_t i = 1; i < rows + 1; i++) 
@@ -180,33 +172,33 @@ static void draw_board(GameState* s, struct Renderer* renderer, uint32_t sprite_
 		for (uint8_t j = 0; j < cols; j++) 
 		{			
 			// Compute normalized tile position
-			xpos = s -> config_pos[0] + norm_grid_offset_x + norm_spacing_x + j * (norm_tile_size_x + norm_spacing_x);
-			ypos = -s -> config_pos[1] - norm_grid_offset_y - i * (norm_tile_size_y + norm_spacing_y);
+			xpos = dc -> board_pos[0] + norm_grid_offset_x + norm_spacing_x + j * (norm_tile_size_x + norm_spacing_x);
+			ypos = -dc -> board_pos[1] - norm_grid_offset_y - i * (norm_tile_size_y + norm_spacing_y);
 
 			// Normalized size for the tile
-			p_pos[0] = xpos;
-			p_pos[1] = ypos;
+			piece_pos[0] = xpos;
+			piece_pos[1] = ypos;
 
-			draw_piece(s, renderer, sprite_map, j, i - 1, p_pos, p_size);
+			draw_piece(renderer, dc, s, j, i - 1, piece_pos, piece_size);
 		}
 	}
 }
 
-static void board_controller(GameState* s, struct Renderer* renderer, int choose_scene) 
+static void board_controller(struct Renderer* renderer, GameState* s, DisplayContext* dc, int choose_scene) 
 {
-   	s -> config_pos[0] = scenes[choose_scene].pos[0];
-	s -> config_pos[1] = scenes[choose_scene].pos[1];
+   	dc -> board_pos[0] = s -> scenes[choose_scene].pos[0];
+	dc -> board_pos[1] = s -> scenes[choose_scene].pos[1];
 
-	s -> config_size[0] = scenes[choose_scene].size[0];
-	s -> config_size[1] = scenes[choose_scene].size[1];
-	s -> config_texture = scenes[choose_scene].texture;
+	dc -> board_size[0] = s -> scenes[choose_scene].size[0];
+	dc -> board_size[1] = s -> scenes[choose_scene].size[1];
+	dc -> board_type = s -> scenes[choose_scene].texture;
 
 	DrawColour(renderer, (vec2){-1.0f, -1.0f}, (vec2){2.0f, 2.0f}, (vec4){0.57f, 0.51f, 0.55f, 1.0f});
-    DrawQuad(renderer, s -> config_pos, s -> config_size, s -> config_texture, FULL_SAMPLE);
-	draw_board(s, renderer, board_pieces);
+    DrawQuad(renderer, dc -> board_pos, dc -> board_size, dc -> board_type, FULL_SAMPLE);
+	draw_board(renderer, dc, s);
 }
 
-void scene_update(GameState* s)
+void scene_update(DisplayContext* dc, GameState* s)
 {	
 	// Fill only what you use
 	//float* uv = (float*)createTexCoords(board_pieces, sprite[i], sprite_size);
@@ -219,7 +211,7 @@ void scene_update(GameState* s)
     if (s -> game_state == RESTART)
 	{
 		REYNOLDS_DEBUG("@instance: reset implemented");
-		reset_board(s);
+		reset_board(dc, s);
 
 		s -> win		= false;
 		s -> lose		= false;
@@ -227,49 +219,49 @@ void scene_update(GameState* s)
     }
 }
 
-void scene_render(GameState* s, struct Renderer* renderer)
+void scene_render(struct Renderer* renderer, DisplayContext* dc, GameState* s)
 {
     ASSERT_LOG(renderer, "Attempting to draw on an uninitialised renderer!");
 
     if(s -> scene == MENU || s -> scene == OPTIONS)
 	{
-		s -> config_pos[0]  = scenes[DEFAULT].pos[0];
-		s -> config_pos[1]  = scenes[DEFAULT].pos[1];
-		s -> config_size[0] = scenes[DEFAULT].size[0];
-		s -> config_size[1]	= scenes[DEFAULT].size[1];
+		dc -> board_pos[0]  = s -> scenes[DEFAULT].pos[0];
+		dc -> board_pos[1]  = s -> scenes[DEFAULT].pos[1];
+		dc -> board_size[0] = s -> scenes[DEFAULT].size[0];
+		dc -> board_size[1] = s -> scenes[DEFAULT].size[1];
 	}
  
     switch (s -> scene)
     {
         case MENU:
-            DrawQuad(renderer, s -> config_pos, s -> config_size, menu_texture, FULL_SAMPLE);
+            DrawQuad(renderer, dc -> board_pos, dc -> board_size, dc -> menu_texture, FULL_SAMPLE);
             break;
 
         case OPTIONS:
-            DrawQuad(renderer, s -> config_pos, s -> config_size, options_texture, FULL_SAMPLE);
+            DrawQuad(renderer, dc -> board_pos, dc -> board_size, dc -> options_texture, FULL_SAMPLE);
             break;
 
         case EASY_BOARD:
-            setClearColour(s -> bg_colour);
-            board_controller(s, renderer, EASY);
+            setClearColour(dc -> bg_colour);
+            board_controller(renderer, s, dc, EASY);
             break;
 
         case INTER_BOARD:
-            setClearColour(s -> bg_colour);
-            board_controller(s, renderer, INTERMEDIATE);
+            setClearColour(dc -> bg_colour);
+            board_controller(renderer, s, dc, INTERMEDIATE);
             break;
 
         case HARD_BOARD:
-            setClearColour(s -> bg_colour);
-            board_controller(s, renderer, HARD);
+            setClearColour(dc -> bg_colour);
+            board_controller(renderer, s, dc, HARD);
             break;
     }
 
     if (s -> game_state == GAME_OVER)
-        draw_overlay(renderer, s -> game_over_overlay);
+        draw_overlay(renderer, dc, s);
 }
 
-void unload_textures()
+void unload_textures(DisplayContext* dc)
 {
-	subtex_shutdown(&texture_register);
+	subtex_shutdown(&dc -> texture_register);
 }

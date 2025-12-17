@@ -10,8 +10,8 @@ extern bool win;
 extern bool lose;
 
 //functions
-extern void reveal_tile(GameState* , int , int );
-extern bool valid_flag(GameState* , int , int );
-extern bool check_win(GameState*);
+extern void reveal_tile(DisplayContext* dc, GameState* s, int x, int y);
+extern bool valid_flag(DisplayContext* dc, GameState* s, int x, int y);
+extern bool check_win(DisplayContext* dc, GameState* s);
 
 #endif

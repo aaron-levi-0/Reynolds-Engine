@@ -4,13 +4,13 @@
 #include "common.h"
 #include "gamestate.h"
 
-int valid_tile(GameState* s,  int x, int y)
+int valid_tile(DisplayContext* dc, int x, int y)
 {
 	/* Function to check bounds */
-    return ((x >= 0 && x < (int) s -> tiles_x) && (y >= 0 && y < (int) s -> tiles_y));
+    return ((x >= 0 && x < (int) dc -> tiles_x) && (y >= 0 && y < (int) dc -> tiles_y));
 }
 
-void place_mines(GameState* s) 
+void place_mines(DisplayContext* dc, GameState* s) 
 {
 	int x, y;
 	
@@ -18,8 +18,8 @@ void place_mines(GameState* s)
 	{
          do {
 			 
-            x = rand() % s -> tiles_x;	
-            y = rand() % s -> tiles_y;
+            x = rand() % dc -> tiles_x;	
+            y = rand() % dc -> tiles_y;
 			
         } while (s -> board[y][x] == BOMB);	//y tiles are the height which are the rows
 		
@@ -32,7 +32,7 @@ void place_mines(GameState* s)
             for (int dy = -1; dy <= 1; dy++) 
 			{
                 int nx = x + dx, ny = y + dy;
-                if (valid_tile(s, nx, ny) && s -> board[ny][nx] != BOMB)
+                if (valid_tile(dc, nx, ny) && s -> board[ny][nx] != BOMB)
 					s -> board[ny][nx]++;
             }
         }
@@ -54,30 +54,30 @@ void delete_board(GameState* s)
 	s -> reveal_state 	= NULL;
 }
 
-void init_board_state(GameState* s, const uint32_t* config)
+void init_board_state(DisplayContext* dc, GameState* s, const uint32_t* config)
 {
 	if(s -> board || s -> reveal_state)
 		delete_board(s);
 
 	//TO-DO: need to check if len of configs[] is exactly 7*int?
-	s -> width       = (uint16_t)config[0];
-    s -> height      = (uint16_t)config[1];
-    s -> grid_width  = (uint16_t)config[2];
-    s -> grid_height = (uint16_t)config[3];
-    s -> tiles_x     = (uint8_t) config[4];
-    s -> tiles_y     = (uint8_t) config[5];
-    s -> num_bombs   = (uint16_t)config[6];
+	dc -> width       	= (uint16_t)config[0];
+    dc -> height      	= (uint16_t)config[1];
+    dc -> grid_width  	= (uint16_t)config[2];
+    dc -> grid_height 	= (uint16_t)config[3];
+    dc -> tiles_x     	= (uint8_t) config[4];
+    dc -> tiles_y     	= (uint8_t) config[5];
+    s -> num_bombs   	= (uint16_t)config[6];
 		
-	ASSERT_LOG(s -> width > 0, 		"board size is invalid!");
-	ASSERT_LOG(s -> height > 0, 		"board size is invalid!");
-	ASSERT_LOG(s -> grid_width > 0,	"grid size is invalid!");
-	ASSERT_LOG(s -> grid_height > 0,	"grid size is invalid!");
-	ASSERT_LOG(s -> tiles_x > 0, 		"number of tiles is invalid!");
-	ASSERT_LOG(s -> tiles_y > 0, 		"number of tiles is invalid!");
-	ASSERT_LOG(s -> num_bombs > 0, 	"number of bombs is invalid!");
+	ASSERT_LOG(dc -> width > 0, 		"board size is invalid!");
+	ASSERT_LOG(dc -> height > 0, 		"board size is invalid!");
+	ASSERT_LOG(dc -> grid_width > 0,	"grid size is invalid!");
+	ASSERT_LOG(dc -> grid_height > 0,	"grid size is invalid!");
+	ASSERT_LOG(dc -> tiles_x > 0, 		"number of tiles is invalid!");
+	ASSERT_LOG(dc -> tiles_y > 0, 		"number of tiles is invalid!");
+	ASSERT_LOG(s -> num_bombs > 0, 		"number of bombs is invalid!");
 	
-	const int rows = s -> tiles_y;
-    const int cols = s -> tiles_x;
+	const int rows = dc -> tiles_y;
+    const int cols = dc -> tiles_x;
     const int total_cells = rows * cols;
 	
 	//create row pointers
@@ -100,15 +100,15 @@ void init_board_state(GameState* s, const uint32_t* config)
 	s -> board 			= board_rows;
 	s -> reveal_state 	= reveal_state;
 
-	place_mines(s);
+	place_mines(dc, s);
 }
 
-void reset_board(GameState* s) 
+void reset_board(DisplayContext* dc, GameState* s) 
 {
 	// Clearing board state of bombs and numbers, closing all revealed tiles
-	memset(s -> board[0], 0, s -> tiles_y * s -> tiles_x * sizeof(int));
-	memset(s -> reveal_state[0], 0, s -> tiles_y * s -> tiles_x * sizeof(int));
+	memset(s -> board[0], 0, dc -> tiles_y * dc -> tiles_x * sizeof(int));
+	memset(s -> reveal_state[0], 0, dc -> tiles_y * dc -> tiles_x * sizeof(int));
   
-	REYNOLDS_VERBOSE("Resetting board: %d rows, %d cols", s -> tiles_y, s -> tiles_x);
-	place_mines(s);
+	REYNOLDS_VERBOSE("Resetting board: %d rows, %d cols", dc -> tiles_y, dc -> tiles_x);
+	place_mines(dc, s);
 }
