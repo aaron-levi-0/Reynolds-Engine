@@ -49,20 +49,18 @@
 #error "Unknown platform!"
 #endif
 
-#ifdef REN_EXPORT
-// Exports
-#ifdef _MSC_VER
-#define REN_API __declspec(dllexport)
+#if defined(_WIN32) || defined(__CYGWIN__)
+  #ifdef REN_EXPORT
+    #define REN_API __declspec(dllexport)
+  #else
+    #define REN_API __declspec(dllimport)
+  #endif
 #else
-#define REN_API __attribute__((visibility("default")))
-#endif // _MSC_VER
-#else  // REN_EXPORT
-// Imports
-#ifdef _MSC_VER
-#define REN_API __declspec(dllimport)
-#else
-#define REN_API
-#endif // _MSC_VER
-#endif // NOT REN_EXPORT
+  #ifdef REN_EXPORT
+    #define REN_API __attribute__((visibility("default")))
+  #else
+    #define REN_API
+  #endif
+#endif
 
 #endif // DEFINES_H

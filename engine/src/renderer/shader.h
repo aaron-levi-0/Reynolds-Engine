@@ -18,7 +18,7 @@ extern int GetUniformLocation(unsigned int , const char* );
 extern void bind_shader(unsigned int );
 extern void unbind_shader();
 
-extern void setIntArray(const char* , int* , uint32_t );
-extern void setMat4(const char* , mat4 );
+REN_API void setIntArray(const char* , int* , uint32_t );
+REN_API void setMat4(const char* , mat4 );
 
 #endif

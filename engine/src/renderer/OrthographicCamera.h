@@ -13,7 +13,7 @@ typedef struct {
 	float rotation;	//about z-axis only
 } OrthoCamera;
 
-extern void createOrthoCamera(float left, float right, float bottom, float top);
+REN_API void createOrthoCamera(float left, float right, float bottom, float top);
 
 extern void setOrthoProjection(float left, float right, float bottom, float top); 
 extern void setOrthoPosition(float* , bool );
@@ -23,6 +23,6 @@ extern void* getOrthoPosition();
 extern float getOrthoRotation();
 extern void* getOrthoProjection();
 extern void* getOrthoView();
-extern void* getPVMat();
+REN_API void* getPVMat();
 
 #endif

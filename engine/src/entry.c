@@ -3,8 +3,18 @@
 
 LayerStack* stack = NULL;
 
-bool Running 	= true;
-bool Minimised 	= false;
+static bool isRunning 	= true;
+static bool isMinimised = false;
+
+bool Running()
+{
+	return isRunning;
+}
+
+bool Minimised()
+{
+	return isMinimised;
+}
 
 void onEvent(Event* e)
 {
@@ -18,7 +28,7 @@ void onWindowClose(Event* e)
 {
 	if(e -> type == WindowClose)
 	{
-		Running = false;
+		isRunning = false;
 		destroy_layer_stack(stack);
 	}
 }

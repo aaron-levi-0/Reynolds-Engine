@@ -47,20 +47,20 @@ struct Statistics
 
 #define PUSH_ELEMENT(name, type) push_struct_element(#name, type, false, offsetof(Vertex, name))
 
-extern void setClearColour(vec3 );
-extern void render_clear();
+REN_API void setClearColour(vec3 );
+REN_API void render_clear();
 REN_API Layer create_render_layer(struct Renderer* );
 
-void setShaderPath(const char* );
+REN_API void setShaderPath(const char* );
 
-extern void BeginBatch(struct Renderer* );
-extern void EndBatch(struct Renderer* );
-extern void FlushBatch(struct Renderer* );
+REN_API void BeginBatch(struct Renderer* );
+REN_API void EndBatch(struct Renderer* );
+REN_API void FlushBatch(struct Renderer* );
 
-extern void DrawQuad(struct Renderer* , vec2 , vec2 , unsigned int , vec4 );
-extern void DrawColour(struct Renderer* , vec2 , vec2 , vec4 );
+REN_API void DrawQuad(struct Renderer* , vec2 , vec2 , unsigned int , vec4 );
+REN_API void DrawColour(struct Renderer* , vec2 , vec2 , vec4 );
 
-extern struct Statistics getRenderStats();
-extern void resetStats();
+REN_API struct Statistics getRenderStats();
+REN_API void resetStats();
 
 #endif

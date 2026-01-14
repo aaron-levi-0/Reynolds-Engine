@@ -6,14 +6,18 @@ unsigned int program;
 //must implement CreateShader function to free 'source' memory
 ShaderProgramSource parseFile(const char* filepath)
 {
+	ShaderProgramSource source = {0};
+
+	if(!filepath)
+	{
+		REYNOLDS_WARN("@shader: Shader path not set.");
+		return source;
+	}
+
 	FILE *fp = fopen(filepath, "r");
 	if(!fp)
-	{
-		perror(filepath);
-		exit(EXIT_FAILURE);
-	}
+		REYNOLDS_ERROR("@shader: Could not open file at path: %s", filepath);
 	
-	ShaderProgramSource source;
 	enum ShaderType{ NONE = -1, VERTEX, FRAGMENT };
 	
 	char line[BUFSIZ];

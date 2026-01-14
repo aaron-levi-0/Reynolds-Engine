@@ -22,7 +22,7 @@ typedef struct {
 REN_API void createOrthoCameraController(float);
 REN_API Layer create_camera_layer();
 
-extern void resetOrthoCamera();
+REN_API void resetOrthoCamera();
 
 REN_API void invert_camera(bool ); 
 REN_API void enable_translation(bool );

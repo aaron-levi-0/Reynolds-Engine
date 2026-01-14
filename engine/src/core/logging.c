@@ -27,7 +27,7 @@ void set_log_level(log_level level)
 }
 
 // Helper function to get the log level string with color
-static const char* get_colored_log_level(log_level level) {
+static const char* get_coloured_log_level(log_level level) {
     switch (level) {
         case LOG_LEVEL_FATAL: return COLOUR_FATAL "[FATAL]" COLOUR_RESET;
         case LOG_LEVEL_ERROR: return COLOUR_ERROR "[ERROR]" COLOUR_RESET;
@@ -61,7 +61,7 @@ void log_message(log_level level, const char* format, ...)
 {
     if (level > LOG_LEVEL) return;
     
-    const char* colored_log_level = get_colored_log_level(level);
+    const char* colored_log_level = get_coloured_log_level(level);
 
     // Buffer for the formatted log message
     char out_message[LOG_BUFSIZ - 500];

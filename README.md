@@ -20,8 +20,8 @@ A 2D Game Engine written in C
 
 ## Known Bugs
 
-* 
+* Camera zoom and translate still influence application during game over/ win screen
 
 ## Improvements
 
-* Sub-texture caching
+* 

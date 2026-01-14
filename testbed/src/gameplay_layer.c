@@ -15,6 +15,7 @@
 */
 static GameState* g_state = NULL;
 static DisplayContext* context = NULL;
+static struct Renderer* st_render = NULL;
 
 static void gameplay_update(float dt)
 {
@@ -43,14 +44,21 @@ static void gameplay_update(float dt)
     }
 }
 
-Layer create_gameplay_layer(DisplayContext* dc, GameState* state)
+static void gameplay_render()
 {
+   	scene_render(st_render, context, g_state);
+}
+
+Layer create_gameplay_layer(struct Renderer* r, DisplayContext* dc, GameState* state)
+{
+    st_render = r;
     g_state = state;
     context = dc;
     Layer gameplay_layer = {
         .name   = "Gameplay Layer",
         .id     = LAYER_GAMEPLAY,  
-        .update = gameplay_update
+        .update = gameplay_update,
+        .render = gameplay_render
     };
 
     return gameplay_layer;

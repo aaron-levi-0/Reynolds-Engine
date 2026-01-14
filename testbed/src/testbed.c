@@ -35,7 +35,7 @@ int main()
 	stack = create_layer_stack();
 	Layer render_layer 			= create_render_layer(&st_render);
 	Layer camera_layer 			= create_camera_layer();
-	Layer gameplay_layer 		= create_gameplay_layer(&context, &state);
+	Layer gameplay_layer 		= create_gameplay_layer(&st_render, &context, &state);
 	Layer close_window_layer 	= {"Window Close Layer", .id = LAYER_WINDOW_CLOSE, .onEvent = onWindowClose};
 
 	push_layer(stack, render_layer);
@@ -51,11 +51,14 @@ int main()
 	setZoomLimits(0.25f, 1.0f);
 
 	invert_camera(true);
-	enable_camera(false);
-	
+	enable_translation(true);
+	enable_zoom(true);
+	setLateralLimits(-0.5f, 0.5f); //or do enable_camera_events
+	disable_layer_event(&camera_layer);
+
 	/* Misc */
 	struct Statistics stats;
-	bool handled = false;
+	bool key_event_handled = false;
 	
 	float timestep;
 	srand(time(NULL));
@@ -67,29 +70,27 @@ int main()
 
 	/** RUNTIME PHASE **/
 
-    while (Running)
+    while (Running())
     {	
 		timestep = get_delta_time();	
 		resetStats();
 
-		if(!Minimised)
+		if(!Minimised())
 		{
 			render_clear();
 
-			if(state.game_state == PLAY)
-			{
-				enable_camera(true);
-				enable_rotation(false);
-				setLateralLimits(-0.5f, 0.5f);
-			}
+			if(state.game_state == PLAY && camera_layer.event_enabled == false)
+				enable_layer_event(&camera_layer);
+			else if(state.scene == MENU && camera_layer.event_enabled == true)
+				disable_layer_event(&camera_layer); //this doesnt do anything apparently
 
 			setMat4("u_ProjectionView", getPVMat());
 			
 			BeginBatch(&st_render);
 
 			update_layers(stack, timestep);
-			scene_render(&st_render, &context, &state);
-			
+			render_layers(stack);
+
 			EndBatch(&st_render);
 			FlushBatch(&st_render); //combine both and name 'ExitBatch' or 'ExecuteBatch'
 
@@ -97,12 +98,12 @@ int main()
 
 			if(isKeyPressed(GLFW_KEY_L))
 			{
-				if(!handled)
+				if(!key_event_handled)
 				{
 					REYNOLDS_DEBUG("Draw calls: %d\tQuad count: %d", stats.DrawCalls, stats.QuadCount);
-					handled = true;
+					key_event_handled = true;
 				}
-			} else handled = false;
+			} else key_event_handled = false;
 		}
 		stats = getRenderStats();
     }
