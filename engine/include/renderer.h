@@ -1,0 +1,36 @@
+#ifndef RENDERER_H
+#define RENDERER_H
+
+#include <stdint.h>
+#include <cglm/cglm.h>
+
+#include "core/defines.h"
+#include "../include/layers.h"
+
+struct Renderer;
+struct Statistics
+{
+	uint32_t DrawCalls;
+	uint32_t QuadCount;
+};
+
+REN_API struct Renderer* renderer_create();
+REN_API void renderer_destroy(struct Renderer* r);
+
+REN_API void setClearColour(vec3 );
+REN_API void render_clear();
+REN_API Layer create_render_layer(struct Renderer* );
+
+REN_API void setShaderPath(const char* );
+
+REN_API void BeginBatch(struct Renderer* );
+REN_API void EndBatch(struct Renderer* );
+REN_API void FlushBatch(struct Renderer* );
+
+REN_API void DrawQuad(struct Renderer* , vec2 , vec2 , unsigned int , vec4 );
+REN_API void DrawColour(struct Renderer* , vec2 , vec2 , vec4 );
+
+REN_API void getRenderStats(const struct Renderer* r, struct Statistics* out_stats);
+REN_API void resetStats(struct Renderer* r);
+
+#endif

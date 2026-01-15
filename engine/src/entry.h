@@ -1,7 +1,7 @@
 #ifndef ENTRY_H
 #define ENTRY_H
 
-#include "core/layers.h"
+#include "../include/layers.h"
 
 REN_API extern LayerStack*  stack;
 

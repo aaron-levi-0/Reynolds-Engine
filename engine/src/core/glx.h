@@ -15,6 +15,7 @@
 
 #include "platform/platform.h"
 #include "core/defines.h"
-#include "core/logging.h"
+
+#include "../include/logging.h"
 
 #endif // GLX_H

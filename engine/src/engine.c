@@ -1,5 +1,9 @@
 #include "engine.h"
 
+#include <GL/glew.h>
+#include <GLFW/glfw3.h>
+#include <cglm/version.h>
+
 void vendor_dependencies()
 {
 	REYNOLDS_INFO("Status: Using GLEW %s", glewGetString(GLEW_VERSION));

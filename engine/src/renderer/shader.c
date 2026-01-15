@@ -1,4 +1,4 @@
-#include "renderer/shader.h"
+#include "renderer/shader_internals.h"
 
 struct cache* cache = NULL;
 unsigned int program;

@@ -1,5 +1,7 @@
 #include "key_event.h"
 
+#include <stdio.h>
+
 KeyEvent keyEvent;
 Event* event = &keyEvent.event;
 

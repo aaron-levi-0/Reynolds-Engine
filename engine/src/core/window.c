@@ -1,10 +1,14 @@
-#include "window.h"
+#include "core/window_internals.h"
 
 #include "events/app_event.h"
 #include "events/key_event.h"
 #include "events/mouse_event.h"
-#include "core/layers.h"
+#include "core/layers_internals.h"
 #include "stb_image.h"
+
+#include <GLFW/glfw3.h>
+#include <stdlib.h>
+#include "../include/logging.h"
 
 Window* window 			= NULL;
 GLFWwindow* g_window	= NULL;
@@ -128,7 +132,7 @@ static void init_window()
 	if (!GLFW_Initialised)	//NOTE: we may want to init multiple windows but only need to init GLFW once
 	{
 		int success = glfwInit();
-		ASSERT_LOG(success, "Failed to initialize GLFW!");
+		ASSERT_FATAL(success, "Failed to initialize GLFW!");
 		glfwSetErrorCallback(ErrorCallback);
 		GLFW_Initialised = true;
 	}
@@ -155,7 +159,7 @@ static void init_window()
 Window* create_window(const char* title, unsigned int width, unsigned int height)
 {
 	window = malloc(sizeof(Window));
-	ASSERT_LOG(window, "Failed to allocated memory for window!");
+	ASSERT_FATAL(window, "Failed to allocated memory for window!");
 	
 	window -> title 	= title;
 	window -> width 	= width;

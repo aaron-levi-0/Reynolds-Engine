@@ -1,9 +1,6 @@
 #ifndef DEFINES_H
 #define DEFINES_H
 
-#define ASSERT(_e, ...) 	if(!(_e)) { fprintf(stderr, __VA_ARGS__); exit(EXIT_FAILURE); } 
-#define VALIDATE(_e, ...) 	if(!(_e)) {__VA_OPT__( fprintf(stderr, __VA_ARGS__);) return;} 
-
 #define NOT_USED		0
 #define BIT(x) 			(1 << x)
 #define MAX(x,y)		(x > y)? x:y

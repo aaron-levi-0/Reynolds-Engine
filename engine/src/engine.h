@@ -1,15 +1,18 @@
 #ifndef ENGINE_H
 #define ENGINE_H
 
-#include <cglm/version.h>
 
-#include "core/logging.h"
-#include "core/window.h"
-#include "core/layers.h"
-#include "core/timestep.h"
-#include "renderer/renderer.h"
-#include "OrthoCameraController.h"
+#include "../include/logging.h"
+#include "../include/OrthographicCamera.h"
+#include "../include/OrthoCameraController.h"
 #include "entry.h"
+
+#include "../include/layers.h"
+#include "../include/renderer.h"
+#include "../include/shader.h"
+#include "../include/input.h"
+#include "../include/timestep.h"
+#include "../include/window.h"
 
 REN_API void vendor_dependencies();
 

@@ -15,7 +15,7 @@ REM echo "Files:" %cFilenames%
 REM Configuration
 SET assembly=engine
 SET compilerFlags=-g -Wvarargs -Wall
-SET includeFlags=-Isrc -Ivendor
+SET includeFlags=-Isrc -Ivendor 
 SET linkerFlags=-shared -lglfw3 -lopengl32 -lgdi32 -luser32 -lkernel32 -lglew32
 SET defines=-DDEBUG_VERSION -DREN_EXPORT -D_CRT_SECURE_NO_WARNINGS 
 

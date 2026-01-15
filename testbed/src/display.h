@@ -2,7 +2,6 @@
 #define DISPLAY_H
 
 #include <stdbool.h>
-#include <renderer/renderer.h>
 
 #include "gamestate.h"
 /* Manages the display of the game to the user. */

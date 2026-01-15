@@ -7,7 +7,7 @@ int load_board_config(const char* filepath, const char* board_name, unsigned int
 {
     FILE* file = fopen(filepath, "r");
 	
-	ASSERT(file, "@file: Error: Could not open file %s", filepath);
+	ASSERT_FATAL(file, "@file: Error: Could not open file %s", filepath);
 
     fseek(file, 0, SEEK_END);
     long length = ftell(file);
@@ -28,7 +28,7 @@ int load_board_config(const char* filepath, const char* board_name, unsigned int
     cJSON* root = cJSON_Parse(data);
     free(data);
 
-    ASSERT_LOG(root, "@file: Error: JSON parsing failed");
+    ASSERT_FATAL(root, "@file: Error: JSON parsing failed");
 
     cJSON* board_config = cJSON_GetObjectItem(root, board_name);
     if (!board_config) {

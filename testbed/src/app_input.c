@@ -1,8 +1,7 @@
 #include "app_input.h"
 
 #include "common.h"
-#include <core/window.h>
-#include <core/input.h>
+#include <../include/window.h>
 #include <OrthoCameraController.h>
 
 #include "game_logic.h"
@@ -156,7 +155,7 @@ static void mouse_during_options(DisplayContext* dc, GameState* s, double xpos, 
 		s -> game_state = PLAY;
 		s -> scene 		= EASY_BOARD;
 		
-		ASSERT_LOG(load_board_config(BOARD_CONFIG_PATH, "easy", config), "Could not load board config.");
+		ASSERT_FATAL(load_board_config(BOARD_CONFIG_PATH, "easy", config), "Could not load board config.");
 		
 		init_board_state(dc, s, config);
 		
@@ -165,7 +164,7 @@ static void mouse_during_options(DisplayContext* dc, GameState* s, double xpos, 
 		s -> game_state = PLAY;
 		s -> scene 		= INTER_BOARD;
 		
-		ASSERT_LOG(load_board_config(BOARD_CONFIG_PATH, "intermediate", config), "Could not load board config.");
+		ASSERT_FATAL(load_board_config(BOARD_CONFIG_PATH, "intermediate", config), "Could not load board config.");
 		
 		init_board_state(dc, s, config);
 							
@@ -174,7 +173,7 @@ static void mouse_during_options(DisplayContext* dc, GameState* s, double xpos, 
 		s -> game_state = PLAY;
 		s -> scene 		= HARD_BOARD;
 		
-		ASSERT_LOG(load_board_config(BOARD_CONFIG_PATH, "hard", config), "Could not load board config.");
+		ASSERT_FATAL(load_board_config(BOARD_CONFIG_PATH, "hard", config), "Could not load board config.");
 		
 		init_board_state(dc, s, config);
 	}

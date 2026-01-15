@@ -6,7 +6,9 @@
 
 #include <stdbool.h>
 #include <cglm/cglm.h>
-#include <core/logging.h>
+#include <../include/logging.h>
+
+#include <engine.h>
 
 #define SCREEN_WIDTH	970
 #define SCREEN_HEIGHT	970

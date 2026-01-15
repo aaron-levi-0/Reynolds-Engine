@@ -1,12 +1,24 @@
-#include "renderer/renderer.h"
+#include "renderer/renderer_internals.h"
 
-#include "core/window.h"
+#include "core/window_internals.h"
 #include "events/event.h"
 #include "renderer/buffer.h"
-
-struct Statistics stats = {0};
+#include "renderer/shader_internals.h"
 
 char* SHADER_PATH = NULL;
+
+struct Renderer* renderer_create() 
+{
+    struct Renderer* r = malloc(sizeof(struct Renderer));
+    memset(r, 0, sizeof(*r));
+    return r;
+}
+
+void renderer_destroy(struct Renderer* r) 
+{
+    if (!r) return;
+    free(r);
+}
 
 void setShaderPath(const char* path)
 {
@@ -67,12 +79,12 @@ static void MallocDraw(struct Renderer* renderer)
 		without any texture samples.
 	*/
 	
-	ASSERT_LOG(!renderer -> QuadBuffer, "@renderer: 'QuadBuffer' initialised twice.");
+	ASSERT_FATAL(!renderer -> QuadBuffer, "@renderer: 'QuadBuffer' initialised twice.");
 	
 	size_t VertexSize = sizeof(Vertex);
 	renderer -> QuadBuffer 	= malloc(VertexSize * MAX_VERTICIES);
 	
-	ASSERT_LOG(renderer -> QuadBuffer, "@renderer: Failed to allocate 'QuadBuffer' memory.");
+	ASSERT_FATAL(renderer -> QuadBuffer, "@renderer: Failed to allocate 'QuadBuffer' memory.");
 
 	/* Vertex Array and Vertex Buffer */
    	renderer -> QuadVA = createVA();
@@ -188,7 +200,7 @@ Layer create_render_layer(struct Renderer* r)
 
 void BeginBatch(struct Renderer* renderer)
 {
-	ASSERT(renderer -> QuadBuffer, "in renderer.c: failed to find 'QuadBuffer'");
+	ASSERT_FATAL(renderer -> QuadBuffer, "in renderer.c: failed to find 'QuadBuffer'");
 	renderer -> QuadBufferPtr = renderer -> QuadBuffer;
 }
 
@@ -208,7 +220,7 @@ void FlushBatch(struct Renderer* renderer)
 	
 	renderer -> IndexCount 			= 0;
 	renderer -> TextureSlotIndex 	= 1;
-	stats.DrawCalls++;
+	renderer -> stats.DrawCalls++;
 }
 
 //unable to pass by reference, position loses structure? also note texcoords structure is {(x,y)_beginning, (x,y)_end} // can use tex size instead?
@@ -284,7 +296,7 @@ void DrawQuad(struct Renderer* renderer, vec2 position, vec2 size, unsigned int 
     renderer -> QuadBufferPtr = QuadBufferPtr;
     renderer -> IndexCount += 6;
 	
-	stats.QuadCount++;
+	renderer -> stats.QuadCount++;
 }
 
 void DrawColour(struct Renderer* renderer, vec2 position, vec2 size, vec4 colour) 
@@ -315,15 +327,17 @@ void DrawColour(struct Renderer* renderer, vec2 position, vec2 size, vec4 colour
     renderer -> QuadBufferPtr = QuadBufferPtr;
     renderer -> IndexCount += 6;
 	
-	stats.QuadCount++;
+	renderer -> stats.QuadCount++;
 }
 
-struct Statistics getRenderStats()
+void resetStats(struct Renderer* r) 
 {
-	return stats;
+    if (!r) return;
+    memset(&r -> stats, 0, sizeof(r -> stats));
 }
 
-void resetStats()
+void getRenderStats(const struct Renderer* r, struct Statistics* out) 
 {
-	memset(&stats, 0, sizeof(struct Statistics));
+    if (!r || !out) return;
+    *out = r -> stats;
 }

@@ -1,5 +1,7 @@
 #include "app_event.h"
 
+#include <stdio.h>
+
 static WindowEvent windowEvent;
 static Event* event = &windowEvent.event;
 

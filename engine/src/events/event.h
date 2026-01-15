@@ -1,7 +1,8 @@
 #ifndef EVENT_H
 #define EVENT_H
 
-#include "core/glx.h"
+#include <stdbool.h>
+#include "core/defines.h"
 
 #define EVENT_CLASS_TYPE(type) static const char* type##Event_getName() { return #type; }
 

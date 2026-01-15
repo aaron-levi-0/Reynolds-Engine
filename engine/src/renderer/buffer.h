@@ -1,7 +1,8 @@
 #ifndef BUFFER_H_
 #define BUFFER_H_
 
-#include "core/glx.h"
+#include <stdbool.h>
+#include <stdint.h>
 
 typedef enum {
     TYPE_FLOAT,

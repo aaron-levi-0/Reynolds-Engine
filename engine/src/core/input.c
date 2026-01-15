@@ -1,6 +1,7 @@
-#include "input.h"
+#include "../include/input.h"
 
-#include "core/window.h"
+#include "core/window_internals.h"
+#include <GLFW/glfw3.h>
 
 static double xpos, ypos;
 

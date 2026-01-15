@@ -4,16 +4,16 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "core/logging.h"
+#include "../include/logging.h"
 
 #define VEC_GROWTH_FACTOR 2
 #define VEC_SHRINK_FACTOR 0.5
 
 void vector_init(Vector* vec, size_t elem_size, size_t initial_capacity) 
 {
-    ASSERT_LOG(vec, "Must provide a valid vector pointer");
+    ASSERT_FATAL(vec, "Must provide a valid vector pointer");
     vec -> data = malloc(initial_capacity * elem_size);
-    ASSERT_LOG(vec-> data, "Memory allocation failed");
+    ASSERT_FATAL(vec-> data, "Memory allocation failed");
 
     vec -> size = 0;
     vec -> capacity = initial_capacity;

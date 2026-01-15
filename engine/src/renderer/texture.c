@@ -54,7 +54,7 @@ uint32_t load_texture(const char* path, uint32_t filter, uint32_t wrap)
 	uint32_t textureID;
 	unsigned char* LocalBuffer = stbi_load(path, &width, &height, &BPP, STBI_rgb_alpha);
 	
-	ASSERT_LOG(LocalBuffer,  "@textures: Failed to load texture %s", stbi_failure_reason());
+	ASSERT_FATAL(LocalBuffer,  "@textures: Failed to load texture %s", stbi_failure_reason());
 	
 	glCreateTextures(GL_TEXTURE_2D, 1, &textureID);
 	glBindTexture(GL_TEXTURE_2D, textureID);

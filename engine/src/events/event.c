@@ -1,5 +1,7 @@
 #include "event.h"
 
+#include <stdlib.h>
+
 // Pointer to the most recent event
 static Event* currentEvent = NULL;
 

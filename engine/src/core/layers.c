@@ -1,4 +1,9 @@
-#include "layers.h"
+#include "core/layers_internals.h"
+
+#include <stdlib.h>
+#include <stdint.h>
+
+#include "../include/logging.h"
 
 #define INITIAL_LAYER_CAPACITY 10
 

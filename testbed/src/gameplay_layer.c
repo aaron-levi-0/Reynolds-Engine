@@ -1,6 +1,5 @@
 #include "gameplay_layer.h"
 
-#include <core/input.h>     // setMousePos()
 #include <entry.h>          // bool Minimised
 
 #include "common.h"

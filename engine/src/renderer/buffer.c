@@ -1,7 +1,13 @@
-#include <stdalign.h>
-
 #include "renderer/buffer.h"
+
+#include <GL/glew.h>
+#include <GLFW/glfw3.h>
+#include <stdalign.h>
+#include <stdlib.h>
+#include <string.h>
+
 #include "utils/vector.h"
+#include "../include/logging.h"
 
 #define VEC_INIT_CAPACITY 4
 
@@ -23,7 +29,7 @@ static uint32_t data_type_size(bufferDataType type)
         case TYPE_MAT3:     return (3 * 3) * float_size;
     }
 
-    ASSERT_LOG(false, "@buffer: Unknown data type!");
+    ASSERT_FATAL(false, "@buffer: Unknown data type!");
 }
 
 //can't imagine a type with over 65 000 components
@@ -38,7 +44,7 @@ static uint16_t getComponentCount(bufferDataType type)
         case TYPE_MAT3:    return 3; // 3 * float[3]
     }
 
-    ASSERT_LOG(false, "@buffer: Unknown data type!");
+    ASSERT_FATAL(false, "@buffer: Unknown data type!");
 }
 
 static int OpenGL_convert_type(bufferDataType type)
@@ -52,7 +58,7 @@ static int OpenGL_convert_type(bufferDataType type)
         case TYPE_MAT3:     return GL_FLOAT;
     }
 
-    ASSERT_LOG(false, "@buffer: Unknown data type!");
+    ASSERT_FATAL(false, "@buffer: Unknown data type!");
 }
 
 void create_buffer_layout()
@@ -64,7 +70,7 @@ void push_buffer_element(const char* name, bufferDataType type, bool normalisati
 {   
     uint8_t name_size = strlen(name) + 1;
     element.name = malloc(name_size);
-    ASSERT_LOG(element.name, "@buffer: Failed to allocate memory for buffer element name.");
+    ASSERT_FATAL(element.name, "@buffer: Failed to allocate memory for buffer element name.");
     
     strncpy(element.name, name, name_size);
     
@@ -80,7 +86,7 @@ void push_struct_element(const char* name, bufferDataType type, bool normalisati
 {   
     uint8_t name_size = strlen(name) + 1;
     element.name = malloc(name_size);
-    ASSERT_LOG(element.name, "@buffer: Failed to allocate memory for buffer element name.");
+    ASSERT_FATAL(element.name, "@buffer: Failed to allocate memory for buffer element name.");
     
     strncpy(element.name, name, name_size);
     

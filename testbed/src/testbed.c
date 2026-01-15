@@ -29,13 +29,13 @@ int main()
 	state.scene 		= MENU;
 
 	/* Initialise and load stack defined renderer */
-	struct Renderer st_render; 
+	struct Renderer* renderer = renderer_create(); 
 
 	/* Initialise Layer Stack and Layers */
 	stack = create_layer_stack();
-	Layer render_layer 			= create_render_layer(&st_render);
+	Layer render_layer 			= create_render_layer(renderer);
 	Layer camera_layer 			= create_camera_layer();
-	Layer gameplay_layer 		= create_gameplay_layer(&st_render, &context, &state);
+	Layer gameplay_layer 		= create_gameplay_layer(renderer, &context, &state);
 	Layer close_window_layer 	= {"Window Close Layer", .id = LAYER_WINDOW_CLOSE, .onEvent = onWindowClose};
 
 	push_layer(stack, render_layer);
@@ -73,7 +73,7 @@ int main()
     while (Running())
     {	
 		timestep = get_delta_time();	
-		resetStats();
+		resetStats(renderer);
 
 		if(!Minimised())
 		{
@@ -86,13 +86,13 @@ int main()
 
 			setMat4("u_ProjectionView", getPVMat());
 			
-			BeginBatch(&st_render);
+			BeginBatch(renderer);
 
 			update_layers(stack, timestep);
 			render_layers(stack);
 
-			EndBatch(&st_render);
-			FlushBatch(&st_render); //combine both and name 'ExitBatch' or 'ExecuteBatch'
+			EndBatch(renderer);
+			FlushBatch(renderer); //combine both and name 'ExitBatch' or 'ExecuteBatch'
 
 			update_window();
 
@@ -105,7 +105,7 @@ int main()
 				}
 			} else key_event_handled = false;
 		}
-		stats = getRenderStats();
+		getRenderStats(renderer, &stats);
     }
 	
 	//** SHUTDOWN PHASE **//
@@ -116,5 +116,6 @@ int main()
 	if(state.board)
 		delete_board(&state);
 	
+	renderer_destroy(renderer);
     return 0;
 }

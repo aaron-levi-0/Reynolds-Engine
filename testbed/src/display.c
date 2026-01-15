@@ -221,7 +221,7 @@ void scene_update(DisplayContext* dc, GameState* s)
 
 void scene_render(struct Renderer* renderer, DisplayContext* dc, GameState* s)
 {
-    ASSERT_LOG(renderer, "Attempting to draw on an uninitialised renderer!");
+    ASSERT_FATAL(renderer, "Attempting to draw on an uninitialised renderer!");
 
     if(s -> scene == MENU || s -> scene == OPTIONS)
 	{

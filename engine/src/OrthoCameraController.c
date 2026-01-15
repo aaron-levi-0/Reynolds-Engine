@@ -1,9 +1,11 @@
-#include "OrthoCameraController.h"
+#include "OrthoCameraControllerInternals.h"
 
 #include "core/glx.h"
-#include "core/window.h"
+#include "../include/window.h"
 #include "events/event.h"
 #include "events/mouse_event.h"
+
+#include "../include/input.h"
 
 OrthographicCameraController controller;
 

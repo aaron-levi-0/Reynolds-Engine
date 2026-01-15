@@ -1,5 +1,10 @@
+#include <GL/glew.h>
+
 #include "entry.h"
-#include "core/window.h"
+#include "core/layers_internals.h"
+#include "../include/window.h"
+
+#include "../include/logging.h"
 
 LayerStack* stack = NULL;
 
@@ -18,8 +23,8 @@ bool Minimised()
 
 void onEvent(Event* e)
 {
-	VALIDATE(e);
-	VALIDATE(!e -> handled);
+	VALIDATE_LOG(e);
+	VALIDATE_LOG(!e -> handled);
 	handle_layer_events(stack, e);
 	e -> handled = true;
 }
@@ -40,5 +45,5 @@ void engine_init(const char* title, int w, int h)
 
 	/* Initialising GLEW*/
     GLenum err = glewInit();
-    ASSERT_LOG(err == GLEW_OK, "GLEW Error: %s", glewGetErrorString(err));
+    ASSERT_FATAL(err == GLEW_OK, "GLEW Error: %s", glewGetErrorString(err));
 }

@@ -4,7 +4,7 @@
 #include <stdarg.h>
 #include <time.h>
 
-#include "logging.h"
+#include "../include/logging.h"
 
 #define LOG_BUFSIZ 32000
 

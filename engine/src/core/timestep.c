@@ -1,4 +1,7 @@
-#include "timestep.h"
+#include "../include/timestep.h"
+
+#include <stdbool.h>
+#include <GLFW/glfw3.h>
 
 typedef struct {
     float time;

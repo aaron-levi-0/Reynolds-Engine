@@ -85,7 +85,7 @@ bool subtex_register_cell(Vector* reg,
                         vec2 cell_size,
                         vec2 sample_size)
 {
-    ASSERT_LOG(reg && textureID > 0, "subtex_register_cell: invalid args");
+    ASSERT_FATAL(reg && textureID > 0, "subtex_register_cell: invalid args");
 
     uint16_t col = (uint16_t) cell_pos[0];  
     uint16_t row = (uint16_t) cell_pos[1];

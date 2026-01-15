@@ -37,7 +37,7 @@ bool valid_flag(DisplayContext* dc, GameState* s, int x, int y)
 		is already flagged, it is marked as unflagged.
 	*/
 	
-	ASSERT_LOG(s -> reveal_state, "Application trying to access non-existant board memory!");
+	ASSERT_FATAL(s -> reveal_state, "Application trying to access non-existant board memory!");
 	
 	if (!valid_tile(dc, x, y)) return false;
 	
@@ -58,8 +58,8 @@ bool check_win(DisplayContext* dc, GameState* s)
     int** board        = s -> board;
     int** reveal_state = s -> reveal_state;
 
-    ASSERT_LOG(board, "Application trying to access non-existant board memory!");
-    ASSERT_LOG(reveal_state, "Application trying to access non-existant board memory!");
+    ASSERT_FATAL(board, "Application trying to access non-existant board memory!");
+    ASSERT_FATAL(reveal_state, "Application trying to access non-existant board memory!");
 
     const uint8_t rows = dc -> tiles_y;
     const uint8_t cols = dc -> tiles_x;

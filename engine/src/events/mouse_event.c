@@ -1,5 +1,7 @@
 #include "mouse_event.h"
 
+#include <stdio.h>
+
 MouseEvent mouseEvent;
 static char buffer[256];
 

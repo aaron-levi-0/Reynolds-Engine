@@ -1,4 +1,4 @@
-#include "renderer/OrthographicCamera.h"
+#include "renderer/OrthoCameraInternals.h"
 
 OrthoCamera camera;
 
