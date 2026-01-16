@@ -1,7 +1,10 @@
 #ifndef WINDOW_H
 #define WINDOW_H
 
-#include "events/event.h"
+#include <stdbool.h>
+
+#include "defines.h"
+#include "event_include.h"
 
 //this is used to generalise the window process so that the application is not entirely
 //dependent on glfw. The variables are passed onto glfw if called upon by the library.

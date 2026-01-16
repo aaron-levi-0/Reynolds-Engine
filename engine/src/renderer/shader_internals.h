@@ -1,7 +1,7 @@
 #ifndef SHADER_INTERNALS_H
 #define SHADER_INTERNALS_H
 
-#include "../include/shader.h"
+#include "shader.h"
 #include "utils/hash.h"
 
 #define		CACHE_LIMIT		100

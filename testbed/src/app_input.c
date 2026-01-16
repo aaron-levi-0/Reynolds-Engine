@@ -1,7 +1,7 @@
 #include "app_input.h"
 
 #include "common.h"
-#include <../include/window.h>
+#include <window.h>
 #include <OrthoCameraController.h>
 
 #include "game_logic.h"

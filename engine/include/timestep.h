@@ -1,7 +1,7 @@
 #ifndef TIMESTEP_H
 #define TIMESTEP_H
 
-#include "core/defines.h"
+#include "defines.h"
 
 REN_API float get_time();
 REN_API float get_delta_time();

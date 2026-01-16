@@ -4,8 +4,8 @@
 #include <stdint.h>
 #include <cglm/cglm.h>
 
-#include "core/defines.h"
-#include "../include/layers.h"
+#include "defines.h"
+#include "layers.h"
 
 struct Renderer;
 struct Statistics
@@ -17,18 +17,18 @@ struct Statistics
 REN_API struct Renderer* renderer_create();
 REN_API void renderer_destroy(struct Renderer* r);
 
-REN_API void setClearColour(vec3 );
+REN_API void SetClearColour(vec3 );
 REN_API void render_clear();
 REN_API Layer create_render_layer(struct Renderer* );
 
-REN_API void setShaderPath(const char* );
+REN_API void SetShaderPath(const char* );
 
 REN_API void BeginBatch(struct Renderer* );
 REN_API void EndBatch(struct Renderer* );
 REN_API void FlushBatch(struct Renderer* );
 
-REN_API void DrawQuad(struct Renderer* , vec2 , vec2 , unsigned int , vec4 );
-REN_API void DrawColour(struct Renderer* , vec2 , vec2 , vec4 );
+REN_API void DrawQuad(struct Renderer* renderer, vec2 position, vec2 size, unsigned int textureID, vec4 tex_coords);
+REN_API void DrawColour(struct Renderer* renderer, vec2 position, vec2 size, vec4 colour);
 
 REN_API void getRenderStats(const struct Renderer* r, struct Statistics* out_stats);
 REN_API void resetStats(struct Renderer* r);

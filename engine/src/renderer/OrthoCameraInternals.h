@@ -1,7 +1,7 @@
 #ifndef ORTHOCAMERAINTERNALS_H
 #define ORTHOCAMERAINTERNALS_H
 
-#include "../include/OrthographicCamera.h"
+#include "OrthographicCamera.h"
 #include <cglm/cglm.h>
 
 typedef struct {

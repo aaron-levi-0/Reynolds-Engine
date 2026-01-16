@@ -1,10 +1,10 @@
 #include <GL/glew.h>
 
-#include "entry.h"
+#include "entry_internals.h"
 #include "core/layers_internals.h"
-#include "../include/window.h"
+#include "window.h"
 
-#include "../include/logging.h"
+#include "logging.h"
 
 LayerStack* stack = NULL;
 
@@ -38,7 +38,7 @@ void onWindowClose(Event* e)
 	}
 }
 
-void engine_init(const char* title, int w, int h)
+void EngineInit(const char* title, int w, int h)
 {
     create_window(title, w, h);
 	SetEventCallback(&onEvent);
@@ -46,4 +46,12 @@ void engine_init(const char* title, int w, int h)
 	/* Initialising GLEW*/
     GLenum err = glewInit();
     ASSERT_FATAL(err == GLEW_OK, "GLEW Error: %s", glewGetErrorString(err));
+
+}
+
+LayerStack* InitLayerStack()
+{
+	stack = create_layer_stack();
+	ASSERT_FATAL(!stack, "@engine: failed to create layer stack!");
+	return stack;
 }

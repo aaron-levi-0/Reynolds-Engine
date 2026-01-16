@@ -1,8 +1,11 @@
 #ifndef LAYERS_H    
 #define LAYERS_H
 
-#include "events/event.h"
-#include "utils/vector.h"
+#include <stdbool.h>
+
+#include "defines.h"
+#include "event_include.h"
+#include "vector_include.h"
 
 // Layer structure
 typedef enum LayerID {
@@ -26,9 +29,7 @@ typedef struct {
     bool event_enabled;
 } Layer;
 
-typedef struct {
-    Vector layers;
-} LayerStack;
+typedef Vector LayerStack;
 
 REN_API LayerStack* create_layer_stack();
 REN_API void destroy_layer_stack(LayerStack* );

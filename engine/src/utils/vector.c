@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "../include/logging.h"
+#include "logging.h"
 
 #define VEC_GROWTH_FACTOR 2
 #define VEC_SHRINK_FACTOR 0.5

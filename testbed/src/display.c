@@ -4,9 +4,9 @@
 #include "game_logic.h"
 #include "board.h"
 
-#include <renderer/texture.h>
+#include <texture.h>
 #include <OrthoCameraController.h>
-#include <renderer/subTexture.h>
+#include <subTexture.h>
 
 vec4 FULL_SAMPLE = {0.0f, 0.0f, 1.0f, 1.0f};
 
@@ -35,15 +35,15 @@ void init_display(DisplayContext* dc)
 {
 	subtex_init(&dc -> texture_register, MAX_TEXTURE_SLOTS);
 
-	dc -> easy_board		= load_texture("../testbed/res/board_easy.png", GL_LINEAR, GL_CLAMP_TO_EDGE);
-	dc -> inter_board		= load_texture("../testbed/res/board_classic.png", GL_LINEAR, GL_CLAMP_TO_EDGE);
-	dc -> hard_board		= load_texture("../testbed/res/board_expert.png", GL_LINEAR, GL_CLAMP_TO_EDGE);
-	dc -> menu_texture		= load_texture("../testbed/res/main_menu.png", GL_LINEAR, GL_CLAMP_TO_EDGE);
-	dc -> options_texture	= load_texture("../testbed/res/options.png", GL_LINEAR, GL_CLAMP_TO_EDGE);
-	dc -> board_pieces		= load_texture("../testbed/res/spritemap.png", GL_LINEAR, GL_CLAMP_TO_EDGE);
-	dc -> button_restart	= load_texture("../testbed/res/button_restart.png", GL_LINEAR, GL_CLAMP_TO_EDGE);
-	dc -> game_over			= load_texture("../testbed/res/game_over.png", GL_LINEAR, GL_CLAMP_TO_EDGE);
-	dc -> win_overlay		= load_texture("../testbed/res/win_overlay.png", GL_LINEAR, GL_CLAMP_TO_EDGE);
+	dc -> easy_board		= LoadTexture("../testbed/res/board_easy.png");
+	dc -> inter_board		= LoadTexture("../testbed/res/board_classic.png");
+	dc -> hard_board		= LoadTexture("../testbed/res/board_expert.png");
+	dc -> menu_texture		= LoadTexture("../testbed/res/main_menu.png");
+	dc -> options_texture	= LoadTexture("../testbed/res/options.png");
+	dc -> board_pieces		= LoadTexture("../testbed/res/spritemap.png");
+	dc -> button_restart	= LoadTexture("../testbed/res/button_restart.png");
+	dc -> game_over			= LoadTexture("../testbed/res/game_over.png");
+	dc -> win_overlay		= LoadTexture("../testbed/res/win_overlay.png");
 
 	dc -> sprite_cell_size[0] = 46.0f; 	dc -> sprite_cell_size[1] = 46.0f;
 	dc -> sprite_size[0] = 1.0f; 		dc -> sprite_size[1] = 1.0f;
@@ -242,17 +242,17 @@ void scene_render(struct Renderer* renderer, DisplayContext* dc, GameState* s)
             break;
 
         case EASY_BOARD:
-            setClearColour(dc -> bg_colour);
+            SetClearColour(dc -> bg_colour);
             board_controller(renderer, s, dc, EASY);
             break;
 
         case INTER_BOARD:
-            setClearColour(dc -> bg_colour);
+            SetClearColour(dc -> bg_colour);
             board_controller(renderer, s, dc, INTERMEDIATE);
             break;
 
         case HARD_BOARD:
-            setClearColour(dc -> bg_colour);
+            SetClearColour(dc -> bg_colour);
             board_controller(renderer, s, dc, HARD);
             break;
     }

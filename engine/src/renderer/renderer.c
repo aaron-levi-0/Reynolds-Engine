@@ -1,5 +1,8 @@
 #include "renderer/renderer_internals.h"
 
+#include <GL/glew.h>
+#include <GLFW/glfw3.h>
+
 #include "core/window_internals.h"
 #include "events/event.h"
 #include "renderer/buffer.h"
@@ -20,14 +23,14 @@ void renderer_destroy(struct Renderer* r)
     free(r);
 }
 
-void setShaderPath(const char* path)
+void SetShaderPath(const char* path)
 {
 	uint32_t path_str_len = strlen(path);
 	SHADER_PATH = malloc(path_str_len + 1);
 	strncpy(SHADER_PATH, path, path_str_len + 1);
 }
 
-void setClearColour(vec3 colour)
+void SetClearColour(vec3 colour)
 {
 	glClearColor(colour[0], colour[1], colour[2], 1.0);
 }

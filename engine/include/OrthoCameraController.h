@@ -1,8 +1,7 @@
 #ifndef ORTHOCAMERACONTROLLER_H
 #define ORTHOCAMERACONTROLLER_H
 
-#include "../include/layers.h"
-#include "renderer/OrthoCameraInternals.h"
+#include "layers.h"
 
 typedef struct OrthographicCameraController OrthographicCameraController;
 

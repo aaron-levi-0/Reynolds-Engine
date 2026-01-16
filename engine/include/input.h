@@ -2,7 +2,7 @@
 #define INPUT_H
 
 #include <stdbool.h>
-#include "core/defines.h"
+#include "defines.h"
 
 REN_API bool isKeyPressed(int );
 REN_API bool isMouseButtonPressed(int );

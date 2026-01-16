@@ -4,15 +4,9 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#include "core/glx.h"
-#include "utils/vector.h"
-
-// A named region of a texture atlas/spritesheet
-typedef struct {
-    uint32_t textureID;
-    uint16_t cell_location[2];  // by cell count, not in pixels
-    vec4 uv;                    // {u0, v0, u1, v1} in normalized 0..1 coords
-} SubTexture;
+#include <cglm/cglm.h>
+#include "defines.h"
+#include "vector_include.h"
 
 REN_API void subtex_init(Vector* reg, size_t initial_capacity);
 REN_API void subtex_shutdown(Vector* reg);

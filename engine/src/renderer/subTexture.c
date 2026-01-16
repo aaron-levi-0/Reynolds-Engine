@@ -1,10 +1,11 @@
-#include "renderer/subtexture.h"
+#include "renderer/subTexture_internals.h"
 
 #include <stdlib.h>
 #include <string.h>
 
-#include "renderer/texture.h"
-#include <cglm/cglm.h>
+#include "logging.h"
+#include "renderer/texture_internals.h"
+#include "utils/vector.h"
 
 void subtex_init(Vector* entries, size_t initial_capacity)
 {

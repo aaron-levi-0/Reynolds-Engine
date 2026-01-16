@@ -3,7 +3,8 @@
 #include <stdlib.h>
 #include <stdint.h>
 
-#include "../include/logging.h"
+#include "logging.h"
+#include "utils/vector.h"
 
 #define INITIAL_LAYER_CAPACITY 10
 
@@ -16,7 +17,7 @@ LayerStack* create_layer_stack()
         REYNOLDS_ERROR("@layers: failed to allocate memory for layer stack!");
         return NULL;
     }
-    vector_init(&stack -> layers, sizeof(Layer), INITIAL_LAYER_CAPACITY);
+    vector_init(stack, sizeof(Layer), INITIAL_LAYER_CAPACITY);
     return stack;
 }
 
@@ -24,26 +25,26 @@ LayerStack* create_layer_stack()
 void push_layer(LayerStack* stack, Layer layer) 
 {
     layer.event_enabled = true;
-    vector_push_back(&stack -> layers, &layer);
+    vector_push_back(stack, &layer);
     REYNOLDS_VERBOSE("@layers: pushed layer: %s", layer.name);
 }
 
 // Function to pop a layer from the stack
 static void pop_layer(LayerStack* stack) 
 {
-    if (vector_size(&stack -> layers) <= 0) 
+    if (vector_size(stack) <= 0) 
     {
         REYNOLDS_VERBOSE("@layers: layer stack is empty! Cannot pop more layers.");
         return;
     }
 
-    Layer* top_layer = (Layer*)vector_at(&stack -> layers, stack -> layers.size - 1);
+    Layer* top_layer = (Layer*)vector_at(stack, stack -> size - 1);
     REYNOLDS_VERBOSE("@layers: popped layer: %s", top_layer -> name);
     
     if(top_layer -> onDetatch)
         top_layer -> onDetatch(top_layer -> data);
 
-    vector_pop_back(&stack -> layers); // Pop the layer from the vector
+    vector_pop_back(stack); // Pop the layer from the vector
 }
 
 // Function to destroy a layer stack
@@ -51,11 +52,10 @@ void destroy_layer_stack(LayerStack* stack)
 {
     if(stack) 
     {
-        while(vector_size(&stack -> layers) > 0) 
+        while(vector_size(stack) > 0) 
             pop_layer(stack);
 
-        free_vector(&stack -> layers);
-        free(stack);
+        free_vector(stack);
         return;
     }
     REYNOLDS_ERROR("@layers: layer stack is NULL!");
@@ -64,9 +64,9 @@ void destroy_layer_stack(LayerStack* stack)
 
 uint16_t layer_index(LayerStack* stack, Layer layer)
 {
-    Layer* stack_layer = (Layer*)vector_at(&stack -> layers, 0);
+    Layer* stack_layer = (Layer*)vector_at(stack, 0);
 
-    for(uint16_t index = 0; index < vector_size(&stack -> layers); index++)
+    for(uint16_t index = 0; index < vector_size(stack); index++)
     {
         if(stack_layer -> id == layer.id)
             return index;
@@ -95,8 +95,8 @@ void disable_layer_event(Layer* layer)
 // Function to update all layers in the stack (from bottom to top)
 void update_layers(LayerStack* stack, float deltaTime) 
 {
-    Layer* layer = (Layer*)vector_at(&stack -> layers, 0);
-    for (uint16_t i = 0; i < vector_size(&stack -> layers); i++) 
+    Layer* layer = (Layer*)vector_at(stack, 0);
+    for (uint16_t i = 0; i < vector_size(stack); i++) 
     {
         if (layer -> update)
             layer -> update(deltaTime);
@@ -107,8 +107,8 @@ void update_layers(LayerStack* stack, float deltaTime)
 // Function to render all layers in the stack (from top to bottom)
 void render_layers(LayerStack* stack) 
 {
-    uint16_t i = vector_size(&stack -> layers);
-    Layer* layer = (Layer*)vector_at(&stack -> layers, i - 1);
+    uint16_t i = vector_size(stack);
+    Layer* layer = (Layer*)vector_at(stack, i - 1);
     while(i > 0)
     {
         if (layer -> render)
@@ -121,8 +121,8 @@ void render_layers(LayerStack* stack)
 // Function to handle events for all layers in the stack (from top to bottom)
 void handle_layer_events(LayerStack* stack, Event* e)
 {
-    uint16_t i = vector_size(&stack -> layers);
-    Layer* layer = (Layer*)vector_at(&stack -> layers, i - 1);
+    uint16_t i = vector_size(stack);
+    Layer* layer = (Layer*)vector_at(stack, i - 1);
     while(i > 0)
     {
         if (layer -> onEvent && layer -> event_enabled)

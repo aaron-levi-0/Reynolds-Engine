@@ -1,4 +1,4 @@
-#include "../include/timestep.h"
+#include "timestep.h"
 
 #include <stdbool.h>
 #include <GLFW/glfw3.h>

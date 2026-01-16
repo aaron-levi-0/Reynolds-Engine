@@ -6,16 +6,12 @@
 
 #include <stdbool.h>
 #include <cglm/cglm.h>
-#include <../include/logging.h>
-
 #include <engine.h>
 
 #define SCREEN_WIDTH	970
 #define SCREEN_HEIGHT	970
 
 #define NOT_USED		0
-#define BIT(x) 			(1 << x)
-
 
 #define ALL_BOARDS		448		//this is 0b11100000 or 448 as an integer
 

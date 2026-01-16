@@ -4,7 +4,7 @@
 #include <GLFW/glfw3.h>
 #include <cglm/version.h>
 
-void vendor_dependencies()
+void EngineDependencies()
 {
 	REYNOLDS_INFO("Status: Using GLEW %s", glewGetString(GLEW_VERSION));
 	REYNOLDS_INFO("Status: Using GLFW %s", glfwGetVersionString());

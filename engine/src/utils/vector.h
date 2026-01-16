@@ -1,16 +1,18 @@
 #ifndef VECTOR_H
 #define VECTOR_H
 
+#include "vector_include.h"
+
 #include <stddef.h>
 
 /* A dynamic array for structures, similar to the vector template in c++ */
 
-typedef struct {
+struct Vector {
     void* data;       // Pointer to the array of elements
     size_t size;      // Number of elements in the vector
     size_t capacity;  // Total capacity of the vector
     size_t elem_size; // Size of each element in bytes
-} Vector;
+};
 
 extern void vector_init(Vector* , size_t , size_t );
 extern void vector_resize(Vector* );

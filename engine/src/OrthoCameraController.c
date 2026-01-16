@@ -1,11 +1,12 @@
 #include "OrthoCameraControllerInternals.h"
 
-#include "core/glx.h"
-#include "../include/window.h"
+#include <GLFW/glfw3.h>
+#include "window.h"
 #include "events/event.h"
 #include "events/mouse_event.h"
 
-#include "../include/input.h"
+#include "input.h"
+#include "logging.h"
 
 OrthographicCameraController controller;
 

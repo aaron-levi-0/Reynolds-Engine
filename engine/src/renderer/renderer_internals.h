@@ -1,9 +1,9 @@
 #ifndef RENDERER_INTERNALS_H
 #define RENDERER_INTERNALS_H
 
-#include "../include/renderer.h"
+#include "renderer/texture_internals.h"
+#include "renderer.h"
 #include "core/glx.h"
-#include "renderer/texture.h"
 
 #define	MAX_QUADS			1000
 #define	MAX_VERTICIES		4 * MAX_QUADS

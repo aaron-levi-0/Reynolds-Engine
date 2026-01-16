@@ -1,7 +1,7 @@
 #ifndef WINDOW_INTERNALS_H
 #define WINDOW_INTERNALS_H
 
-#include "../include/window.h"
+#include "window.h"
 
 //this is used to generalise the window process so that the application is not entirely
 //dependent on glfw. The variables are passed onto glfw if called upon by the library.

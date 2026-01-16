@@ -1,7 +1,7 @@
 #ifndef REYNOLDS_LOGGING_H
 #define REYNOLDS_LOGGING_H
 
-#include "core/defines.h"
+#include "defines.h"
 #include <stdlib.h>
 
 typedef enum log_level {

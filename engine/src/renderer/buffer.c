@@ -7,7 +7,7 @@
 #include <string.h>
 
 #include "utils/vector.h"
-#include "../include/logging.h"
+#include "logging.h"
 
 #define VEC_INIT_CAPACITY 4
 

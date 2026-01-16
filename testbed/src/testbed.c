@@ -17,11 +17,11 @@ int main()
 	set_log_level(LOG_LEVEL_VERBOSE);
 	REYNOLDS_INFO("Initialising Log...");
 	
-	engine_init("minesweeper.c", SCREEN_WIDTH, SCREEN_HEIGHT);
-    vendor_dependencies();
+	EngineInit("minesweeper.c", SCREEN_WIDTH, SCREEN_HEIGHT);
+    EngineDependencies();
 
 	load_icon(ICON_PATH);
-	setShaderPath(SHADER_PATH);	
+	SetShaderPath(SHADER_PATH);	
 
 	DisplayContext context = {0};
 
@@ -32,7 +32,7 @@ int main()
 	struct Renderer* renderer = renderer_create(); 
 
 	/* Initialise Layer Stack and Layers */
-	stack = create_layer_stack();
+	LayerStack* stack 			= InitLayerStack();
 	Layer render_layer 			= create_render_layer(renderer);
 	Layer camera_layer 			= create_camera_layer();
 	Layer gameplay_layer 		= create_gameplay_layer(renderer, &context, &state);
@@ -66,7 +66,7 @@ int main()
 	init_display(&context);
 	init_scenes(&context, &state);
 
-	setClearColour((vec3){1.0f, 1.0f, 1.0f}); // NOTE: set to white #ffffff
+	SetClearColour((vec3){1.0f, 1.0f, 1.0f}); // NOTE: set to white #ffffff
 
 	/** RUNTIME PHASE **/
 

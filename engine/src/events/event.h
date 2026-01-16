@@ -1,8 +1,10 @@
 #ifndef EVENT_H
 #define EVENT_H
 
+#include "event_include.h"
+
 #include <stdbool.h>
-#include "core/defines.h"
+#include "defines.h"
 
 #define EVENT_CLASS_TYPE(type) static const char* type##Event_getName() { return #type; }
 
@@ -36,14 +38,14 @@ typedef enum
 } EventCategory;
 
 // Event base structure
-typedef struct Event {
+struct Event {
     EventType type;
     int categoryFlags;
 	int (*getCategoryFlags)(void);
     const char* (*getName)(void);
     const char* (*debug)(void);
 	bool handled;
-} Event;
+};
 
 extern bool isInCategory(Event* , EventCategory );
 extern void setCurrentEvent(Event* );

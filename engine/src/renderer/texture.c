@@ -1,4 +1,10 @@
-#include "renderer/texture.h"
+#include "renderer/texture_internals.h"
+
+#include <GL/glew.h>
+#include <GLFW/glfw3.h>
+
+#include <stdint.h>
+#include <stdlib.h>
 
 #include "stb_image.h"
 #include "utils/vector.h"
@@ -45,7 +51,7 @@ void setWhiteTexture(uint32_t colour)
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, 1, 1, 0, GL_RGBA, GL_UNSIGNED_BYTE, &colour);
 }
 
-uint32_t load_texture(const char* path, uint32_t filter, uint32_t wrap)
+static uint32_t load_texture(const char* path, uint32_t filter, uint32_t wrap)
 {
 	int width, height, BPP;
 	
@@ -78,6 +84,11 @@ uint32_t load_texture(const char* path, uint32_t filter, uint32_t wrap)
 
 	vector_push_back(&AssetManager, &texture);
 	return textureID;
+}
+
+uint32_t LoadTexture(const char* filepath)
+{
+	return load_texture(filepath, GL_LINEAR, GL_REPEAT);
 }
 
 void getTextureSize(uint32_t textureID, uint32_t* size)

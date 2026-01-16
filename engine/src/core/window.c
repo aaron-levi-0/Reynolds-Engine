@@ -8,7 +8,7 @@
 
 #include <GLFW/glfw3.h>
 #include <stdlib.h>
-#include "../include/logging.h"
+#include "logging.h"
 
 Window* window 			= NULL;
 GLFWwindow* g_window	= NULL;
