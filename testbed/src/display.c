@@ -5,7 +5,7 @@
 #include "board.h"
 
 #include <texture.h>
-#include <OrthoCameraController.h>
+#include <Camera/OrthoCameraController.h>
 #include <subTexture.h>
 
 vec4 FULL_SAMPLE = {0.0f, 0.0f, 1.0f, 1.0f};

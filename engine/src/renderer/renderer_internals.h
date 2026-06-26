@@ -35,6 +35,8 @@ struct Renderer
 	unsigned int texture_slots[MAX_TEXTURE_SLOTS];
 	unsigned int TextureSlotIndex;
 
+	char* ShaderPath;
+
 	bool initialised;
 
 	struct Statistics stats;

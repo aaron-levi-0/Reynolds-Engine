@@ -1,9 +1,9 @@
 #include "app_input.h"
 
-#include "common.h"
 #include <window.h>
-#include <OrthoCameraController.h>
+#include <Camera/camera.h>
 
+#include "common.h"
 #include "game_logic.h"
 #include "board.h"
 #include "display.h"

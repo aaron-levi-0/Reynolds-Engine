@@ -3,6 +3,7 @@
 
 #include "layers.h"
 
-extern void handle_layer_events(LayerStack* , Event* );
+extern bool request_window_close;
+extern LayerStack* handle_layer_events(LayerStack* , Event* );
 
 #endif // LAYERS_INTERNALS_H

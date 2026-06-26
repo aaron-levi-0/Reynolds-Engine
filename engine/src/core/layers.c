@@ -8,6 +8,8 @@
 
 #define INITIAL_LAYER_CAPACITY 10
 
+bool request_window_close = false;
+
 // Function to create a new layer stack
 LayerStack* create_layer_stack() 
 {
@@ -56,13 +58,15 @@ void destroy_layer_stack(LayerStack* stack)
             pop_layer(stack);
 
         free_vector(stack);
+        free(stack);
         return;
     }
-    REYNOLDS_ERROR("@layers: layer stack is NULL!");
+    REYNOLDS_WARN("@layers: layer stack is NULL!");
 }
 
 
-uint16_t layer_index(LayerStack* stack, Layer layer)
+//not even used? changed from uint32_t to int16_t to allow for -1 return on failure
+int16_t layer_index(LayerStack* stack, Layer layer)
 {
     Layer* stack_layer = (Layer*)vector_at(stack, 0);
 
@@ -75,7 +79,7 @@ uint16_t layer_index(LayerStack* stack, Layer layer)
     }
 
     REYNOLDS_WARN("@layers: layer index could not be resolved!");
-    return 0;
+    return -1;
 }
 
 // Function to enable the onEvent function for a layer
@@ -108,7 +112,10 @@ void update_layers(LayerStack* stack, float deltaTime)
 void render_layers(LayerStack* stack) 
 {
     uint16_t i = vector_size(stack);
+    if(i == 0) return;
+    
     Layer* layer = (Layer*)vector_at(stack, i - 1);
+
     while(i > 0)
     {
         if (layer -> render)
@@ -118,16 +125,29 @@ void render_layers(LayerStack* stack)
     }
 }
 
-// Function to handle events for all layers in the stack (from top to bottom)
-void handle_layer_events(LayerStack* stack, Event* e)
+// Function to handle events for all layers in the stack (from top to bottom). went from void to LayerStack* 
+// to allow for stack destruction on window close event
+LayerStack* handle_layer_events(LayerStack* stack, Event* e)
 {
     uint16_t i = vector_size(stack);
+    if(i == 0) return NULL;
+
     Layer* layer = (Layer*)vector_at(stack, i - 1);
+
     while(i > 0)
     {
+        if(request_window_close)
+        {
+            destroy_layer_stack(stack);
+            return NULL;
+        }
+
         if (layer -> onEvent && layer -> event_enabled)
             layer -> onEvent(e);
+            
         layer--;
         i--;
     }
+
+    return stack;
 }

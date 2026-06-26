@@ -21,7 +21,7 @@ REN_API void SetClearColour(vec3 );
 REN_API void render_clear();
 REN_API Layer create_render_layer(struct Renderer* );
 
-REN_API void SetShaderPath(const char* );
+REN_API void SetShaderPath(struct Renderer* r, const char* path);
 
 REN_API void BeginBatch(struct Renderer* );
 REN_API void EndBatch(struct Renderer* );

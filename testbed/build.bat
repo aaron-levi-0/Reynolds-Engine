@@ -22,7 +22,7 @@ REM ECHO %workspaceFolder%
 REM Configuration
 SET assembly=testbed
 SET compilerFlags=-g -lglfw3 -lopengl32 -lgdi32 -luser32 -lkernel32 -lglew32
-SET includeFlags=-Isrc -Ivendor -I..\engine\include -I..\engine\src -I..\engine\vendor -I..\engine\include
+SET includeFlags=-Isrc -Ivendor -I..\engine\include
 REM SET linkerFlags=-L../bin/ -.lengine.lib
 SET defines=-DDEBUG_VERSION -DREN_IMPORT -DENABLE_RELATIVE_PATHS -DSRC_FOLDER=\"%workspaceFolder%/\"
 

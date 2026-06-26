@@ -46,18 +46,16 @@
 #error "Unknown platform!"
 #endif
 
-#if defined(_WIN32) || defined(__CYGWIN__)
-  #ifdef REN_EXPORT
+#if defined(REN_STATIC)
+  #define REN_API
+#elif defined(_WIN32) || defined(__CYGWIN__)
+  #if defined(REN_EXPORT)
     #define REN_API __declspec(dllexport)
   #else
     #define REN_API __declspec(dllimport)
   #endif
 #else
-  #ifdef REN_EXPORT
-    #define REN_API __attribute__((visibility("default")))
-  #else
-    #define REN_API
-  #endif
+  #define REN_API __attribute__((visibility("default")))
 #endif
 
 #endif // DEFINES_H

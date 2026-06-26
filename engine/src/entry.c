@@ -2,7 +2,7 @@
 
 #include "entry_internals.h"
 #include "core/layers_internals.h"
-#include "window.h"
+#include "core/window_internals.h"
 
 #include "logging.h"
 
@@ -25,7 +25,7 @@ void onEvent(Event* e)
 {
 	VALIDATE_LOG(e);
 	VALIDATE_LOG(!e -> handled);
-	handle_layer_events(stack, e);
+	stack = handle_layer_events(stack, e);
 	e -> handled = true;
 }
 
@@ -34,7 +34,7 @@ void onWindowClose(Event* e)
 	if(e -> type == WindowClose)
 	{
 		isRunning = false;
-		destroy_layer_stack(stack);
+		request_window_close = true;
 	}
 }
 
@@ -52,6 +52,13 @@ void EngineInit(const char* title, int w, int h)
 LayerStack* InitLayerStack()
 {
 	stack = create_layer_stack();
-	ASSERT_FATAL(!stack, "@engine: failed to create layer stack!");
+	ASSERT_FATAL(stack, "@engine: failed to create layer stack!");
+	
 	return stack;
+}
+
+void EngineShutdown()
+{
+	close_window();
+	destroy_layer_stack(stack);
 }

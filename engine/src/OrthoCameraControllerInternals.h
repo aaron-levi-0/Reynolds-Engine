@@ -1,7 +1,7 @@
 #ifndef ORTHOCAMERACONTROLLERINTERNALS_H
 #define ORTHOCAMERACONTROLLERINTERNALS_H
 
-#include "OrthoCameraController.h"
+#include "Camera/OrthoCameraController.h"
 #include "layers.h"
 #include "renderer/OrthoCameraInternals.h"
 

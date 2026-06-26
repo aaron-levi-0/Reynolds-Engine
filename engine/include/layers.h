@@ -5,7 +5,7 @@
 
 #include "defines.h"
 #include "event_include.h"
-#include "vector_include.h"
+#include "utils/vector.h"
 
 // Layer structure
 typedef enum LayerID {

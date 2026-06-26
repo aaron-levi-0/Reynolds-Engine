@@ -8,8 +8,6 @@
 #include "renderer/buffer.h"
 #include "renderer/shader_internals.h"
 
-char* SHADER_PATH = NULL;
-
 struct Renderer* renderer_create() 
 {
     struct Renderer* r = malloc(sizeof(struct Renderer));
@@ -23,11 +21,11 @@ void renderer_destroy(struct Renderer* r)
     free(r);
 }
 
-void SetShaderPath(const char* path)
+void SetShaderPath(struct Renderer* r, const char* path)
 {
 	uint32_t path_str_len = strlen(path);
-	SHADER_PATH = malloc(path_str_len + 1);
-	strncpy(SHADER_PATH, path, path_str_len + 1);
+	r -> ShaderPath = malloc(path_str_len + 1);
+	strncpy(r -> ShaderPath, path, path_str_len + 1);
 }
 
 void SetClearColour(vec3 colour)
@@ -135,7 +133,7 @@ static void MallocDraw(struct Renderer* renderer)
 		samplers[i] = i;
 	
 	/* Load shaders and use the resulting shader program */
-	ShaderProgramSource source = parseFile(SHADER_PATH);
+	ShaderProgramSource source = parseFile(renderer -> ShaderPath);
 	unsigned int program = CreateShader(source.VertexSource, source.FragmentSource);
 	bind_shader(program);
 	
@@ -152,8 +150,8 @@ static void FreeDraw(struct Renderer* renderer)
 	
 	glDeleteTextures(1, &renderer -> WhiteTexture);
 	
-	if(SHADER_PATH)
-		free(SHADER_PATH);
+	if(renderer -> ShaderPath)
+		free(renderer -> ShaderPath);
 	if(renderer -> QuadBuffer)
 		free(renderer -> QuadBuffer);
 }

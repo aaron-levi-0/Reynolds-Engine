@@ -1,4 +1,5 @@
 #include <engine.h>
+#include <Camera/camera.h>
 #include <time.h>
 
 #include "board.h"
@@ -21,7 +22,6 @@ int main()
     EngineDependencies();
 
 	load_icon(ICON_PATH);
-	SetShaderPath(SHADER_PATH);	
 
 	DisplayContext context = {0};
 
@@ -30,6 +30,7 @@ int main()
 
 	/* Initialise and load stack defined renderer */
 	struct Renderer* renderer = renderer_create(); 
+	SetShaderPath(renderer, SHADER_PATH);	
 
 	/* Initialise Layer Stack and Layers */
 	LayerStack* stack 			= InitLayerStack();
@@ -111,11 +112,11 @@ int main()
 	//** SHUTDOWN PHASE **//
 
 	unload_textures(&context);
-	close_window();
 	
 	if(state.board)
 		delete_board(&state);
 	
 	renderer_destroy(renderer);
+	EngineShutdown();
     return 0;
 }

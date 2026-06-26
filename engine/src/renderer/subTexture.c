@@ -14,7 +14,7 @@ void subtex_init(Vector* entries, size_t initial_capacity)
 
 void subtex_shutdown(Vector* entries)
 {
-    free_vector(entries);
+    if(entries) free_vector(entries);
 }
 
 static int subtex_find_index(const Vector* entries, uint32_t textureID, uint16_t cell_location[2])

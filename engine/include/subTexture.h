@@ -6,7 +6,7 @@
 
 #include <cglm/cglm.h>
 #include "defines.h"
-#include "vector_include.h"
+#include "utils/vector.h"
 
 REN_API void subtex_init(Vector* reg, size_t initial_capacity);
 REN_API void subtex_shutdown(Vector* reg);

@@ -4,7 +4,7 @@
 #include <stdbool.h>
 #include <cglm/cglm.h>
 
-#include <utils/Vector.h>
+#include <utils/vector.h>
 
 // forward declare to avoid heavy includes
 struct Renderer;

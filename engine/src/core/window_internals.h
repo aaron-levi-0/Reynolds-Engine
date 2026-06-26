@@ -16,6 +16,8 @@ struct Window
 	EventCallbackFn EventCallback;
 };
 
+extern Window* create_window(const char* , unsigned int , unsigned int ); 
+extern void close_window();
 extern void* GetNativeWindow();
 
 #endif // WINDOW_INTERNALS_H
