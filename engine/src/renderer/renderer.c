@@ -1,7 +1,6 @@
 #include "renderer/renderer_internals.h"
 
 #include <GL/glew.h>
-#include <GLFW/glfw3.h>
 
 #include "core/window_internals.h"
 #include "events/event.h"

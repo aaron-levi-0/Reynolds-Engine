@@ -1,7 +1,6 @@
 #include "renderer/texture_internals.h"
 
 #include <GL/glew.h>
-#include <GLFW/glfw3.h>
 
 #include <stdint.h>
 #include <stdlib.h>

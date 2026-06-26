@@ -1,7 +1,6 @@
 #include "renderer/shader_internals.h"
 
 #include <GL/glew.h>
-#include <GLFW/glfw3.h>
 
 struct cache* cache = NULL;
 unsigned int program;
@@ -11,6 +10,16 @@ ShaderProgramSource parseFile(const char* filepath)
 {
 	ShaderProgramSource source = {0};
 
+	enum ShaderType{ NONE = -1, VERTEX, FRAGMENT };
+	enum ShaderType type = NONE;
+	char* ShaderStream[2];
+
+	size_t space;
+	
+	char line[BUFSIZ];
+	const char* vertex_header = "#shader vertex";
+	const char* fragment_header = "#shader fragment";
+
 	if(!filepath)
 	{
 		REYNOLDS_WARN("@shader: Shader path not set.");
@@ -19,17 +28,20 @@ ShaderProgramSource parseFile(const char* filepath)
 
 	FILE *fp = fopen(filepath, "r");
 	if(!fp)
+	{
 		REYNOLDS_ERROR("@shader: Could not open file at path: %s", filepath);
+		return source;
+	}
 	
-	enum ShaderType{ NONE = -1, VERTEX, FRAGMENT };
-	
-	char line[BUFSIZ];
-	const char* vertex_header = "#shader vertex";
-	const char* fragment_header = "#shader fragment";
-	
-	enum ShaderType type = NONE;
-	char ShaderStream[2][BUFSIZ];
-	
+	ShaderStream[0] = malloc(BUFSIZ);
+	ShaderStream[1] = malloc(BUFSIZ);
+
+	if(!ShaderStream[0] || !ShaderStream[1])
+	{
+		REYNOLDS_ERROR("@shader: Could not allocate memory for shader source.");
+		return source;
+	}
+
 	*ShaderStream[0] = '\0';
 	*ShaderStream[1] = '\0';
 	
@@ -41,9 +53,24 @@ ShaderProgramSource parseFile(const char* filepath)
 		else if (!strncmp(line, fragment_header, strlen(fragment_header)))
 			type = FRAGMENT;
 		
-		else strcat(ShaderStream[type], line);
+		else if (type != NONE)					//ignores any text before the first header and any text after the last header
+		{
+			space = sizeof(ShaderStream[type]) - strlen(ShaderStream[type]) - 1;
+			
+			if (space > 0)
+				strcat(ShaderStream[type], line);
+			else
+			{
+				realloc(ShaderStream[type], strlen(ShaderStream[type]) + strlen(line) + 1);
+				if(!ShaderStream[type])
+				{
+					REYNOLDS_ERROR("@shader: Could not allocate memory for shader source.");
+					return source;
+				}
+			}
+		}
 		
-		//if type = -1 error otherwise it will write in 2. or flag and ignore code up until a header. Also may need to check if cattonated line exceeds BUFSIZ?
+		//may need to check if cattonated line exceeds BUFSIZ
 	}
 	fclose(fp);
 
@@ -112,7 +139,7 @@ void unbind_shader()
 
 //finds uniform in shader and caches value for quick access next call
 
-int GetUniformLocation(unsigned int programID, const char* name)
+static int GetUniformLocation(unsigned int programID, const char* name)
 {
 	int location, cached_location;
 
@@ -132,12 +159,12 @@ int GetUniformLocation(unsigned int programID, const char* name)
 
 void setIntArray(const char* name, int* array, uint32_t count)
 {
-	int location = glGetUniformLocation(program, name);
+	int location = GetUniformLocation(program, name);
 	glUniform1iv(location, count, array);
 }
 
 void setMat4(const char* name, mat4 array)
 {
-	int location = glGetUniformLocation(program, name);
+	int location = GetUniformLocation(program, name);
 	glUniformMatrix4fv(location, 1, GL_FALSE, (float* )array);
 }

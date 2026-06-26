@@ -20,8 +20,10 @@ A 2D Game Engine written in C
 
 ## Known Bugs
 
-* Camera zoom and translate still influence application during game over/ win screen
+* Camera zoom jitters on menu and options screen on minesweeper game
 
 ## Improvements
 
-* 
+* Fixed events logic
+* General improvements in error handling
+

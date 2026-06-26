@@ -71,8 +71,8 @@ static void KeyCallback(GLFWwindow* _window, int key, int scancode, int action, 
 {
 	Window* win_callbk = (Window* )glfwGetWindowUserPointer(_window); 
 	Event* event = NULL;
-	scancode 	+= NOT_USED;
-	mods 		+= NOT_USED;
+	(void) scancode;
+	(void) mods;
 	
 	switch(action)
 	{
@@ -95,7 +95,7 @@ static void MouseButtonCallback(GLFWwindow* _window, int button, int action, int
 {
 	Window* win_callbk = (Window* )glfwGetWindowUserPointer(_window); 
 	Event* event = NULL;
-	mods += NOT_USED;
+	(void) mods;
 	
 	switch(action)
 	{

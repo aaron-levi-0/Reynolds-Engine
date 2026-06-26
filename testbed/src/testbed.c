@@ -5,6 +5,7 @@
 #include "board.h"
 #include "common.h"
 #include "gameplay_layer.h"
+#include "ui_layer.h"
 #include "gamestate.h"
 #include "display.h"
 
@@ -37,11 +38,13 @@ int main()
 	Layer render_layer 			= create_render_layer(renderer);
 	Layer camera_layer 			= create_camera_layer();
 	Layer gameplay_layer 		= create_gameplay_layer(renderer, &context, &state);
+	Layer ui_layer 				= create_ui_layer(renderer, &context, &state);
 	Layer close_window_layer 	= {"Window Close Layer", .id = LAYER_WINDOW_CLOSE, .onEvent = onWindowClose};
 
 	push_layer(stack, render_layer);
 	push_layer(stack, close_window_layer);
 	push_layer(stack, gameplay_layer);
+	push_layer(stack, ui_layer);
 	push_layer(stack, camera_layer);
 
 	// disable_layer_event(&gameplay_layer); // disable gameplay events for debugging or ui //
@@ -79,11 +82,6 @@ int main()
 		if(!Minimised())
 		{
 			render_clear();
-
-			if(state.game_state == PLAY && camera_layer.event_enabled == false)
-				enable_layer_event(&camera_layer);
-			else if(state.scene == MENU && camera_layer.event_enabled == true)
-				disable_layer_event(&camera_layer); //this doesnt do anything apparently
 
 			setMat4("u_ProjectionView", getPVMat());
 			

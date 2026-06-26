@@ -198,15 +198,14 @@ static void board_controller(struct Renderer* renderer, GameState* s, DisplayCon
 	draw_board(renderer, dc, s);
 }
 
+void ui_scene_update(DisplayContext* dc, GameState* s)
+{
+	if (s -> scene == MENU || s -> scene == OPTIONS)
+		resetOrthoCamera();
+}
+
 void scene_update(DisplayContext* dc, GameState* s)
 {	
-	// Fill only what you use
-	//float* uv = (float*)createTexCoords(board_pieces, sprite[i], sprite_size);
-	
-    // Handle scene-level side effects (no DrawQuad here)
-    if (s -> scene == MENU || s -> game_state == GAME_OVER)
-    	resetOrthoCamera();
-
     // Handle game-state transitions
     if (s -> game_state == RESTART)
 	{
@@ -219,11 +218,11 @@ void scene_update(DisplayContext* dc, GameState* s)
     }
 }
 
-void scene_render(struct Renderer* renderer, DisplayContext* dc, GameState* s)
+void ui_scene_render(struct Renderer* renderer, DisplayContext* dc, GameState* s)
 {
-    ASSERT_FATAL(renderer, "Attempting to draw on an uninitialised renderer!");
+	ASSERT_FATAL(renderer, "Attempting to draw on an uninitialised renderer!");
 
-    if(s -> scene == MENU || s -> scene == OPTIONS)
+	if(s -> scene == MENU || s -> scene == OPTIONS)
 	{
 		dc -> board_pos[0]  = s -> scenes[DEFAULT].pos[0];
 		dc -> board_pos[1]  = s -> scenes[DEFAULT].pos[1];
@@ -231,16 +230,27 @@ void scene_render(struct Renderer* renderer, DisplayContext* dc, GameState* s)
 		dc -> board_size[1] = s -> scenes[DEFAULT].size[1];
 	}
  
+	switch (s -> scene)
+	{
+		case MENU:
+			DrawQuad(renderer, dc -> board_pos, dc -> board_size, dc -> menu_texture, FULL_SAMPLE);
+			break;
+
+		case OPTIONS:
+			DrawQuad(renderer, dc -> board_pos, dc -> board_size, dc -> options_texture, FULL_SAMPLE);
+			break;
+	}
+
+	if (s -> game_state == GAME_OVER)
+        draw_overlay(renderer, dc, s);
+}
+
+void scene_render(struct Renderer* renderer, DisplayContext* dc, GameState* s)
+{
+    ASSERT_FATAL(renderer, "Attempting to draw on an uninitialised renderer!");
+ 
     switch (s -> scene)
     {
-        case MENU:
-            DrawQuad(renderer, dc -> board_pos, dc -> board_size, dc -> menu_texture, FULL_SAMPLE);
-            break;
-
-        case OPTIONS:
-            DrawQuad(renderer, dc -> board_pos, dc -> board_size, dc -> options_texture, FULL_SAMPLE);
-            break;
-
         case EASY_BOARD:
             SetClearColour(dc -> bg_colour);
             board_controller(renderer, s, dc, EASY);
@@ -257,7 +267,7 @@ void scene_render(struct Renderer* renderer, DisplayContext* dc, GameState* s)
             break;
     }
 
-    if (s -> game_state == GAME_OVER)
+	if (s -> game_state == GAME_OVER)
         draw_overlay(renderer, dc, s);
 }
 

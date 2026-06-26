@@ -26,7 +26,6 @@ void onEvent(Event* e)
 	VALIDATE_LOG(e);
 	VALIDATE_LOG(!e -> handled);
 	stack = handle_layer_events(stack, e);
-	e -> handled = true;
 }
 
 void onWindowClose(Event* e)

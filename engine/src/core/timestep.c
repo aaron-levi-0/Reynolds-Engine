@@ -15,10 +15,6 @@ Timestep ts = {0};
 float get_time()
 {
     ts.time = (float)glfwGetTime();
-
-    if(ts.is_capped && ts.time < ts.capped_frame_time)
-       return ts.capped_frame_time;
-    
     return ts.time;
 }
 
@@ -26,6 +22,18 @@ float get_delta_time()
 {
     float current_time = get_time();
     float delta_time = current_time - ts.last_frame_time;
+
+    if (ts.is_capped && delta_time < ts.capped_frame_time)
+    {
+        float sleep_time = ts.capped_frame_time - delta_time;
+        if (sleep_time > 0.0f)
+        {
+            glfwWaitEventsTimeout(sleep_time);
+            current_time = get_time();
+            delta_time = current_time - ts.last_frame_time;
+        }
+    }    
+
     ts.last_frame_time = current_time;
     return delta_time;
 

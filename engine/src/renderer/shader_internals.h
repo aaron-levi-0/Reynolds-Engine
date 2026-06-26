@@ -14,7 +14,7 @@ typedef struct
 
 extern ShaderProgramSource parseFile(const char*);
 extern unsigned int CreateShader(char*, char*);
-extern int GetUniformLocation(unsigned int , const char* );
+//extern int GetUniformLocation(unsigned int , const char* );
 
 extern void bind_shader(unsigned int );
 extern void unbind_shader();

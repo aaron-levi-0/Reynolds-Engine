@@ -4,6 +4,7 @@
 #include <stdint.h>
 
 #include "logging.h"
+#include "events/event.h"
 #include "utils/vector.h"
 
 #define INITIAL_LAYER_CAPACITY 10
@@ -144,7 +145,9 @@ LayerStack* handle_layer_events(LayerStack* stack, Event* e)
 
         if (layer -> onEvent && layer -> event_enabled)
             layer -> onEvent(e);
-            
+
+        if (e -> handled) break;          // stop propagating once consumed
+
         layer--;
         i--;
     }

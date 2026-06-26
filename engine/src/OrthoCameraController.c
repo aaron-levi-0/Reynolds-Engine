@@ -183,10 +183,8 @@ static void onWindowResize()
 //window resize changes the aspect ratio
 static void onEvent(Event* e)
 {
-	if(e -> type == MouseScroll)
-		onMouseScrolled();
-	else if(e -> type == WindowResize)
-		onWindowResize();
+	if(e -> type == MouseScroll) { onMouseScrolled(); e -> handled = true; }
+	else if(e -> type == WindowResize) { onWindowResize(); }
 }
 
 Layer create_camera_layer()
