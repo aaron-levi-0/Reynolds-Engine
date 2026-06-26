@@ -72,8 +72,10 @@ int main()
 
 	SetClearColour((vec3){1.0f, 1.0f, 1.0f}); // NOTE: set to white #ffffff
 
-	/** RUNTIME PHASE **/
+	audio_init();
+	audio_play_music("../testbed/res/audio/track_B.wav");
 
+	/** RUNTIME PHASE **/
     while (Running())
     {	
 		timestep = get_delta_time();	
@@ -115,6 +117,7 @@ int main()
 		delete_board(&state);
 	
 	renderer_destroy(renderer);
+	audio_shutdown();
 	EngineShutdown();
     return 0;
 }

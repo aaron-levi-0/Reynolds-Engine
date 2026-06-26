@@ -15,6 +15,8 @@
 #include "texture.h"
 #include "subTexture.h"
 
+#include "audio.h"
+
 REN_API void EngineDependencies();
 
 #endif // ENGINE_H
