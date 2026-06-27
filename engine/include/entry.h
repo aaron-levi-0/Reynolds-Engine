@@ -1,6 +1,7 @@
 #ifndef ENTRY_H
 #define ENTRY_H
 
+#include "renderer.h"
 #include "layers.h"
 
 REN_API bool  Running();

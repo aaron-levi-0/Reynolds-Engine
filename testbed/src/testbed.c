@@ -6,6 +6,7 @@
 #include "common.h"
 #include "gameplay_layer.h"
 #include "ui_layer.h"
+#include "debug_layer.h"
 #include "gamestate.h"
 #include "display.h"
 
@@ -13,8 +14,6 @@ const char* ICON_PATH 	= "../testbed/res/extra/minesweeper.png";
 const char* SHADER_PATH = "../testbed/res/shaders/shader";
 
 struct Statistics stats;
-
-extern void debug_update(float deltaTime);
 
 int main()
 {
@@ -39,7 +38,7 @@ int main()
 	Layer gameplay_layer 		= create_gameplay_layer(renderer, &context, &state);
 	Layer ui_layer 				= create_ui_layer(renderer, &context, &state);
 	Layer close_window_layer 	= {"Window Close Layer", .id = LAYER_WINDOW_CLOSE, .onEvent = onWindowClose};
-	Layer debug_layer 			= {"Debug Layer", .id = LAYER_DEBUG, .update = debug_update};
+	Layer debug_layer 			= create_debug_layer(renderer);
 	
 	push_layer(stack, render_layer);
 	push_layer(stack, close_window_layer);
@@ -81,13 +80,4 @@ int main()
 	EngineShutdown();
 
     return 0;
-}
-
-void debug_update(float deltaTime)
-{
-	if(isKeyPressed(GLFW_KEY_F))
-		REYNOLDS_DEBUG("FPS: %d", (int)(1.0f/deltaTime));
-
-	if(isKeyPressed(GLFW_KEY_L))
-		REYNOLDS_DEBUG("Draw calls: %d\tQuad count: %d", getDrawCalls(renderer), getQuadCount(renderer));
 }

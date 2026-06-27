@@ -12,7 +12,6 @@ ShaderProgramSource parseFile(const char* filepath)
 
 	enum ShaderType{ NONE = -1, VERTEX, FRAGMENT };
 	enum ShaderType type = NONE;
-	char* ShaderStream[2];
 
 	size_t space;
 	
@@ -33,12 +32,15 @@ ShaderProgramSource parseFile(const char* filepath)
 		return source;
 	}
 	
-	ShaderStream[0] = malloc(BUFSIZ);
-	ShaderStream[1] = malloc(BUFSIZ);
+	char* ShaderStream[2] = {malloc(BUFSIZ), malloc(BUFSIZ)};
 
 	if(!ShaderStream[0] || !ShaderStream[1])
 	{
 		REYNOLDS_ERROR("@shader: Could not allocate memory for shader source.");
+
+		free(ShaderStream[0]);
+		free(ShaderStream[1]);
+		fclose(fp);
 		return source;
 	}
 
@@ -55,29 +57,25 @@ ShaderProgramSource parseFile(const char* filepath)
 		
 		else if (type != NONE)					//ignores any text before the first header and any text after the last header
 		{
-			space = sizeof(ShaderStream[type]) - strlen(ShaderStream[type]) - 1;
+			space = sizeof(*ShaderStream[type]) - strlen(ShaderStream[type]) - 1;
 			
 			if (space > 0)
 				strcat(ShaderStream[type], line);
 			else
 			{
-				realloc(ShaderStream[type], strlen(ShaderStream[type]) + strlen(line) + 1);
+				ShaderStream[type] = realloc(ShaderStream[type], strlen(ShaderStream[type]) + strlen(line) + 1);
 				if(!ShaderStream[type])
 				{
 					REYNOLDS_ERROR("@shader: Could not allocate memory for shader source.");
 					return source;
 				}
 			}
-		}
-		
-		//may need to check if cattonated line exceeds BUFSIZ
+		}		
 	}
 	fclose(fp);
 
-	source.VertexSource = malloc(strlen(ShaderStream[0]) + 1);
-	strcpy(source.VertexSource, ShaderStream[0]);
-	source.FragmentSource = malloc(strlen(ShaderStream[1]) + 1);
-	strcpy(source.FragmentSource, ShaderStream[1]);
+	source.VertexSource 	= ShaderStream[0];
+	source.FragmentSource 	= ShaderStream[1];
 	
 	return source;
 }

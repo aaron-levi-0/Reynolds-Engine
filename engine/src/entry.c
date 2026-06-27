@@ -6,7 +6,6 @@
 #include "core/window_internals.h"
 
 #include "logging.h"
-#include "renderer.h"
 #include "shader.h"
 #include "timestep.h"
 #include "Camera/OrthographicCamera.h"
