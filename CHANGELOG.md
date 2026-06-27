@@ -5,14 +5,27 @@ All notable changes to Reynolds-Engine are recorded here. The format is loosely 
 
 ## [Unreleased]
 
-### Added
-- `ARCHITECTURE.md` — engine architecture overview with diagrams.
-- `docs/adr/` — architecture decision records (0001–0004).
-- This `CHANGELOG.md`.
-
 ### Notes
 - A 2D AABB physics module (`physics.h` / `physics.c`) exists as a prototype patch; it is not
   yet merged into `main`.
+
+## [0.2.2]
+
+### Added
+- `get_log_level()` to query the active log level (e.g. from a debug layer).
+- Testbed **debug layer**: FPS readout and draw-call / quad counters on keypress.
+- `EngineInit` validates its arguments (non-NULL title, positive dimensions) and logs start-up.
+
+### Removed
+- Stray scratch file `a.md`.
+
+## [0.2.1]
+
+### Added
+- **Audio module** `audio.{h,c}` — a thin wrapper over miniaudio (init/shutdown, one-shot SFX,
+  looping music, master volume). See ADR-0005.
+- `ARCHITECTURE.md`, `docs/adr/` (records 0001–0005), and this `CHANGELOG.md`.
+- Audio tracks under `testbed/res/audio/`.
 
 ## [0.1.2]
 
