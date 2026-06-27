@@ -9,6 +9,15 @@ All notable changes to Reynolds-Engine are recorded here. The format is loosely 
 - A 2D AABB physics module (`physics.h` / `physics.c`) exists as a prototype patch; it is not
   yet merged into `main`.
 
+## [0.2.3]
+
+### Added
+- `testbed/src/debug_layer.{c,h}` — debug layer extracted to its own files (FPS readout and
+  draw-call / quad counters on keypress).
+
+### Fixed
+- Suppressed the `stb_image` `unused-but-set-variable` warning (scoped pragma in the vendor stub).
+
 ## [0.2.2]
 
 ### Added

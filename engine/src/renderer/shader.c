@@ -57,7 +57,7 @@ ShaderProgramSource parseFile(const char* filepath)
 		
 		else if (type != NONE)					//ignores any text before the first header and any text after the last header
 		{
-			space = sizeof(*ShaderStream[type]) - strlen(ShaderStream[type]) - 1;
+			space = sizeof(ShaderStream[type]) - strlen(ShaderStream[type]) - 1;
 			
 			if (space > 0)
 				strcat(ShaderStream[type], line);
@@ -69,6 +69,7 @@ ShaderProgramSource parseFile(const char* filepath)
 					REYNOLDS_ERROR("@shader: Could not allocate memory for shader source.");
 					return source;
 				}
+				strcat(ShaderStream[type], line);
 			}
 		}		
 	}
@@ -98,7 +99,6 @@ unsigned int CompileShader(const char* source, unsigned int type)
 		
 		const char* shader = type == GL_VERTEX_SHADER ? "vertex": "fragment";
 		REYNOLDS_ERROR("@shader: Failed to compile %s", shader);
-		REYNOLDS_ERROR("OpenGL Error: %s", message);
 		glDeleteShader(id);
 		return 0;
 	}
