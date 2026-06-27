@@ -10,6 +10,7 @@
 struct Renderer;
 
 typedef struct { vec2 pos, size; uint32_t texture; } SceneConfig;
+typedef struct { int8_t value; uint8_t state; } Tile;   
 
 typedef struct
 {
@@ -20,13 +21,9 @@ typedef struct
     bool lose;
     bool game_over_overlay;
 
-    uint16_t num_bombs;
-
-    int** board;            // row pointers
-    int** reveal_state;
-
+    Tile* board;
     SceneConfig scenes[3];
-
+    uint16_t num_bombs;
 } GameState;
 
 typedef struct 

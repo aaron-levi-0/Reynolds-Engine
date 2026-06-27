@@ -2,6 +2,7 @@
 
 #include "common.h"
 #include "board.h"
+#include "app_input.h"
 
 void reveal_tile(DisplayContext* dc, GameState* s, int x, int y)
 {
@@ -9,15 +10,19 @@ void reveal_tile(DisplayContext* dc, GameState* s, int x, int y)
 		tile, a flood-fill algorithm is then implemented to reveal all neighbouring clear tiles
 		as well.
 	*/
+
+    Tile* board = s -> board;
+    uint8_t reveal_state = board[IDX(x, y)].state;
+    int8_t board_value = board[IDX(x, y)].value;
+
 	
 	VALIDATE_LOG(s -> board, "Application trying to access non-existant board memory!");
-	VALIDATE_LOG(s -> reveal_state, "Application trying to access non-existant board memory!");
 
-    if (!valid_tile(dc, x, y) || s -> reveal_state[y][x] != IS_TILE_CLOSED) return;
+    if (!valid_tile(dc, x, y) || reveal_state != IS_TILE_CLOSED) return;
+    
+    reveal_state = IS_TILE_CLEARED;
 
-    s -> reveal_state[y][x] = IS_TILE_CLEARED;
-
-    if (s -> board[y][x] != 0) return; // Stop if it's a numbered tile
+    if (board_value != 0) return; // Stop if it's a numbered tile
 
     // Recursively reveal neighbors (flood-fill algorithm)
     for (int8_t dx = -1; dx <= 1; dx++) 
@@ -37,15 +42,18 @@ bool valid_flag(DisplayContext* dc, GameState* s, int x, int y)
 		is already flagged, it is marked as unflagged.
 	*/
 	
-	ASSERT_FATAL(s -> reveal_state, "Application trying to access non-existant board memory!");
+	ASSERT_FATAL(s -> board, "Application trying to access non-existant board memory!");
 	
+    Tile* board = s -> board;
+    uint8_t reveal_state = board[IDX(x, y)].state;
+
 	if (!valid_tile(dc, x, y)) return false;
 	
-	if(s -> reveal_state[y][x] == IS_TILE_CLOSED || s -> reveal_state[y][x] == IS_TILE_UNFLAGGED)
+	if(reveal_state == IS_TILE_CLOSED || reveal_state == IS_TILE_UNFLAGGED)
 		return true;
 	
-	if(s -> reveal_state[y][x] == IS_TILE_FLAGGED)
-		s -> reveal_state[y][x] = IS_TILE_UNFLAGGED;
+	if(reveal_state == IS_TILE_FLAGGED)
+		reveal_state = IS_TILE_UNFLAGGED;
 	
 	return false;
 }
@@ -55,18 +63,16 @@ bool check_win(DisplayContext* dc, GameState* s)
 		been flagged and all non-bomb tiles remain unflagged.
 	*/
 
-    int** board        = s -> board;
-    int** reveal_state = s -> reveal_state;
+    ASSERT_FATAL(s -> board, "Application trying to access non-existant board memory!");
 
-    ASSERT_FATAL(board, "Application trying to access non-existant board memory!");
-    ASSERT_FATAL(reveal_state, "Application trying to access non-existant board memory!");
+    Tile* board = s -> board;
 
     const uint8_t rows = dc -> tiles_y;
     const uint8_t cols = dc -> tiles_x;
 
     for (uint8_t y = 0; y < rows; y++) {
         for (uint8_t x = 0; x < cols; x++) {
-            if (board[y][x] != BOMB && reveal_state[y][x] != IS_TILE_CLEARED) {
+            if (board[IDX(x, y)].value != BOMB && board[IDX(x, y)].state != IS_TILE_CLEARED) {
                 return false; // some safe tile still hidden
             }
         }

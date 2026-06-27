@@ -17,7 +17,7 @@
 extern int  valid_tile(DisplayContext* dc, int x, int y);
 extern void init_board_state(DisplayContext* dc, GameState* s, const uint32_t* config);
 extern void reset_board(DisplayContext* dc, GameState* s);
-extern void delete_board(GameState* s);
+extern void delete_board(Tile* board);
 extern void place_mines(DisplayContext* dc, GameState* s);
 
 #endif

@@ -3,6 +3,7 @@
 #include "common.h"
 #include "game_logic.h"
 #include "board.h"
+#include "app_input.h"
 
 #include <texture.h>
 #include <Camera/OrthoCameraController.h>
@@ -12,6 +13,8 @@ vec4 FULL_SAMPLE = {0.0f, 0.0f, 1.0f, 1.0f};
 
 enum choose_scene { EASY, INTERMEDIATE, HARD };
 #define DEFAULT	(INTERMEDIATE)
+
+#define SPRITE_AMOUNT 12	
 
 enum sprites { CLOSED_TILE = 0, ONE_TILE, TWO_TILE, THREE_TILE, FOUR_TILE, FIVE_TILE, 
 				SIX_TILE, SEVEN_TILE, EIGHT_TILE, NINE_TILE, FLAG_TILE, BOMB_TILE};
@@ -30,6 +33,8 @@ uint16_t sprite_cell[][2] = {
 	[FLAG_TILE] 	= {2, 0},
 	[BOMB_TILE]		= {3, 0}
 }; //NOTE: sprite sheet sampling starts from bottom left TO-DO: fix order
+
+vec4 sprite_uv[SPRITE_AMOUNT] = {0};
 
 void init_display(DisplayContext* dc)
 {
@@ -56,6 +61,7 @@ void init_display(DisplayContext* dc)
 									dc -> sprite_cell_size,
 									dc -> sprite_size);
 		VALIDATE_LOG(ok, "Could not register sprite id %d", id);
+		glm_vec4_copy(get_uv(&dc -> texture_register, dc -> board_pieces, sprite_cell[id]), sprite_uv[id]);
 	}
 
 	dc -> bg_colour[0] = 0.57f;
@@ -106,28 +112,31 @@ void calc_norms(DisplayContext* dc, float* params[])
 
 static void draw_piece(struct Renderer* renderer, DisplayContext* dc, GameState* s,  int x, int y, vec2 pos, vec2 size)
 {
+	Tile* board = s -> board;
 	VALIDATE_LOG(renderer, "Attempting to draw on an uninitialised renderer!");
 	VALIDATE_LOG(s -> board, "Application trying to access non-existant board memory!");
-	VALIDATE_LOG(s -> reveal_state, "Application is trying to access non-existant board memory!");
 	VALIDATE_LOG(valid_tile(dc, x, y), "Invalid board coordinates: (%d, %d)", x, y);
 
-	if(s -> reveal_state[y][x] == IS_TILE_CLOSED || s -> reveal_state[y][x] == IS_TILE_UNFLAGGED)
+	uint8_t reveal_state = board[IDX(x, y)].state;
+	int8_t board_value = board[IDX(x, y)].value;
+
+	if(reveal_state == IS_TILE_CLOSED || reveal_state == IS_TILE_UNFLAGGED)
 	{	
-		DrawQuad(renderer, pos, size, dc -> board_pieces, get_uv(&dc -> texture_register, dc -> board_pieces, sprite_cell[CLOSED_TILE]));
+		DrawQuad(renderer, pos, size, dc -> board_pieces, sprite_uv[CLOSED_TILE]);
 	}
 	
-	else if(s -> reveal_state[y][x] == IS_TILE_FLAGGED)
+	else if(reveal_state == IS_TILE_FLAGGED)
 	{
-		DrawQuad(renderer, pos, size, dc -> board_pieces, get_uv(&dc -> texture_register, dc -> board_pieces, sprite_cell[CLOSED_TILE]));
-		DrawQuad(renderer, pos, size, dc -> board_pieces, get_uv(&dc -> texture_register, dc -> board_pieces, sprite_cell[FLAG_TILE]));
+		DrawQuad(renderer, pos, size, dc -> board_pieces, sprite_uv[CLOSED_TILE]);
+		DrawQuad(renderer, pos, size, dc -> board_pieces, sprite_uv[FLAG_TILE]);
 	} 
-	else if(s -> board[y][x] != BOMB)
+	else if(board_value != BOMB)
 	{
-		if(s -> board[y][x] == EMPTY) return;
-		DrawQuad(renderer, pos, size, dc -> board_pieces, get_uv(&dc -> texture_register, dc -> board_pieces, sprite_cell[s -> board[y][x]]));
+		if(board[IDX(x, y)].value == EMPTY) return;
+		DrawQuad(renderer, pos, size, dc -> board_pieces, sprite_uv[board[IDX(x, y)].value]);
 	}
 	else
-		DrawQuad(renderer, pos, size, dc -> board_pieces, get_uv(&dc -> texture_register, dc -> board_pieces, sprite_cell[BOMB_TILE]));
+		DrawQuad(renderer, pos, size, dc -> board_pieces, sprite_uv[BOMB_TILE]);
 }
 
 //This is an overlay that tells the user that the game is now complete and gives them the option to restart

@@ -18,7 +18,7 @@
 enum tile_state {IS_TILE_CLOSED, IS_TILE_CLEARED, IS_TILE_FLAGGED, IS_TILE_UNFLAGGED};
 enum game_state {NONE = BIT(0), PLAY = BIT(1), GAME_OVER = BIT(2), RESTART = BIT(3)};
 enum scene 		{MENU = BIT(4), OPTIONS = BIT(5), EASY_BOARD = BIT(6), INTER_BOARD = BIT(7), HARD_BOARD = BIT(8)};
-	
+
 /* typedef struct{
 	enum {TILE_CLOSED, TILE_CLEARED, TILE_FLAGGED, TILE_UNFLAGGED} tile_state;
 	enum {NONE = BIT(0), PLAY = BIT(1), GAME_OVER = BIT(2), RESTART = BIT(3)} game_state;

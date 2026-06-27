@@ -179,6 +179,11 @@ static void mouse_during_options(DisplayContext* dc, GameState* s, double xpos, 
 	}
 }
 
+uint32_t ms_index(DisplayContext* dc, int x, int y)
+{
+	return (uint32_t)(y * dc -> tiles_x + x);
+}
+
 static void mouse_during_play(DisplayContext* dc, GameState* s, double xpos, double ypos, bool right_click)
 {
 	int grid_coords[2];
@@ -189,28 +194,29 @@ static void mouse_during_play(DisplayContext* dc, GameState* s, double xpos, dou
 	
 	if(valid_tile(dc, gridX, gridY))
 	{
-		int** reveal_state = s -> reveal_state;
-		VALIDATE_LOG(reveal_state, "Application trying to access non-existant board memory!");
+		Tile* board = s -> board; 
+		VALIDATE_LOG(board, "Application trying to access non-existant board memory!");
+
+		uint8_t reveal_state = board[IDX(gridX, gridY)].state;
 		
 		if(right_click)
 		{
 			// handle right click to flag tiles
 			if (valid_flag(dc, s, gridX, gridY))
-				reveal_state[gridY][gridX] = IS_TILE_FLAGGED;
+				reveal_state = IS_TILE_FLAGGED;
 			
 			REYNOLDS_DEBUG("@input: tile right clicked at: (%d, %d)", gridX, gridY);
 			
 		} else {
-			int** board = s -> board;
-			VALIDATE_LOG(board, "Application trying to access non-existant board memory!");
+			int8_t board_value = board[IDX(gridX, gridY)].value;
 			
 			// handle left click to all tiles		
-			if(reveal_state[gridY][gridX] == IS_TILE_UNFLAGGED)
-				reveal_state[gridY][gridX] = IS_TILE_CLOSED;
+			if(reveal_state == IS_TILE_UNFLAGGED)
+				reveal_state = IS_TILE_CLOSED;
 			
 			reveal_tile(dc, s, gridX, gridY);
 
-			s -> lose = (board[gridY][gridX] == BOMB && reveal_state[gridY][gridX] == IS_TILE_CLEARED);
+			s -> lose = (board_value == BOMB && reveal_state == IS_TILE_CLEARED);
 			
 			REYNOLDS_DEBUG("@input: tile left clicked at: (%d, %d)", gridX, gridY);
 		}

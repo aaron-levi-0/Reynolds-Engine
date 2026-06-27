@@ -73,7 +73,7 @@ int main()
 	unload_textures(&context);
 	
 	if(state.board)
-		delete_board(&state);
+		delete_board(state.board);
 	
 	renderer_destroy(renderer);
 	audio_shutdown();

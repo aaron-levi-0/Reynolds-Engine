@@ -48,7 +48,6 @@ static SubTexture* get_subtex_struc(const Vector* entries, uint32_t textureID, u
 
 float* get_uv(const Vector* entries, uint32_t textureID, uint16_t cell_location[2])
 {
-    //VALIDATE_LOG(entries, "get_uv: invalid args");
     SubTexture* st = get_subtex_struc(entries, textureID, cell_location);
 
     if (!st) 
