@@ -12,8 +12,6 @@ ShaderProgramSource parseFile(const char* filepath)
 
 	enum ShaderType{ NONE = -1, VERTEX, FRAGMENT };
 	enum ShaderType type = NONE;
-
-	size_t space;
 	
 	char line[BUFSIZ];
 	const char* vertex_header = "#shader vertex";
@@ -32,7 +30,8 @@ ShaderProgramSource parseFile(const char* filepath)
 		return source;
 	}
 	
-	char* ShaderStream[2] = {malloc(BUFSIZ), malloc(BUFSIZ)};
+	char* ShaderStream[2]	= {malloc(BUFSIZ), malloc(BUFSIZ)};
+	size_t capacity[2]		= { BUFSIZ, BUFSIZ };
 
 	if(!ShaderStream[0] || !ShaderStream[1])
 	{
@@ -57,22 +56,28 @@ ShaderProgramSource parseFile(const char* filepath)
 		
 		else if (type != NONE)					//ignores any text before the first header and any text after the last header
 		{
-			space = sizeof(ShaderStream[type]) - strlen(ShaderStream[type]) - 1;
-			
-			if (space > 0)
-				strcat(ShaderStream[type], line);
-			else
+			size_t needed = strlen(ShaderStream[type]) + strlen(line) + 1;
+
+			if (needed > capacity[type]) 
 			{
-				ShaderStream[type] = realloc(ShaderStream[type], strlen(ShaderStream[type]) + strlen(line) + 1);
-				if(!ShaderStream[type])
-				{
-					REYNOLDS_ERROR("@shader: Could not allocate memory for shader source.");
-					return source;
+				size_t new_cap = capacity[type];
+				while (new_cap < needed) new_cap *= 2;
+				
+				char* grown = realloc(ShaderStream[type], new_cap);
+				if (!grown) 
+				{ 
+					REYNOLDS_ERROR("@shader: OOM growing shader source.");
+					free(ShaderStream[0]); free(ShaderStream[1]); fclose(fp); 
+					return source; 
 				}
-				strcat(ShaderStream[type], line);
+
+				ShaderStream[type] = grown;
+				capacity[type]     = new_cap;
 			}
-		}		
+			strcat(ShaderStream[type], line);	
+		}
 	}
+
 	fclose(fp);
 
 	source.VertexSource 	= ShaderStream[0];
