@@ -3,6 +3,7 @@
 
 #include "defines.h"
 #include <stdlib.h>
+#include <stdint.h>
 
 typedef enum log_level {
     LOG_LEVEL_FATAL = 0,
@@ -13,7 +14,8 @@ typedef enum log_level {
     LOG_LEVEL_VERBOSE 
 } log_level;
 
-REN_API void set_log_level(log_level level);
+REN_API void set_log_level(log_level level);\
+REN_API uint8_t get_log_level();
 REN_API void log_message(log_level level, const char* format, ...);
 
 #define LOG_VERBOSE_ENABLED 1

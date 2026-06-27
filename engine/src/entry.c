@@ -39,6 +39,11 @@ void onWindowClose(Event* e)
 
 void EngineInit(const char* title, int w, int h)
 {
+	ASSERT_FATAL(title, "@engine: window title is NULL!");
+	ASSERT_FATAL(w > 0 && h > 0, "@engine: invalid window dimensions!");
+
+	REYNOLDS_INFO("Initialising Log...");
+
     create_window(title, w, h);
 	SetEventCallback(&onEvent);
 
@@ -55,6 +60,33 @@ LayerStack* InitLayerStack()
 	
 	return stack;
 }
+
+/*void EngineRun()
+{
+	while (Running())
+    {	
+		timestep = get_delta_time();	
+		resetStats(renderer);
+
+		if(!Minimised())
+		{
+			render_clear();
+
+			setMat4("u_ProjectionView", getPVMat());
+			
+			BeginBatch(renderer);
+
+			update_layers(stack, timestep);
+			render_layers(stack);
+
+			EndBatch(renderer);
+			FlushBatch(renderer); //combine both and name 'ExitBatch' or 'ExecuteBatch'
+
+			update_window();
+		}
+		getRenderStats(renderer, &stats);
+    }
+}*/
 
 void EngineShutdown()
 {

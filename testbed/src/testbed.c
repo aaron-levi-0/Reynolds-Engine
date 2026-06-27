@@ -12,20 +12,19 @@
 const char* ICON_PATH 	= "../testbed/res/extra/minesweeper.png";
 const char* SHADER_PATH = "../testbed/res/shaders/shader";
 
+struct Statistics stats;
+
+extern void debug_update(float deltaTime);
+
 int main()
 {
-	/** BOOTSTRAP PHASE **/
-
+	/** BOOTSTRAP PHASE **/	
 	set_log_level(LOG_LEVEL_VERBOSE);
-	REYNOLDS_INFO("Initialising Log...");
-	
 	EngineInit("minesweeper.c", SCREEN_WIDTH, SCREEN_HEIGHT);
     EngineDependencies();
-
 	load_icon(ICON_PATH);
 
 	DisplayContext context = {0};
-
 	GameState state 	= {0};
 	state.scene 		= MENU;
 
@@ -40,40 +39,36 @@ int main()
 	Layer gameplay_layer 		= create_gameplay_layer(renderer, &context, &state);
 	Layer ui_layer 				= create_ui_layer(renderer, &context, &state);
 	Layer close_window_layer 	= {"Window Close Layer", .id = LAYER_WINDOW_CLOSE, .onEvent = onWindowClose};
-
+	Layer debug_layer 			= {"Debug Layer", .id = LAYER_DEBUG, .update = debug_update, .onEvent = debug_event};
+	
 	push_layer(stack, render_layer);
 	push_layer(stack, close_window_layer);
 	push_layer(stack, gameplay_layer);
 	push_layer(stack, ui_layer);
 	push_layer(stack, camera_layer);
-
-	// disable_layer_event(&gameplay_layer); // disable gameplay events for debugging or ui //
+	push_layer(stack, debug_layer);
 	
 	/* Setup orthographic camera */
 	float aspect_ratio = (float)getWindowWidth()/(float)getWindowHeight();
+
 	createOrthoCameraController(aspect_ratio);
 	setZoomLimits(0.25f, 1.0f);
-
 	invert_camera(true);
 	enable_translation(true);
 	enable_zoom(true);
 	setLateralLimits(-0.5f, 0.5f); //or do enable_camera_events
-	disable_layer_event(&camera_layer);
 
-	/* Misc */
-	struct Statistics stats;
-	bool key_event_handled = false;
-	
+	/* Time setup */
 	float timestep;
 	srand(time(NULL));
-	
+
+	/* Scene setup*/
 	init_display(&context);
 	init_scenes(&context, &state);
-
 	SetClearColour((vec3){1.0f, 1.0f, 1.0f}); // NOTE: set to white #ffffff
 
-	audio_init();
-	audio_play_music("../testbed/res/audio/track_B.wav");
+	//audio_init();
+	//audio_play_music("../testbed/res/audio/track_B.wav");
 
 	/** RUNTIME PHASE **/
     while (Running())
@@ -85,7 +80,7 @@ int main()
 		{
 			render_clear();
 
-			setMat4("u_ProjectionView", getPVMat());
+			setMat4("u_ProjectionView", getPVMat());	//TO-DO: move to render layer
 			
 			BeginBatch(renderer);
 
@@ -93,22 +88,13 @@ int main()
 			render_layers(stack);
 
 			EndBatch(renderer);
-			FlushBatch(renderer); //combine both and name 'ExitBatch' or 'ExecuteBatch'
+			FlushBatch(renderer); // combine both and name 'ExitBatch' or 'ExecuteBatch'
 
 			update_window();
-
-			if(isKeyPressed(GLFW_KEY_L))
-			{
-				if(!key_event_handled)
-				{
-					REYNOLDS_DEBUG("Draw calls: %d\tQuad count: %d", stats.DrawCalls, stats.QuadCount);
-					key_event_handled = true;
-				}
-			} else key_event_handled = false;
 		}
 		getRenderStats(renderer, &stats);
     }
-	
+
 	//** SHUTDOWN PHASE **//
 
 	unload_textures(&context);
@@ -119,5 +105,21 @@ int main()
 	renderer_destroy(renderer);
 	audio_shutdown();
 	EngineShutdown();
+
     return 0;
+}
+
+void debug_update(float deltaTime)
+{
+	if(isKeyPressed(GLFW_KEY_F))
+		REYNOLDS_DEBUG("FPS: %d", (int)(1.0f/deltaTime));
+}
+
+void debug_event(Event* e)
+{
+	if(e -> type == KeyPressed)
+	{
+		if(e -> key.code == GLFW_KEY_L)
+			REYNOLDS_DEBUG("Draw calls: %d\tQuad count: %d", stats.DrawCalls, stats.QuadCount);
+	}
 }

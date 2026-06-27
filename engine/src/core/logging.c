@@ -21,6 +21,11 @@
 
 uint8_t LOG_LEVEL = LOG_LEVEL_INFO;
 
+uint8_t get_log_level()
+{
+    return LOG_LEVEL;
+}
+
 void set_log_level(log_level level)
 {
     LOG_LEVEL = level;
