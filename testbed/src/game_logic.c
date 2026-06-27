@@ -45,15 +45,15 @@ bool valid_flag(DisplayContext* dc, GameState* s, int x, int y)
 	ASSERT_FATAL(s -> board, "Application trying to access non-existant board memory!");
 	
     Tile* board = s -> board;
-    uint8_t reveal_state = board[IDX(x, y)].state;
+    uint8_t* reveal_state = &board[IDX(x, y)].state;
 
 	if (!valid_tile(dc, x, y)) return false;
 	
-	if(reveal_state == IS_TILE_CLOSED || reveal_state == IS_TILE_UNFLAGGED)
+	if(*reveal_state == IS_TILE_CLOSED || *reveal_state == IS_TILE_UNFLAGGED)
 		return true;
 	
-	if(reveal_state == IS_TILE_FLAGGED)
-		reveal_state = IS_TILE_UNFLAGGED;
+	if(*reveal_state == IS_TILE_FLAGGED)
+		*reveal_state = IS_TILE_UNFLAGGED;
 	
 	return false;
 }

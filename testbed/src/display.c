@@ -132,8 +132,8 @@ static void draw_piece(struct Renderer* renderer, DisplayContext* dc, GameState*
 	} 
 	else if(board_value != BOMB)
 	{
-		if(board[IDX(x, y)].value == EMPTY) return;
-		DrawQuad(renderer, pos, size, dc -> board_pieces, sprite_uv[board[IDX(x, y)].value]);
+		if(board_value == EMPTY) return;
+		DrawQuad(renderer, pos, size, dc -> board_pieces, sprite_uv[board_value]);
 	}
 	else
 		DrawQuad(renderer, pos, size, dc -> board_pieces, sprite_uv[BOMB_TILE]);

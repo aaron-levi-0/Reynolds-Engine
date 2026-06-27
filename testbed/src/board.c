@@ -15,6 +15,8 @@ int valid_tile(DisplayContext* dc, int x, int y)
 
 void place_mines(DisplayContext* dc, GameState* s) 
 {
+	ASSERT_FATAL(s -> board, "Application trying to access non-existant board memory!");
+	
 	int x, y;
 	Tile* board = s -> board;
 	
@@ -78,8 +80,8 @@ void init_board_state(DisplayContext* dc, GameState* s, const uint32_t* config)
 	ASSERT_FATAL(s->num_bombs <= total_cells,"Number of bombs exceeds number of tiles");
 
 	//set the contiguos board memory
-	Tile* board = calloc(total_cells, sizeof(Tile));
-	ASSERT_FATAL(board, "Failed to initialise board state!\n");
+	s -> board = calloc(total_cells, sizeof(Tile));
+	ASSERT_FATAL(s -> board, "Failed to initialise board state!\n");
 	
 	place_mines(dc, s);
 }
