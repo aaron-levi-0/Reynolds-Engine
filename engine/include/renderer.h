@@ -30,7 +30,8 @@ REN_API void FlushBatch(struct Renderer* );
 REN_API void DrawQuad(struct Renderer* renderer, vec2 position, vec2 size, unsigned int textureID, vec4 tex_coords);
 REN_API void DrawColour(struct Renderer* renderer, vec2 position, vec2 size, vec4 colour);
 
-REN_API void getRenderStats(const struct Renderer* r, struct Statistics* out_stats);
+REN_API uint32_t getDrawCalls(const struct Renderer* r);
+REN_API uint32_t getQuadCount(const struct Renderer* r);
 REN_API void resetStats(struct Renderer* r);
 
 #endif

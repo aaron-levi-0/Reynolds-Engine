@@ -1,10 +1,15 @@
 #include <GL/glew.h>
+#include <time.h>
 
 #include "entry_internals.h"
 #include "core/layers_internals.h"
 #include "core/window_internals.h"
 
 #include "logging.h"
+#include "renderer.h"
+#include "shader.h"
+#include "timestep.h"
+#include "Camera/OrthographicCamera.h"
 
 LayerStack* stack = NULL;
 
@@ -61,8 +66,12 @@ LayerStack* InitLayerStack()
 	return stack;
 }
 
-/*void EngineRun()
+void EngineRun(struct Renderer* renderer, LayerStack* stack)
 {
+	/* Time setup */
+	float timestep;
+	srand(time(NULL));
+
 	while (Running())
     {	
 		timestep = get_delta_time();	
@@ -72,7 +81,7 @@ LayerStack* InitLayerStack()
 		{
 			render_clear();
 
-			setMat4("u_ProjectionView", getPVMat());
+			setMat4("u_ProjectionView", getPVMat()); //TO-DO: move to render layer
 			
 			BeginBatch(renderer);
 
@@ -84,9 +93,8 @@ LayerStack* InitLayerStack()
 
 			update_window();
 		}
-		getRenderStats(renderer, &stats);
     }
-}*/
+}
 
 void EngineShutdown()
 {

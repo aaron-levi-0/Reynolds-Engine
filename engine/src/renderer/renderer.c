@@ -336,8 +336,14 @@ void resetStats(struct Renderer* r)
     memset(&r -> stats, 0, sizeof(r -> stats));
 }
 
-void getRenderStats(const struct Renderer* r, struct Statistics* out) 
+uint32_t getDrawCalls(const struct Renderer* r) 
 {
-    if (!r || !out) return;
-    *out = r -> stats;
+	if (!r) return 0;
+	return r -> stats.DrawCalls;
+}
+
+uint32_t getQuadCount(const struct Renderer* r) 
+{
+	if (!r) return 0;
+	return r -> stats.QuadCount;
 }

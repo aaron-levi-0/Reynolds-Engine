@@ -39,7 +39,7 @@ int main()
 	Layer gameplay_layer 		= create_gameplay_layer(renderer, &context, &state);
 	Layer ui_layer 				= create_ui_layer(renderer, &context, &state);
 	Layer close_window_layer 	= {"Window Close Layer", .id = LAYER_WINDOW_CLOSE, .onEvent = onWindowClose};
-	Layer debug_layer 			= {"Debug Layer", .id = LAYER_DEBUG, .update = debug_update, .onEvent = debug_event};
+	Layer debug_layer 			= {"Debug Layer", .id = LAYER_DEBUG, .update = debug_update};
 	
 	push_layer(stack, render_layer);
 	push_layer(stack, close_window_layer);
@@ -58,10 +58,6 @@ int main()
 	enable_zoom(true);
 	setLateralLimits(-0.5f, 0.5f); //or do enable_camera_events
 
-	/* Time setup */
-	float timestep;
-	srand(time(NULL));
-
 	/* Scene setup*/
 	init_display(&context);
 	init_scenes(&context, &state);
@@ -71,29 +67,7 @@ int main()
 	//audio_play_music("../testbed/res/audio/track_B.wav");
 
 	/** RUNTIME PHASE **/
-    while (Running())
-    {	
-		timestep = get_delta_time();	
-		resetStats(renderer);
-
-		if(!Minimised())
-		{
-			render_clear();
-
-			setMat4("u_ProjectionView", getPVMat());	//TO-DO: move to render layer
-			
-			BeginBatch(renderer);
-
-			update_layers(stack, timestep);
-			render_layers(stack);
-
-			EndBatch(renderer);
-			FlushBatch(renderer); // combine both and name 'ExitBatch' or 'ExecuteBatch'
-
-			update_window();
-		}
-		getRenderStats(renderer, &stats);
-    }
+    EngineRun(renderer, stack);
 
 	//** SHUTDOWN PHASE **//
 
@@ -113,13 +87,7 @@ void debug_update(float deltaTime)
 {
 	if(isKeyPressed(GLFW_KEY_F))
 		REYNOLDS_DEBUG("FPS: %d", (int)(1.0f/deltaTime));
-}
 
-void debug_event(Event* e)
-{
-	if(e -> type == KeyPressed)
-	{
-		if(e -> key.code == GLFW_KEY_L)
-			REYNOLDS_DEBUG("Draw calls: %d\tQuad count: %d", stats.DrawCalls, stats.QuadCount);
-	}
+	if(isKeyPressed(GLFW_KEY_L))
+		REYNOLDS_DEBUG("Draw calls: %d\tQuad count: %d", getDrawCalls(renderer), getQuadCount(renderer));
 }
