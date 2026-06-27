@@ -12,15 +12,17 @@ void reveal_tile(DisplayContext* dc, GameState* s, int x, int y)
 	*/
 
     Tile* board = s -> board;
-    uint8_t reveal_state = board[IDX(x, y)].state;
-    int8_t board_value = board[IDX(x, y)].value;
-
 	
 	VALIDATE_LOG(s -> board, "Application trying to access non-existant board memory!");
 
-    if (!valid_tile(dc, x, y) || reveal_state != IS_TILE_CLOSED) return;
+    if (!valid_tile(dc, x, y)) return;
     
-    reveal_state = IS_TILE_CLEARED;
+    uint8_t* reveal_state = &board[IDX(x, y)].state;
+    int8_t board_value = board[IDX(x, y)].value;
+
+    if (*reveal_state != IS_TILE_CLOSED) return;
+
+    *reveal_state = IS_TILE_CLEARED;
 
     if (board_value != 0) return; // Stop if it's a numbered tile
 
@@ -43,12 +45,11 @@ bool valid_flag(DisplayContext* dc, GameState* s, int x, int y)
 	*/
 	
 	ASSERT_FATAL(s -> board, "Application trying to access non-existant board memory!");
-	
     Tile* board = s -> board;
-    uint8_t* reveal_state = &board[IDX(x, y)].state;
 
 	if (!valid_tile(dc, x, y)) return false;
-	
+	uint8_t* reveal_state = &board[IDX(x, y)].state;
+
 	if(*reveal_state == IS_TILE_CLOSED || *reveal_state == IS_TILE_UNFLAGGED)
 		return true;
 	

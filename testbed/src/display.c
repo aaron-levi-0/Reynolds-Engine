@@ -9,17 +9,31 @@
 #include <Camera/OrthoCameraController.h>
 #include <subTexture.h>
 
-vec4 FULL_SAMPLE = {0.0f, 0.0f, 1.0f, 1.0f};
+enum Difficulty { 
+	DIFFICULTY_EASY, 
+	DIFFICULTY_INTERMEDIATE, 
+	DIFFICULTY_HARD 
+};
 
-enum choose_scene { EASY, INTERMEDIATE, HARD };
-#define DEFAULT	(INTERMEDIATE)
+#define DEFAULT	(DIFFICULTY_INTERMEDIATE)
 
-#define SPRITE_AMOUNT 12	
+enum SpriteIndex { 
+	CLOSED_TILE = 0, 
+	ONE_TILE, 
+	TWO_TILE, 
+	THREE_TILE, 
+	FOUR_TILE, 
+	FIVE_TILE,
+	SIX_TILE,
+	SEVEN_TILE,
+	EIGHT_TILE, 
+	NINE_TILE, 
+	FLAG_TILE, 
+	BOMB_TILE,
+	SPRITE_COUNT
+};
 
-enum sprites { CLOSED_TILE = 0, ONE_TILE, TWO_TILE, THREE_TILE, FOUR_TILE, FIVE_TILE, 
-				SIX_TILE, SEVEN_TILE, EIGHT_TILE, NINE_TILE, FLAG_TILE, BOMB_TILE};
-
-uint16_t sprite_cell[][2] = {
+static const uint16_t SPRITE_CELL[SPRITE_COUNT][2] = {
 	[CLOSED_TILE] 	= {0, 2},
 	[ONE_TILE]		= {1, 2},
 	[TWO_TILE]		= {2, 2},
@@ -34,7 +48,8 @@ uint16_t sprite_cell[][2] = {
 	[BOMB_TILE]		= {3, 0}
 }; //NOTE: sprite sheet sampling starts from bottom left TO-DO: fix order
 
-vec4 sprite_uv[SPRITE_AMOUNT] = {0};
+static vec4 FULL_SAMPLE = {0.0f, 0.0f, 1.0f, 1.0f};
+vec4 sprite_uv[SPRITE_COUNT] = {0};
 
 void init_display(DisplayContext* dc)
 {
@@ -57,11 +72,11 @@ void init_display(DisplayContext* dc)
 	{
 		bool ok = subtex_register_cell(&dc -> texture_register,
 									dc -> board_pieces,
-									sprite_cell[id],
+									SPRITE_CELL[id],
 									dc -> sprite_cell_size,
 									dc -> sprite_size);
 		VALIDATE_LOG(ok, "Could not register sprite id %d", id);
-		glm_vec4_copy(get_uv(&dc -> texture_register, dc -> board_pieces, sprite_cell[id]), sprite_uv[id]);
+		glm_vec4_copy(get_uv(&dc -> texture_register, dc -> board_pieces, SPRITE_CELL[id]), sprite_uv[id]);
 	}
 
 	dc -> bg_colour[0] = 0.57f;
@@ -71,9 +86,9 @@ void init_display(DisplayContext* dc)
 
 void init_scenes(DisplayContext* dc, GameState* s)
 {
-    s -> scenes[EASY]         = (SceneConfig){{-0.5f,-0.5f},{1.0f,1.0f}, dc -> easy_board}; //TO-DO: stop zoom-in making tex blurry
-    s -> scenes[INTERMEDIATE] = (SceneConfig){{-1.0f,-1.0f},{2.0f,2.0f}, dc -> inter_board};
-    s -> scenes[HARD]         = (SceneConfig){{-0.75f,-0.4f},{1.5f,0.8f}, dc -> hard_board};
+    s -> scenes[DIFFICULTY_EASY]         = (SceneConfig){{-0.5f,-0.5f},{1.0f,1.0f}, dc -> easy_board}; //TO-DO: stop zoom-in making tex blurry
+    s -> scenes[DIFFICULTY_INTERMEDIATE] = (SceneConfig){{-1.0f,-1.0f},{2.0f,2.0f}, dc -> inter_board};
+    s -> scenes[DIFFICULTY_HARD]         = (SceneConfig){{-0.75f,-0.4f},{1.5f,0.8f}, dc -> hard_board};
 }
 
 void calc_norms(DisplayContext* dc, float* params[]) 
@@ -262,17 +277,17 @@ void scene_render(struct Renderer* renderer, DisplayContext* dc, GameState* s)
     {
         case EASY_BOARD:
             SetClearColour(dc -> bg_colour);
-            board_controller(renderer, s, dc, EASY);
+            board_controller(renderer, s, dc, DIFFICULTY_EASY);
             break;
 
         case INTER_BOARD:
             SetClearColour(dc -> bg_colour);
-            board_controller(renderer, s, dc, INTERMEDIATE);
+            board_controller(renderer, s, dc, DIFFICULTY_INTERMEDIATE);
             break;
 
         case HARD_BOARD:
             SetClearColour(dc -> bg_colour);
-            board_controller(renderer, s, dc, HARD);
+            board_controller(renderer, s, dc, DIFFICULTY_HARD);
             break;
     }
 

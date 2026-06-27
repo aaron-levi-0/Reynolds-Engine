@@ -241,7 +241,6 @@ static void click_logic(DisplayContext* dc, GameState* s, int instance, bool mou
 	double xpos = getMouseX();
 	double ypos = getMouseY();
 		
-	// instance may be any enum from game_instance struct (now defunct)
 	if(instance & MENU)
 		mouse_during_menu(s, xpos, ypos);
 	else if(instance & OPTIONS)
