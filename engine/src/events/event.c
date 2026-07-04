@@ -192,18 +192,20 @@ Event* createMouseButtonReleasedEvent(int button)
 
 double getMouseX(Event* event) 
 {
-    if (event -> type == MouseMoved || event -> type == MouseScroll || event -> type == MouseButtonPressed || event -> type == MouseButtonReleased) 
+    if (event -> type == MouseMoved || event -> type == MouseScroll) 
         return event -> mouse.x;
+    else if (event -> type == MouseButtonPressed || event -> type == MouseButtonReleased) 
+        return event -> button.x;
 
     return -1.0; // Return -1 if the event is not a mouse event
 }
 
 double getMouseY(Event* event) 
 {
-    REYNOLDS_DEBUG("@input: getMouseY called with event type: %s. Mouse Y: %f", getEventName(event -> type), event -> mouse.y);
-
-    if (event -> type == MouseMoved || event -> type == MouseScroll || event -> type == MouseButtonPressed || event -> type == MouseButtonReleased) 
+    if (event -> type == MouseMoved || event -> type == MouseScroll) 
         return event -> mouse.y;
+    else if (event -> type == MouseButtonPressed || event -> type == MouseButtonReleased) 
+        return event -> button.y;
     
     return -1.0; // Return -1 if the event is not a mouse event
 }

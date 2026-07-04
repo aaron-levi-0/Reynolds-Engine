@@ -45,10 +45,17 @@ static void gameplay_update(float dt)
 
 static void gameplay_event(Event* e)
 {
-    Mxpos = getMouseX(e);
-	Mypos = getMouseY(e);
+    if (e -> type != MouseButtonPressed)
+        return;
 
-   REYNOLDS_DEBUG("@input: mouse position updated to: (%f, %f)", Mxpos, Mypos);
+    Mxpos = getMouseX(e);
+    Mypos = getMouseY(e);   
+
+
+    if(Mxpos < 0 || Mypos < 0) {
+        REYNOLDS_WARN("@input: mouse position out of bounds: (%f, %f)", Mxpos, Mypos);
+    } else
+        REYNOLDS_DEBUG("@input: mouse button pressed at: (%f, %f)", Mxpos, Mypos);
 }
 
 static void gameplay_render()

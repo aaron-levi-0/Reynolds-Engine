@@ -19,7 +19,7 @@ typedef struct {
     bool      handled;
     union {                                   // only the member for `type` is valid
         struct { int code, repeat; }        key;     // KEY_PRESSED / KEY_RELEASED
-        struct { int button; }              button;  // MOUSE_PRESSED / MOUSE_RELEASED
+        struct { int button; double x, y; } button;  // MOUSE_PRESSED / MOUSE_RELEASED
         struct { double x, y; }             mouse;   // MOUSE_MOVED / MOUSE_SCROLLED
         struct { uint32_t width, height; }  resize;  // WINDOW_RESIZE
         struct { uint32_t x, y; }           moved;   // WINDOW_MOVED
