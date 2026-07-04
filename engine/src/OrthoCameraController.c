@@ -3,7 +3,6 @@
 #include <GLFW/glfw3.h>
 #include "window.h"
 #include "events/event.h"
-#include "events/mouse_event.h"
 
 #include "input.h"
 #include "logging.h"
@@ -146,11 +145,11 @@ void onUpdate(float ts)
 	setOrthoPosition(camera -> position, true);
 }	
 
-static void onMouseScrolled()
+static void onMouseScrolled(Event* e)
 {
 	if(controller.zoom)
 	{
-		controller.zoom_level -= (float)getYOffset()*0.25f;
+		controller.zoom_level -= (float)getMouseY(e)*0.25f;
 
 		if(!(minimum_zoom && maximum_zoom))
 		{
@@ -183,7 +182,7 @@ static void onWindowResize()
 //window resize changes the aspect ratio
 static void onEvent(Event* e)
 {
-	if(e -> type == MouseScroll) { onMouseScrolled(); e -> handled = true; }
+	if(e -> type == MouseScroll) { onMouseScrolled(e); e -> handled = true; }
 	else if(e -> type == WindowResize) { onWindowResize(); }
 }
 

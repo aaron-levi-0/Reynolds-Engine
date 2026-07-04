@@ -83,13 +83,11 @@ void EngineRun(struct Renderer* renderer, LayerStack* stack)
 			setMat4("u_ProjectionView", getPVMat()); //TO-DO: move to render layer
 			
 			BeginBatch(renderer);
-
 			update_layers(stack, timestep);
 			render_layers(stack);
-
 			EndBatch(renderer);
-			FlushBatch(renderer); //combine both and name 'ExitBatch' or 'ExecuteBatch'
 
+			FlushBatch(renderer);
 			update_window();
 		}
     }

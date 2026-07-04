@@ -3,20 +3,22 @@
 
 #include "window.h"
 
+#include <stdint.h>
+
 //this is used to generalise the window process so that the application is not entirely
 //dependent on glfw. The variables are passed onto glfw if called upon by the library.
 
 struct Window
 {
 	const char* title;
-	unsigned int width, height;
+	int32_t width, height;
 	int xpos, ypos;
 	bool VSync;
 	
 	EventCallbackFn EventCallback;
 };
 
-extern Window* create_window(const char* , unsigned int , unsigned int ); 
+extern Window* create_window(const char* , int32_t width, int32_t height); 
 extern void close_window();
 extern void* GetNativeWindow();
 

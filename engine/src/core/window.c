@@ -1,14 +1,13 @@
 #include "core/window_internals.h"
 
-#include "events/app_event.h"
-#include "events/key_event.h"
-#include "events/mouse_event.h"
-#include "core/layers_internals.h"
-#include "stb_image.h"
-
 #include <GLFW/glfw3.h>
 #include <stdlib.h>
+
 #include "logging.h"
+#include "core/layers_internals.h"
+#include "events/event.h"
+
+#include "stb_image.h"
 
 Window* window 			= NULL;
 GLFWwindow* g_window	= NULL;
@@ -45,6 +44,7 @@ static void WindowSizeCallback(GLFWwindow* _window, int width, int height)
 	win_callbk -> height = height;
 	
 	Event* event = createWindowResizeEvent(width, height);
+	if (!event) return;
 	win_callbk -> EventCallback(event);
 }
 
@@ -56,6 +56,7 @@ static void WindowMoveCallback(GLFWwindow* _window, int xpos, int ypos)
 	win_callbk -> ypos = ypos;
 	
 	Event* event = createWindowMovedEvent(xpos, ypos);
+	if (!event) return;
 	win_callbk -> EventCallback(event); 
 }
 
@@ -64,6 +65,7 @@ static void WindowCloseCallback(GLFWwindow* _window)
 	Window* win_callbk = (Window* )glfwGetWindowUserPointer(_window); 
 	
 	Event* event = createWindowCloseEvent();
+	if (!event) return;
 	win_callbk -> EventCallback(event);
 }
 
@@ -78,14 +80,17 @@ static void KeyCallback(GLFWwindow* _window, int key, int scancode, int action, 
 	{
 		case GLFW_PRESS:
 			event = createKeyPressedEvent(key, 0);
+			if (!event) return;
 			win_callbk -> EventCallback(event);
 			break;
 		case GLFW_RELEASE:
 			event = createKeyReleasedEvent(key);
+			if (!event) return;
 			win_callbk -> EventCallback(event);
 			break;
 		case GLFW_REPEAT:
 			event = createKeyPressedEvent(key, getRepeatCount());
+			if (!event) return;
 			win_callbk -> EventCallback(event);
 			break;		
 	}	
@@ -156,11 +161,12 @@ static void init_window()
 	glfwSetCursorPosCallback(g_window, MousePosCallback);
 }
 
-Window* create_window(const char* title, unsigned int width, unsigned int height)
+Window* create_window(const char* title, int32_t width, int32_t height)
 {
 	window = malloc(sizeof(Window));
-	ASSERT_FATAL(window, "Failed to allocated memory for window!");
-	
+	ASSERT_FATAL(window, "Failed to allocated memory for window.");
+	ASSERT_FATAL(width > 0 && height > 0, "Window dimensions must be greater than zero.");
+
 	window -> title 	= title;
 	window -> width 	= width;
 	window -> height 	= height;

@@ -9,13 +9,13 @@
 #include <Camera/OrthoCameraController.h>
 #include <subTexture.h>
 
+#define DEFAULT	(DIFFICULTY_INTERMEDIATE)
+
 enum Difficulty { 
 	DIFFICULTY_EASY, 
 	DIFFICULTY_INTERMEDIATE, 
 	DIFFICULTY_HARD 
 };
-
-#define DEFAULT	(DIFFICULTY_INTERMEDIATE)
 
 enum SpriteIndex { 
 	CLOSED_TILE = 0, 
@@ -48,7 +48,7 @@ static const uint16_t SPRITE_CELL[SPRITE_COUNT][2] = {
 	[BOMB_TILE]		= {3, 0}
 }; //NOTE: sprite sheet sampling starts from bottom left TO-DO: fix order
 
-static vec4 FULL_SAMPLE = {0.0f, 0.0f, 1.0f, 1.0f};
+static const vec4 FULL_SAMPLE = {0.0f, 0.0f, 1.0f, 1.0f};
 vec4 sprite_uv[SPRITE_COUNT] = {0};
 
 void init_display(DisplayContext* dc)

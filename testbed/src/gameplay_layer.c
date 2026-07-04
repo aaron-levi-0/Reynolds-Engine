@@ -43,6 +43,13 @@ static void gameplay_update(float dt)
     }
 }
 
+static void gameplay_event(Event* e)
+{
+    Mxpos = getMouseX(e);
+	Mypos = getMouseY(e);
+	
+}
+
 static void gameplay_render()
 {
    	scene_render(st_render, context, g_state);

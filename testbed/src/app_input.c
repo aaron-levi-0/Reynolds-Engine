@@ -14,13 +14,13 @@
 					/* CONSTANTS */
 
 const char* BOARD_CONFIG_PATH = "../testbed/res/extra/boards.json";
-
+double Mxpos = 0, Mypos = 0;
 // Enumerations for button types and mouse actions
-enum button_types 	{ PLAY_BUTTON = 0, EASY_BUTTON, INTER_BUTTON, HARD_BUTTON, RESTART_BUTTON };
+enum button_types 	{ PLAY_BUTTON = 0, EASY_BUTTON, INTER_BUTTON, HARD_BUTTON, RESTART_BUTTON, BUTTON_COUNT };
 enum mouse 			{ LEFT_CLICK = 0, RIGHT_CLICK = 1 };
 
 // Predefined button bounds for UI elements
-const int BUTTON_BOUNDS[][4] = {
+const int BUTTON_BOUNDS[BUTTON_COUNT][4] = {
 	[PLAY_BUTTON] 		= {348, 620, 750, 860},
     [EASY_BUTTON] 		= {380, 586, 235, 345},
     [INTER_BUTTON] 		= {348, 620, 425, 540},
@@ -237,18 +237,15 @@ static void mouse_during_end(GameState* s, double xpos, double ypos)
 static void click_logic(DisplayContext* dc, GameState* s, int instance, bool mouse_click)
 {
 	/* Function handles mouse input for different scenes and states. */
-	
-	double xpos = getMouseX();
-	double ypos = getMouseY();
 		
 	if(instance & MENU)
-		mouse_during_menu(s, xpos, ypos);
+		mouse_during_menu(s, Mxpos, Mypos);
 	else if(instance & OPTIONS)
-		mouse_during_options(dc, s, xpos, ypos);
+		mouse_during_options(dc, s, Mxpos, Mypos);
 	else if(instance & PLAY)
-		mouse_during_play(dc, s, xpos, ypos, mouse_click);
+		mouse_during_play(dc, s, Mxpos, Mypos, mouse_click);
 	else if(instance & GAME_OVER)
-		mouse_during_end(s, xpos, ypos);	
+		mouse_during_end(s, Mxpos, Mypos);	
 }
 
 bool handled = false;

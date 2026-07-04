@@ -1,34 +1,31 @@
-#include "gameplay_layer.h"
+#include "ui_layer.h"
 
-#include <entry.h>          // bool Minimised
-
-#include "common.h"
-#include "game_logic.h"     // check_win()
-#include "display.h"        // init_textures(), init_scenes()
-#include "app_input.h"      // MouseInput(), KeyInput()
+#include "display.h" 
 
 /*
-    Since your LayerStack stores Layers BY VALUE (copies),
-    we can't store per-layer state inside the Layer struct itself.
-    So we keep a module-static pointer to the GameState.
+    The LayerStack holds layers by value, so per-instance state can't live in
+    the Layer struct — we keep module-static pointers instead (ADR-0003).
+
+    Responsibility: menus and overlays only. Input is polled once, in the
+    gameplay layer (ADR-0006), so this layer no longer touches input — that
+    removes the duplicate per-frame input handling the two layers used to do.
 */
+
 static GameState* g_state = NULL;
 static DisplayContext* context = NULL;
 static struct Renderer* st_render = NULL;
 
 static void ui_update(float dt)
 {
-    if (!g_state) return;
+    (void)dt;
 
-    setMousePos();
-    MouseInput(context, g_state);
-    KeyInput(g_state);
-    ui_scene_update(context, g_state);
+    if (!g_state) return;
+    ui_scene_update(context, g_state); // menu-scene logic (e.g. camera reset)
 }
 
 static void ui_render()
 {
-   	ui_scene_render(st_render, context, g_state);
+   	ui_scene_render(st_render, context, g_state); // menus, options, overlays
 }
 
 Layer create_ui_layer(struct Renderer* r, DisplayContext* dc, GameState* state)
