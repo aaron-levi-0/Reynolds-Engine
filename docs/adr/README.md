@@ -14,11 +14,12 @@ Each record answers three things: the **context** (forces at play), the **decisi
 | # | Title | Status |
 |---|-------|--------|
 | [0001](0001-synchronous-event-dispatch.md) | Synchronous, blocking event dispatch with shared event objects | Accepted |
-| [0002](0002-event-consumption-input-only.md) | `handled` consumption applies to input events, not broadcasts | Accepted |
+| [0002](0002-event-consumption-input-only.md) | `handled` consumption applies to input events, not broadcasts | Accepted (representation superseded by 0007) |
 | [0003](0003-layer-stack-stored-by-value.md) | Layers are stored by value in the stack | Accepted |
 | [0004](0004-glfw-platform-boundary.md) | Quarantine GLFW behind a thin platform boundary | Accepted |
 | [0005](0005-audio-via-miniaudio.md) | Audio via a thin wrapper over miniaudio's high-level engine | Accepted |
 | [0006](0006-input-polling-events-internal.md) | Game/layer input via polling; event vocabulary stays internal for now | Accepted |
+| [0007](0007-tagged-union-event.md) | Value-type tagged-union `Event`, replacing per-category shared objects | Accepted |
 
 ## Template
 

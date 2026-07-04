@@ -237,15 +237,17 @@ static void mouse_during_end(GameState* s, double xpos, double ypos)
 static void click_logic(DisplayContext* dc, GameState* s, int instance, bool mouse_click)
 {
 	/* Function handles mouse input for different scenes and states. */
-		
+	double xpos = Mxpos;
+    double ypos = Mypos;
+
 	if(instance & MENU)
-		mouse_during_menu(s, Mxpos, Mypos);
+		mouse_during_menu(s, xpos, ypos);
 	else if(instance & OPTIONS)
-		mouse_during_options(dc, s, Mxpos, Mypos);
+		mouse_during_options(dc, s, xpos, ypos);
 	else if(instance & PLAY)
-		mouse_during_play(dc, s, Mxpos, Mypos, mouse_click);
+		mouse_during_play(dc, s, xpos, ypos, mouse_click);
 	else if(instance & GAME_OVER)
-		mouse_during_end(s, Mxpos, Mypos);	
+		mouse_during_end(s, xpos, ypos);	
 }
 
 bool handled = false;

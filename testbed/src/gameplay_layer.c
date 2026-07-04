@@ -47,7 +47,8 @@ static void gameplay_event(Event* e)
 {
     Mxpos = getMouseX(e);
 	Mypos = getMouseY(e);
-	
+
+   REYNOLDS_DEBUG("@input: mouse position updated to: (%f, %f)", Mxpos, Mypos);
 }
 
 static void gameplay_render()
@@ -64,7 +65,8 @@ Layer create_gameplay_layer(struct Renderer* r, DisplayContext* dc, GameState* s
         .name   = "Gameplay Layer",
         .id     = LAYER_GAMEPLAY,  
         .update = gameplay_update,
-        .render = gameplay_render
+        .render = gameplay_render,
+        .onEvent  = gameplay_event
     };
 
     return gameplay_layer;

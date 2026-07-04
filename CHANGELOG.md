@@ -9,6 +9,14 @@ All notable changes to Reynolds-Engine are recorded here. The format is loosely 
 - A 2D AABB physics module (`physics.h` / `physics.c`) exists as a prototype patch; it is not
   yet merged into `main`.
 
+## [0.2.4]
+
+### Changed
+- **Event system rebuilt on a value-type tagged union.** `Event` is now one struct — `type`, `handled`, and a `union` payload (key / button / mouse / resize / moved) in `event_include.h` — replacing the base-struct + per-category-object design. Dispatch stays synchronous (ADR-0001); the tagged union is the migration step toward buffering. See ADR-0007.
+
+### Removed
+- Per-category event files `app_event.{c,h}`, `key_event.{c,h}`, `mouse_event.{c,h}`; their `create*Event` factories are consolidated into `events/event.c` and the per-category shared event objects are gone.
+
 ## [0.2.3]
 
 ### Added

@@ -17,9 +17,9 @@ together and [`docs/adr/`](docs/adr/) for the decisions behind them.
 | Shaders + uniform cache | ✅ | `shader.c` (cached uniform lookups) |
 | Time / delta | ✅ | `timestep.c` |
 | Logging | ✅ | `logging.c` (levels, colour, `get_log_level()`) |
-| Event system + input | 🟡 | Layers **poll** input today (ADR-0006); `handled` consumption is input-only (ADR-0002). One shared event object per category; public event API pending the tagged-union redesign (ADR-0001) |
+| Event system + input | 🟡 | `Event` is now a value-type **tagged union** (ADR-0007); per-category shared objects removed. Layers still **poll** input (ADR-0006); `handled` consumption is input-only (ADR-0002). Buffering / event queue still to come |
 | Text / font rendering | 📦 | stb_truetype vendored; no engine wrapper yet |
-| Audio | 🟡 | | Audio | 🟡 | miniaudio wrapped in `audio.{h,c}` — init/shutdown, SFX one-shots, looping music, master volume (ADR-0005) |
+| Audio | 🟡 | miniaudio wrapped in `audio.{h,c}` — init/shutdown, SFX one-shots, looping music, master volume (ADR-0005) |
 | Physics | 🧪  | 2D AABB rigid-body module exists as a patch; not merged to `main` |
 | UI | 🟡 | Testbed UI layer (`testbed/src/ui_layer.c`); no engine-level UI yet |
 | Debug | 🟡 | Testbed debug layer (FPS / draw-call counters on keypress, via polling) |

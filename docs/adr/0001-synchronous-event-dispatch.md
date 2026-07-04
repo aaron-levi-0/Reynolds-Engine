@@ -1,6 +1,6 @@
 # 0001 — Synchronous, blocking event dispatch with shared event objects
 
-- Status: Accepted
+- Status: Accepted — event representation superseded by [ADR-0007](0007-tagged-union-event.md); synchronous dispatch still in force
 - Date: 2026-06-26
 
 ## Context
@@ -24,6 +24,7 @@ event *category* reuses a single shared `Event` object (`mouse_event.c`, `key_ev
 - It blocks an event **queue/bus**, is not reentrant, and the shared object would corrupt if
   events were ever buffered or produced from more than one source. `event.h` already notes the
   intent to buffer events in future.
-- Migration path: a value-type **tagged-union** `Event` (one struct, `type` + a `union`
-  payload) created on the stack. That removes the shared global and makes queuing trivial.
-  Tracked as a future change, not yet done.
+- Migration path: a value-type **tagged-union** `Event` (one struct, `type` + a `union`  
+  payload). Adopted in v0.2.4 — the shared per-category objects are gone (ADR-0007). Events
+  are still `malloc`'d and dispatch is still synchronous, so the queue/bus remains a
+  further step.

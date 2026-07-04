@@ -87,8 +87,9 @@ sequenceDiagram
 
 - Events are **synchronous and blocking** — created, dispatched, and fully handled before
   the next one (ADR-0001).
-- Each category currently reuses a **single shared event object** (`mouse_event.c`,
-  `key_event.c`, `app_event.c`). Safe only because dispatch is immediate.
+- Each `Event` is a value-type **tagged union** (`type` + a `union` payload); the
+  `create*Event` factories in `events/event.c` build one per event. The old per-category
+  shared objects (`mouse_event.c`, `key_event.c`, `app_event.c`) are gone — ADR-0007.
 - `handled` lets an upper layer **consume** an *input* event so lower layers don't see it;
   broadcasts like resize are never consumed (ADR-0002).
 
