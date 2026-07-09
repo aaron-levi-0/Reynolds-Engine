@@ -33,7 +33,7 @@ enum SpriteIndex {
 	SPRITE_COUNT
 };
 
-static const uint16_t SPRITE_CELL[SPRITE_COUNT][2] = {
+static uint16_t SPRITE_CELL[SPRITE_COUNT][2] = {
 	[CLOSED_TILE] 	= {0, 2},
 	[ONE_TILE]		= {1, 2},
 	[TWO_TILE]		= {2, 2},

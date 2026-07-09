@@ -12,11 +12,17 @@ typedef struct
 	char* FragmentSource;
 }ShaderProgramSource;
 
-extern ShaderProgramSource parseFile(const char*);
-extern unsigned int CreateShader(char*, char*);
-//extern int GetUniformLocation(unsigned int , const char* );
+struct Shader
+{
+	uint32_t programID;
+	struct cache* uniforms;
+};
 
-extern void bind_shader(unsigned int );
-extern void unbind_shader();
+extern ShaderProgramSource parseFile(const char*);
+extern uint32_t CreateShader(char*, char*);
+
+extern void BindShader(struct Shader* shader);
+extern void UnbindShader();
+extern void FreeShader(struct Shader* shader);
 
 #endif

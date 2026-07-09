@@ -20,11 +20,9 @@ void renderer_destroy(struct Renderer* r)
     free(r);
 }
 
-void SetShaderPath(struct Renderer* r, const char* path)
+void SetShader(struct Renderer* r, struct Shader* shader)
 {
-	uint32_t path_str_len = strlen(path);
-	r -> ShaderPath = malloc(path_str_len + 1);
-	strncpy(r -> ShaderPath, path, path_str_len + 1);
+	r -> shader = shader;
 }
 
 void SetClearColour(vec3 colour)
@@ -125,18 +123,6 @@ static void MallocDraw(struct Renderer* renderer)
 	create_texture(&renderer -> WhiteTexture);
 	renderer -> texture_slots[0] = renderer -> WhiteTexture;
 	setWhiteTexture(WHITE);
-	
-	//load uniform textures
-	int samplers[MAX_TEXTURE_SLOTS];
-	for (int i = 0; i < MAX_TEXTURE_SLOTS; i++)
-		samplers[i] = i;
-	
-	/* Load shaders and use the resulting shader program */
-	ShaderProgramSource source = parseFile(renderer -> ShaderPath);
-	unsigned int program = CreateShader(source.VertexSource, source.FragmentSource);
-	bind_shader(program);
-	
-	setIntArray("u_textures", samplers, MAX_TEXTURE_SLOTS);
 }
 
 static void FreeDraw(struct Renderer* renderer)
@@ -149,8 +135,8 @@ static void FreeDraw(struct Renderer* renderer)
 	
 	glDeleteTextures(1, &renderer -> WhiteTexture);
 	
-	if(renderer -> ShaderPath)
-		free(renderer -> ShaderPath);
+	if(renderer -> shader)
+		FreeShader(renderer -> shader);
 	if(renderer -> QuadBuffer)
 		free(renderer -> QuadBuffer);
 }
@@ -158,7 +144,7 @@ static void FreeDraw(struct Renderer* renderer)
 // Function to handle resize events
 static void onEvent(Event* e) 
 {
-    if (e->type == WindowResize) 
+    if (e -> type == WindowResize) 
 	{
         uint32_t width = getWindowWidth();
         uint32_t height = getWindowHeight();
@@ -213,7 +199,10 @@ void EndBatch(struct Renderer* renderer)
 
 void FlushBatch(struct Renderer* renderer)
 {
-	for (unsigned int i = 0; i < renderer -> TextureSlotIndex; i++)
+	BindShader(renderer -> shader);
+	setMat4(renderer -> shader, "u_ProjectionView", renderer -> view_projection);
+
+	for (uint32_t i = 0; i < renderer -> TextureSlotIndex; i++)
 		glBindTextureUnit(i, renderer -> texture_slots[i]);
 	
 	drawTriangles(renderer -> QuadVA, renderer -> IndexCount);
@@ -223,9 +212,40 @@ void FlushBatch(struct Renderer* renderer)
 	renderer -> stats.DrawCalls++;
 }
 
-//unable to pass by reference, position loses structure? also note texcoords structure is {(x,y)_beginning, (x,y)_end} // can use tex size instead?
-void DrawQuad(struct Renderer* renderer, vec2 position, vec2 size, unsigned int textureID, vec4 tex_coords) 
+void setViewProjection(struct Renderer* renderer, mat4 view_projection)
 {
+	ASSERT_FATAL(renderer, "@renderer: 'renderer' is NULL.");
+	ASSERT_FATAL(view_projection, "@renderer: 'view_projection' is NULL.");
+	
+	glm_mat4_ucopy(view_projection, renderer -> view_projection);
+}
+
+static void setPosition(Vertex* vertex, const vec2 position)
+{
+	vertex -> position[0] = position[0];
+	vertex -> position[1] = position[1];
+}
+
+static void setTexture(Vertex* vertex, const vec2 tex_coords, const uint32_t id)
+{
+	vertex -> texture_coord[0] = tex_coords[0];
+	vertex -> texture_coord[1] = tex_coords[1];
+	vertex -> textureID = (float) id;
+}
+
+static void setColour(Vertex* vertex, const vec4 colour)
+{
+	vertex -> colour[0] = colour[0];
+	vertex -> colour[1] = colour[1];
+	vertex -> colour[2] = colour[2];
+	vertex -> colour[3] = colour[3];
+}
+
+//unable to pass by reference, position loses structure? also note texcoords structure is {(x,y)_beginning, (x,y)_end} // can use tex size instead?
+void DrawQuad(struct Renderer* renderer, const vec2 position, const vec2 size, const uint32_t textureID, const vec4 tex_coords) 
+{
+	const vec4 white = {1.0f, 1.0f, 1.0f, 1.0f};
+
     if (renderer->IndexCount >= MAX_INDICIES || renderer -> TextureSlotIndex > MAX_TEXTURE_SLOTS - 1) 
 	{
         EndBatch(renderer);
@@ -233,10 +253,10 @@ void DrawQuad(struct Renderer* renderer, vec2 position, vec2 size, unsigned int 
         BeginBatch(renderer);
     }
 
-    unsigned int texture_index = 0; //white texture
+    uint32_t texture_index = 0; //white texture
 	
 	//check if renderer already has the texture loaded
-	for (unsigned int i = 1; i < renderer->TextureSlotIndex; i++) 
+	for (uint32_t i = 1; i < renderer -> TextureSlotIndex; i++) 
 	{
 		if (renderer -> texture_slots[i] == textureID) 
 		{
@@ -248,7 +268,7 @@ void DrawQuad(struct Renderer* renderer, vec2 position, vec2 size, unsigned int 
 	//place texture in renderer texture slot if it is not in already
 	if (texture_index == 0) 
 	{
-		texture_index = renderer->TextureSlotIndex;
+		texture_index = renderer -> TextureSlotIndex;
 		renderer -> texture_slots[texture_index] = textureID;
 		renderer -> TextureSlotIndex++;
 	}
@@ -261,35 +281,36 @@ void DrawQuad(struct Renderer* renderer, vec2 position, vec2 size, unsigned int 
 	/* load data into renderer */
 	
     //vertex 1
-	QuadBufferPtr -> position[0] 		= position[0];
-	QuadBufferPtr -> position[1] 		= position[1];
-	QuadBufferPtr -> texture_coord[0] 	= tex_coords[0];
-	QuadBufferPtr -> texture_coord[1] 	= tex_coords[1];
-	QuadBufferPtr -> textureID 			= (float) texture_index;
+	setPosition(QuadBufferPtr, position);
+	setTexture(QuadBufferPtr, (vec2){tex_coords[0], tex_coords[1]}, texture_index);
+	setColour(QuadBufferPtr, white);
 	QuadBufferPtr++;
 	
 	//vertex 2
-	QuadBufferPtr -> position[0] 		= position[0] + size[0];
-	QuadBufferPtr -> position[1] 		= position[1];
-	QuadBufferPtr -> texture_coord[0] 	= tex_coords[2];
-	QuadBufferPtr -> texture_coord[1] 	= tex_coords[1];
-	QuadBufferPtr -> textureID 			= (float) texture_index;
+	float position0 = position[0] + size[0];
+	float position1 = position[1];
+
+	setPosition(QuadBufferPtr, (vec2){position0, position1});
+	setTexture(QuadBufferPtr, (vec2){tex_coords[2], tex_coords[1]}, texture_index);
+	setColour(QuadBufferPtr, white);
 	QuadBufferPtr++;
 	
 	//vertex 3
-	QuadBufferPtr -> position[0] 		= position[0] + size[0];
-	QuadBufferPtr -> position[1] 		= position[1] + size[1];
-	QuadBufferPtr -> texture_coord[0] 	= tex_coords[2];
-	QuadBufferPtr -> texture_coord[1] 	= tex_coords[3];
-	QuadBufferPtr -> textureID 			= (float) texture_index;
+	position0 = position[0] + size[0];
+	position1 = position[1] + size[1];
+
+	setPosition(QuadBufferPtr, (vec2){position0, position1});
+	setTexture(QuadBufferPtr, (vec2){tex_coords[2], tex_coords[3]}, texture_index);
+	setColour(QuadBufferPtr, white);
 	QuadBufferPtr++;
 	
 	//vertex 4
-	QuadBufferPtr -> position[0] 		= position[0];
-	QuadBufferPtr -> position[1] 		= position[1] + size[1];
-	QuadBufferPtr -> texture_coord[0] 	= tex_coords[0];
-	QuadBufferPtr -> texture_coord[1] 	= tex_coords[3];
-	QuadBufferPtr -> textureID 			= (float) texture_index;
+	position0 = position[0];
+	position1 = position[1] + size[1];
+
+	setPosition(QuadBufferPtr, (vec2){position0, position1});
+	setTexture(QuadBufferPtr, (vec2){tex_coords[0], tex_coords[3]}, texture_index);
+	setColour(QuadBufferPtr, white);
 	QuadBufferPtr++;
 	
 	//update location of renderer quad pointer and increase index count
@@ -299,7 +320,7 @@ void DrawQuad(struct Renderer* renderer, vec2 position, vec2 size, unsigned int 
 	renderer -> stats.QuadCount++;
 }
 
-void DrawColour(struct Renderer* renderer, vec2 position, vec2 size, vec4 colour) 
+void DrawColour(struct Renderer* renderer, const vec2 position, const vec2 size, const vec4 colour) 
 {
     if (renderer -> IndexCount >= MAX_INDICIES) 
 	{
@@ -308,7 +329,7 @@ void DrawColour(struct Renderer* renderer, vec2 position, vec2 size, vec4 colour
         BeginBatch(renderer);
     }
 
-    unsigned int texture_index = 0; //white texture
+    uint32_t texture_index = 0; //white texture
 
     Vertex* QuadBufferPtr = renderer -> QuadBufferPtr;
 
@@ -316,10 +337,7 @@ void DrawColour(struct Renderer* renderer, vec2 position, vec2 size, vec4 colour
 	{
         QuadBufferPtr -> position[0] = position[0] + (i == 1 || i == 2 ? size[0] : 0);
         QuadBufferPtr -> position[1] = position[1] + (i >= 2 ? size[1] : 0);
-        QuadBufferPtr -> colour[0] = colour[0];
-        QuadBufferPtr -> colour[1] = colour[1];
-        QuadBufferPtr -> colour[2] = colour[2];
-        QuadBufferPtr -> colour[3] = colour[3];
+        setColour(QuadBufferPtr, colour);
         QuadBufferPtr -> textureID = (float)texture_index; // texture index of 0 draws colour as stated in shader
         QuadBufferPtr++;
     }

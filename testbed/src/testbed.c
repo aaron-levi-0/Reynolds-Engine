@@ -28,8 +28,17 @@ int main()
 	state.scene 			= MENU;
 
 	/* Initialise and load stack defined renderer */
-	struct Renderer* renderer = renderer_create(); 
-	SetShaderPath(renderer, SHADER_PATH);	
+	struct Renderer* renderer 	= renderer_create(); 
+	struct Shader* batch_shader = LoadShader(SHADER_PATH);
+
+	SetShader(renderer, batch_shader);
+	//load uniform textures
+	int samplers[MAX_TEXTURE_SLOTS];
+	for (int i = 0; i < MAX_TEXTURE_SLOTS; i++)
+		samplers[i] = i;
+		
+	setIntArray(batch_shader, "u_textures", samplers, MAX_TEXTURE_SLOTS);
+
 
 	/* Initialise Layer Stack and Layers */
 	LayerStack* stack 			= InitLayerStack();

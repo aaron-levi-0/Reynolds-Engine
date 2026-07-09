@@ -34,11 +34,5 @@ out vec4 colour;
 void main()
 {
 	int index = int(v_index);
-	
-	if(index == 0)
-	{
-		colour = v_colour;
-	} else {
-		colour = texture(u_textures[index], v_texcoord);
-	}
+	colour = v_colour * texture(u_textures[index], v_texcoord);
 }

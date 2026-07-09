@@ -5,7 +5,10 @@
 #include <cglm/cglm.h>
 #include "defines.h"
 
-REN_API void setIntArray(const char* , int* , uint32_t );
-REN_API void setMat4(const char* , mat4 );
+struct Shader;
+
+REN_API struct Shader* LoadShader(const char* filepath);
+REN_API void setIntArray(struct Shader* shader, const char* name, int* array, uint32_t count);
+REN_API void setMat4(struct Shader* shader, const char* name, mat4 array);
 
 #endif

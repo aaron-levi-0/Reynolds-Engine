@@ -4,6 +4,7 @@
 #include "entry_internals.h"
 #include "core/layers_internals.h"
 #include "core/window_internals.h"
+#include "renderer/renderer_internals.h"
 
 #include "logging.h"
 #include "shader.h"
@@ -78,10 +79,9 @@ void EngineRun(struct Renderer* renderer, LayerStack* stack)
 
 		if(!Minimised())
 		{
-			render_clear();
+			render_clear();		
+			setViewProjection(renderer, getPVMat());
 
-			setMat4("u_ProjectionView", getPVMat()); //TO-DO: move to render layer
-			
 			BeginBatch(renderer);
 			update_layers(stack, timestep);
 			render_layers(stack);

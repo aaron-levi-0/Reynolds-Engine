@@ -2,8 +2,10 @@
 
 #include <GL/glew.h>
 
+uint32_t currently_bound = 0;
+uint32_t program;
+
 struct cache* cache = NULL;
-unsigned int program;
 
 //must implement CreateShader function to free 'source' memory
 ShaderProgramSource parseFile(const char* filepath)
@@ -86,9 +88,9 @@ ShaderProgramSource parseFile(const char* filepath)
 	return source;
 }
 
-unsigned int CompileShader(const char* source, unsigned int type)
+uint32_t CompileShader(const char* source, uint32_t type)
 {
-	unsigned int id = glCreateShader(type);
+	uint32_t id = glCreateShader(type);
 	glShaderSource(id, 1, &source, NULL);
 	glCompileShader(id);
 	
@@ -110,11 +112,11 @@ unsigned int CompileShader(const char* source, unsigned int type)
 	return id;
 }
 
-unsigned int CreateShader(char* vertexSource, char* fragmentSource)
+uint32_t CreateShader(char* vertexSource, char* fragmentSource)
 {
 	program = glCreateProgram();
-	unsigned int vs = CompileShader(vertexSource, GL_VERTEX_SHADER);
-	unsigned int fs = CompileShader(fragmentSource, GL_FRAGMENT_SHADER);
+	uint32_t vs = CompileShader(vertexSource, GL_VERTEX_SHADER);
+	uint32_t fs = CompileShader(fragmentSource, GL_FRAGMENT_SHADER);
 	
 	glAttachShader(program, vs);
 	glAttachShader(program, fs);
@@ -130,44 +132,72 @@ unsigned int CreateShader(char* vertexSource, char* fragmentSource)
 	return program;
 }
 
-void bind_shader(unsigned int programID)
+struct Shader* LoadShader(const char* filepath)
 {
-	glUseProgram(programID);
+	ShaderProgramSource source = parseFile(filepath);
+	uint32_t programID = CreateShader(source.VertexSource, source.FragmentSource);
+	
+	struct Shader* shader = malloc(sizeof(struct Shader));
+	shader -> programID = programID;
+	shader -> uniforms = NULL;
+
+	return shader;
 }
 
-void unbind_shader()
+void BindShader(struct Shader* shader)
+{
+	if (shader -> programID == currently_bound) return;
+	glUseProgram(shader -> programID);
+	currently_bound = shader -> programID;
+}
+
+void UnbindShader()
 {
 	glUseProgram(0);
+	currently_bound = 0;
+}
+
+void FreeShader(struct Shader* shader)
+{
+	if(!shader) return;
+	
+	if(shader -> programID)
+		glDeleteProgram(shader -> programID);
+	
+	if(shader -> uniforms)
+		free(shader -> uniforms);
+	
+	free(shader);
 }
 
 //finds uniform in shader and caches value for quick access next call
 
-static int GetUniformLocation(unsigned int programID, const char* name)
+static int GetUniformLocation(struct Shader* shader, const char* name)
 {
 	int location, cached_location;
 
-	if(!cache) cache = create_cache(CACHE_LIMIT);
+	if(!shader -> uniforms) shader -> uniforms = create_cache(CACHE_LIMIT);
 
-	cached_location = cache_get(cache, name);
+	cached_location = cache_get(shader -> uniforms, name);
 	if (cached_location != -1)
 		return cached_location;
 
-	location = glGetUniformLocation(programID, name);
+	location = glGetUniformLocation(shader -> programID, name);
 	if (location == -1)
 		REYNOLDS_ERROR("@shader: uniform %s does not exist!", name);
 	
-	cache_set(cache, name, location);
+	cache_set(shader -> uniforms, name, location);
 	return location;
 }
 
-void setIntArray(const char* name, int* array, uint32_t count)
+void setIntArray(struct Shader* shader, const char* name, int* array, uint32_t count)
 {
-	int location = GetUniformLocation(program, name);
-	glUniform1iv(location, count, array);
+	int location = GetUniformLocation(shader, name);
+	glProgramUniform1iv(shader -> programID, location, count, array);
 }
 
-void setMat4(const char* name, mat4 array)
+void setMat4(struct Shader* shader, const char* name, mat4 array)
 {
-	int location = GetUniformLocation(program, name);
-	glUniformMatrix4fv(location, 1, GL_FALSE, (float* )array);
+	int location = GetUniformLocation(shader, name);
+	glProgramUniformMatrix4fv(shader -> programID, location, 1, GL_FALSE, (float* )array);
 }

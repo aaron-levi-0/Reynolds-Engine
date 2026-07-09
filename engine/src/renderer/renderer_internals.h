@@ -20,23 +20,24 @@ typedef struct
 
 struct Renderer
 {
-	unsigned int QuadVA;
-	unsigned int QuadVB;
-	unsigned int QuadIB;
+	uint32_t QuadVA;
+	uint32_t QuadVB;
+	uint32_t QuadIB;
+
+	uint32_t WhiteTexture;
+	uint32_t WhiteTextureSlot;
 	
-	unsigned int WhiteTexture;
-	unsigned int WhiteTextureSlot;
-	
-	unsigned int IndexCount;
+	uint32_t IndexCount;
 
 	Vertex* QuadBuffer;
 	Vertex* QuadBufferPtr;
 	
-	unsigned int texture_slots[MAX_TEXTURE_SLOTS];
-	unsigned int TextureSlotIndex;
+	uint32_t texture_slots[MAX_TEXTURE_SLOTS];
+	uint32_t TextureSlotIndex;
 
-	char* ShaderPath;
+	struct Shader* shader;
 
+	mat4 view_projection;
 	bool initialised;
 
 	struct Statistics stats;
@@ -44,4 +45,5 @@ struct Renderer
 
 #define PUSH_ELEMENT(name, type) push_struct_element(#name, type, false, offsetof(Vertex, name))
 
+extern void setViewProjection(struct Renderer* renderer, mat4 view_projection);
 #endif
