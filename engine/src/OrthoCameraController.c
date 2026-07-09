@@ -1,9 +1,8 @@
 #include "OrthoCameraControllerInternals.h"
 
-#include <GLFW/glfw3.h>
 #include "window.h"
 #include "events/event.h"
-
+#include "keycodes.h"
 #include "input.h"
 #include "logging.h"
 
@@ -107,9 +106,9 @@ void onUpdate(float ts)
 	
 	if(controller.rotation)
 	{
-		if(isKeyPressed(GLFW_KEY_Q))
+		if(isKeyPressed(KEY_Q))
 			camera -> rotation += camera_rotation_speed * ts;
-		else if(isKeyPressed(GLFW_KEY_E))
+		else if(isKeyPressed(KEY_E))
 			camera -> rotation -= camera_rotation_speed * ts;
 		
 		setOrthoRotation(camera -> rotation, true);
@@ -120,22 +119,22 @@ void onUpdate(float ts)
 
 	if(!controller.inverted)
 	{
-		if(isKeyPressed(GLFW_KEY_W))
+		if(isKeyPressed(KEY_W))
 			camera -> position[1] -= camera_translation_speed * ts; //may want to make translation speed a function of zoom_level later
-		else if(isKeyPressed(GLFW_KEY_S))                    
+		else if(isKeyPressed(KEY_S))                    
 			camera -> position[1] += camera_translation_speed * ts;
-		else if(isKeyPressed(GLFW_KEY_D))                     
+		else if(isKeyPressed(KEY_D))                     
 			camera -> position[0] -= camera_translation_speed * ts;
-		else if(isKeyPressed(GLFW_KEY_A))                     
+		else if(isKeyPressed(KEY_A))                     
 			camera -> position[0] += camera_translation_speed * ts;
 	} else {
-		if(isKeyPressed(GLFW_KEY_W))
+		if(isKeyPressed(KEY_W))
 			camera -> position[1] += camera_translation_speed * ts; //may want to make translation speed a function of zoom_level later
-		else if(isKeyPressed(GLFW_KEY_S))                    
+		else if(isKeyPressed(KEY_S))                    
 			camera -> position[1] -= camera_translation_speed * ts;
-		else if(isKeyPressed(GLFW_KEY_D))                     
+		else if(isKeyPressed(KEY_D))                     
 			camera -> position[0] += camera_translation_speed * ts;
-		else if(isKeyPressed(GLFW_KEY_A))                     
+		else if(isKeyPressed(KEY_A))                     
 			camera -> position[0] -= camera_translation_speed * ts;	
 	}
 	

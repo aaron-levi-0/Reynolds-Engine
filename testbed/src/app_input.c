@@ -2,6 +2,7 @@
 
 #include <window.h>
 #include <Camera/camera.h>
+#include <keycodes.h>
 
 #include "common.h"
 #include "game_logic.h"
@@ -17,7 +18,6 @@ const char* BOARD_CONFIG_PATH = "../testbed/res/extra/boards.json";
 double Mxpos = 0, Mypos = 0;
 // Enumerations for button types and mouse actions
 enum button_types 	{ PLAY_BUTTON = 0, EASY_BUTTON, INTER_BUTTON, HARD_BUTTON, RESTART_BUTTON, BUTTON_COUNT };
-enum mouse 			{ LEFT_CLICK = 0, RIGHT_CLICK = 1 };
 
 // Predefined button bounds for UI elements
 const int BUTTON_BOUNDS[BUTTON_COUNT][4] = {
@@ -109,11 +109,11 @@ void KeyInput(GameState* s)
 {
 	/* Function handles keyboard input for the game */
 	
-	if(isKeyPressed(GLFW_KEY_R) && s -> game_state == PLAY)
+	if(isKeyPressed(KEY_R) && s -> game_state == PLAY)
 	{		
 		s -> game_state = RESTART;
 
-	} else if (isKeyPressed(GLFW_KEY_M) && (s -> scene == OPTIONS || s -> game_state == PLAY))
+	} else if (isKeyPressed(KEY_M) && (s -> scene == OPTIONS || s -> game_state == PLAY))
 	{
 		REYNOLDS_DEBUG("@instance: scene switched to menu");
 		s -> scene 		= MENU;
@@ -258,18 +258,18 @@ void MouseInput(DisplayContext* dc, GameState* s)
 
 	if(!handled)
 	{	
-		if (isMouseButtonPressed(GLFW_MOUSE_BUTTON_LEFT)) 
+		if (isMouseButtonPressed(MOUSE_BUTTON_LEFT)) 
 		{			
 			handled = true;
-			click_logic(dc, s, s -> scene | s -> game_state, LEFT_CLICK);
+			click_logic(dc, s, s -> scene | s -> game_state, MOUSE_BUTTON_LEFT);
 		} 
-		else if (isMouseButtonPressed(GLFW_MOUSE_BUTTON_RIGHT)) 
+		else if (isMouseButtonPressed(MOUSE_BUTTON_RIGHT)) 
 		{		
 			handled = true;
-			click_logic(dc, s, s -> game_state, RIGHT_CLICK);
+			click_logic(dc, s, s -> game_state, MOUSE_BUTTON_RIGHT);
 		}
 	}
 	
-	if (!isMouseButtonPressed(GLFW_MOUSE_BUTTON_LEFT) && !isMouseButtonPressed(GLFW_MOUSE_BUTTON_RIGHT)) 
+	if (!isMouseButtonPressed(MOUSE_BUTTON_LEFT) && !isMouseButtonPressed(MOUSE_BUTTON_RIGHT)) 
 		handled = false;
 }

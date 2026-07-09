@@ -156,7 +156,7 @@ Event* createMouseScrollEvent(double xpos, double ypos)
 	return event;
 }
 
-Event* createMouseButtonPressedEvent(int button) 
+Event* createMouseButtonPressedEvent(int button, double xpos, double ypos) 
 {	
     Event* event = malloc(sizeof(Event));
 
@@ -169,11 +169,13 @@ Event* createMouseButtonPressedEvent(int button)
     event -> type 			= MouseButtonPressed;
     event -> handled		= false;
 	event -> button.button  = button;
+	event -> button.x 		= xpos;
+	event -> button.y 		= ypos;
 
 	return event;	
 }
 
-Event* createMouseButtonReleasedEvent(int button) 
+Event* createMouseButtonReleasedEvent(int button, double xpos, double ypos) 
 {	
     Event* event = malloc(sizeof(Event));
 
@@ -186,6 +188,8 @@ Event* createMouseButtonReleasedEvent(int button)
     event -> type 			= MouseButtonReleased;
     event -> handled		= false;
 	event -> button.button  = button;
+    event -> button.x 		= xpos;
+    event -> button.y 		= ypos;
 
 	return event;
 }

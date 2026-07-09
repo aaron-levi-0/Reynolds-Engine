@@ -23,9 +23,9 @@ int main()
     EngineDependencies();
 	load_icon(ICON_PATH);
 
-	DisplayContext context = {0};
-	GameState state 	= {0};
-	state.scene 		= MENU;
+	DisplayContext context 	= {0};
+	GameState state 		= {0};
+	state.scene 			= MENU;
 
 	/* Initialise and load stack defined renderer */
 	struct Renderer* renderer = renderer_create(); 

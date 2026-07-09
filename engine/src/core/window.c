@@ -6,6 +6,7 @@
 #include "logging.h"
 #include "core/layers_internals.h"
 #include "events/event.h"
+#include "keycodes.h"
 
 #include "stb_image.h"
 
@@ -78,17 +79,17 @@ static void KeyCallback(GLFWwindow* _window, int key, int scancode, int action, 
 	
 	switch(action)
 	{
-		case GLFW_PRESS:
+		case MOUSE_PRESS:
 			event = createKeyPressedEvent(key, 0);
 			if (!event) return;
 			win_callbk -> EventCallback(event);
 			break;
-		case GLFW_RELEASE:
+		case MOUSE_RELEASE:
 			event = createKeyReleasedEvent(key);
 			if (!event) return;
 			win_callbk -> EventCallback(event);
 			break;
-		case GLFW_REPEAT:
+		case MOUSE_REPEAT:
 			event = createKeyPressedEvent(key, getRepeatCount());
 			if (!event) return;
 			win_callbk -> EventCallback(event);
@@ -101,15 +102,18 @@ static void MouseButtonCallback(GLFWwindow* _window, int button, int action, int
 	Window* win_callbk = (Window* )glfwGetWindowUserPointer(_window); 
 	Event* event = NULL;
 	(void) mods;
+
+	double xpos, ypos;
+	glfwGetCursorPos(_window, &xpos, &ypos);
 	
 	switch(action)
 	{
-		case GLFW_PRESS:
-			event = createMouseButtonPressedEvent(button);
+		case MOUSE_PRESS:
+			event = createMouseButtonPressedEvent(button, xpos, ypos);
 			win_callbk -> EventCallback(event);
 			break;
-		case GLFW_RELEASE:
-			event = createMouseButtonReleasedEvent(button);
+		case MOUSE_RELEASE:
+			event = createMouseButtonReleasedEvent(button, xpos, ypos);
 			win_callbk -> EventCallback(event);
 			break;	
 	}

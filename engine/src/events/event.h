@@ -18,9 +18,9 @@ extern Event* createKeyPressedEvent(int keyCode, int repeatCount);
 extern Event* createKeyReleasedEvent(int keyCode); 
 extern uint16_t getRepeatCount();
 
-extern Event* createMouseMovedEvent(double , double );
-extern Event* createMouseScrollEvent(double , double );
-extern Event* createMouseButtonPressedEvent(int );
-extern Event* createMouseButtonReleasedEvent(int ); 
+extern Event* createMouseMovedEvent(double xpos, double ypos);
+extern Event* createMouseScrollEvent(double xpos, double ypos);
+extern Event* createMouseButtonPressedEvent(int button, double xpos, double ypos);
+extern Event* createMouseButtonReleasedEvent(int button, double xpos, double ypos); 
 
 #endif // EVENT_H

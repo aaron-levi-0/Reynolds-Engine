@@ -2,6 +2,7 @@
 
 #include "core/window_internals.h"
 #include <GLFW/glfw3.h>
+#include "keycodes.h"
 
 static double xpos, ypos;
 
@@ -10,7 +11,7 @@ bool isKeyPressed(int keycode)
 	GLFWwindow* window = (GLFWwindow* )GetNativeWindow();
 	int state = glfwGetKey(window, keycode);
 	
-	return state == GLFW_PRESS || state == GLFW_REPEAT;
+	return state == MOUSE_PRESS || state == MOUSE_REPEAT;
 }
 
 bool isMouseButtonPressed(int button)
@@ -18,7 +19,7 @@ bool isMouseButtonPressed(int button)
 	GLFWwindow* window = (GLFWwindow* )GetNativeWindow();
 	int state = glfwGetMouseButton(window, button);
 	
-	return state == GLFW_PRESS;
+	return state == MOUSE_PRESS;
 }
 
 void setMousePos()
