@@ -3,12 +3,11 @@
 #include <GL/glew.h>
 
 uint32_t currently_bound = 0;
-uint32_t program;
 
 struct cache* cache = NULL;
 
 //must implement CreateShader function to free 'source' memory
-ShaderProgramSource parseFile(const char* filepath)
+static ShaderProgramSource parseFile(const char* filepath)
 {
 	ShaderProgramSource source = {0};
 
@@ -88,7 +87,7 @@ ShaderProgramSource parseFile(const char* filepath)
 	return source;
 }
 
-uint32_t CompileShader(const char* source, uint32_t type)
+static uint32_t CompileShader(const char* source, uint32_t type)
 {
 	uint32_t id = glCreateShader(type);
 	glShaderSource(id, 1, &source, NULL);
@@ -112,16 +111,34 @@ uint32_t CompileShader(const char* source, uint32_t type)
 	return id;
 }
 
+static uint32_t linkProgram(uint32_t vertexShader, uint32_t fragmentShader)
+{
+	uint32_t program = glCreateProgram();
+	glAttachShader(program, vertexShader);
+	glAttachShader(program, fragmentShader);
+	glLinkProgram(program);
+
+	int linked;
+	glGetProgramiv(program, GL_LINK_STATUS, &linked);
+	if (!linked)
+	{
+		int length;
+		glGetProgramiv(program, GL_INFO_LOG_LENGTH, &length);
+		char* message = alloca(length);
+		glGetProgramInfoLog(program, length, &length, message);
+		REYNOLDS_ERROR("@shader: link failed: %s", message);
+		glDeleteProgram(program);
+		return 0;
+	}
+	
+	return program;
+}
+
 uint32_t CreateShader(char* vertexSource, char* fragmentSource)
 {
-	program = glCreateProgram();
-	uint32_t vs = CompileShader(vertexSource, GL_VERTEX_SHADER);
-	uint32_t fs = CompileShader(fragmentSource, GL_FRAGMENT_SHADER);
-	
-	glAttachShader(program, vs);
-	glAttachShader(program, fs);
-	glLinkProgram(program);
-	glValidateProgram(program);
+	uint32_t vs 		= CompileShader(vertexSource, GL_VERTEX_SHADER);
+	uint32_t fs 		= CompileShader(fragmentSource, GL_FRAGMENT_SHADER);
+	uint32_t program 	= linkProgram(vs, fs);
 	
 	glDeleteShader(vs);
 	glDeleteShader(fs);
@@ -135,6 +152,13 @@ uint32_t CreateShader(char* vertexSource, char* fragmentSource)
 struct Shader* LoadShader(const char* filepath)
 {
 	ShaderProgramSource source = parseFile(filepath);
+
+	if(!source.VertexSource || !source.FragmentSource)
+	{
+		REYNOLDS_ERROR("@shader: Failed to load shader from path: %s", filepath);
+		return NULL;
+	}
+	
 	uint32_t programID = CreateShader(source.VertexSource, source.FragmentSource);
 	
 	struct Shader* shader = malloc(sizeof(struct Shader));
@@ -165,7 +189,7 @@ void FreeShader(struct Shader* shader)
 		glDeleteProgram(shader -> programID);
 	
 	if(shader -> uniforms)
-		free(shader -> uniforms);
+		free_cache(shader -> uniforms);
 	
 	free(shader);
 }
@@ -190,7 +214,7 @@ static int GetUniformLocation(struct Shader* shader, const char* name)
 	return location;
 }
 
-void setIntArray(struct Shader* shader, const char* name, int* array, uint32_t count)
+void SetIntArray(struct Shader* shader, const char* name, int* array, uint32_t count)
 {
 	int location = GetUniformLocation(shader, name);
 	glProgramUniform1iv(shader -> programID, location, count, array);

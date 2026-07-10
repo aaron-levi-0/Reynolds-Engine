@@ -14,12 +14,6 @@ struct Renderer* renderer_create()
     return r;
 }
 
-void renderer_destroy(struct Renderer* r) 
-{
-    if (!r) return;
-    free(r);
-}
-
 void SetShader(struct Renderer* r, struct Shader* shader)
 {
 	r -> shader = shader;
@@ -134,9 +128,8 @@ static void FreeDraw(struct Renderer* renderer)
 	freeBuffer(renderer -> QuadIB);
 	
 	glDeleteTextures(1, &renderer -> WhiteTexture);
-	
-	if(renderer -> shader)
-		FreeShader(renderer -> shader);
+	renderer -> shader = NULL;
+
 	if(renderer -> QuadBuffer)
 		free(renderer -> QuadBuffer);
 }
@@ -162,10 +155,14 @@ static void onEvent(Event* e)
     }
 }
 
+//TO-DO: Turn this into a function that returns an error code.
 static void onDetach(void* renderer)
 {
 	struct Renderer* r = (struct Renderer*) renderer;
+	if(!r) return;
+
 	FreeDraw(r);
+	free(r);
 }
 
 // Function to create the render layer

@@ -14,7 +14,7 @@ together and [`docs/adr/`](docs/adr/) for the decisions behind them.
 | Orthographic camera + pan/zoom | ✅ | `OrthoCameraController.c` |
 | Layer stack | ✅ | `layers.c` (layers stored by value — ADR-0003) |
 | Texture loading | ✅ | stb_image |
-| Shaders + uniform cache | ✅ | `shader.c` (cached uniform lookups) |
+| Shaders + uniform cache | ✅ | Opaque `Shader` handles (`LoadShader`/`SetShader`, 0.2.5); per-shader uniform cache; DSA uniform uploads (`glProgramUniform*`); renderer binds its shader + uploads `u_ProjectionView` at `FlushBatch` — ready for a second shader (map). Known: `FreeShader` cache leak, no link-status check, varying sampler index (see CHANGELOG 0.2.5) |
 | Time / delta | ✅ | `timestep.c` |
 | Logging | ✅ | `logging.c` (levels, colour, `get_log_level()`) |
 | Event system + input | 🟡 | `Event` is now a value-type **tagged union** (ADR-0007); per-category shared objects removed. Layers still **poll** input (ADR-0006); `handled` consumption is input-only (ADR-0002). Buffering / event queue still to come |

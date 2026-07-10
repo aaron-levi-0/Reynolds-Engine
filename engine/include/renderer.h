@@ -16,7 +16,6 @@ struct Statistics
 };
 
 REN_API struct Renderer* renderer_create();
-REN_API void renderer_destroy(struct Renderer* r);
 
 REN_API void SetClearColour(vec3 );
 REN_API void render_clear();

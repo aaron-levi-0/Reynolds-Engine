@@ -19,9 +19,9 @@ int main()
 {
 	/** BOOTSTRAP PHASE **/	
 	set_log_level(LOG_LEVEL_VERBOSE);
-	EngineInit("minesweeper.c", SCREEN_WIDTH, SCREEN_HEIGHT);
+	InitEngine("minesweeper.c", SCREEN_WIDTH, SCREEN_HEIGHT);
     EngineDependencies();
-	load_icon(ICON_PATH);
+	LoadIcon(ICON_PATH);
 
 	DisplayContext context 	= {0};
 	GameState state 		= {0};
@@ -37,14 +37,13 @@ int main()
 	for (int i = 0; i < MAX_TEXTURE_SLOTS; i++)
 		samplers[i] = i;
 		
-	setIntArray(batch_shader, "u_textures", samplers, MAX_TEXTURE_SLOTS);
-
+	SetIntArray(batch_shader, "u_textures", samplers, MAX_TEXTURE_SLOTS);
 
 	/* Initialise Layer Stack and Layers */
 	LayerStack* stack 			= InitLayerStack();
 	Layer render_layer 			= create_render_layer(renderer);
 	Layer camera_layer 			= create_camera_layer();
-	Layer gameplay_layer 		= create_gameplay_layer(renderer, &context, &state);
+	Layer gameplay_layer 		= create_gameplay_layer(renderer, &context, &state); //UNCLEAR: audio layer in gameplay layer or separate from?
 	Layer ui_layer 				= create_ui_layer(renderer, &context, &state);
 	Layer close_window_layer 	= {"Window Close Layer", .id = LAYER_WINDOW_CLOSE, .onEvent = onWindowClose};
 	Layer debug_layer 			= create_debug_layer(renderer);
@@ -60,11 +59,9 @@ int main()
 	float aspect_ratio = (float)getWindowWidth()/(float)getWindowHeight();
 
 	createOrthoCameraController(aspect_ratio);
+	invert_camera(true); enable_translation(true); enable_zoom(true);
 	setZoomLimits(0.25f, 1.0f);
-	invert_camera(true);
-	enable_translation(true);
-	enable_zoom(true);
-	setLateralLimits(-0.5f, 0.5f); //or do enable_camera_events
+	setLateralLimits(-0.5f, 0.5f);
 
 	/* Scene setup*/
 	init_display(&context);
@@ -84,9 +81,9 @@ int main()
 	if(state.board)
 		delete_board(state.board);
 	
-	renderer_destroy(renderer);
-	audio_shutdown();
 	EngineShutdown();
+	audio_shutdown();
+	FreeShader(batch_shader);
 
     return 0;
 }

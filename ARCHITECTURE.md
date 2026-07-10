@@ -42,10 +42,13 @@ public header and fully defined in a private one — so games hold a handle, not
 
 The application drives three phases (see `testbed/src/testbed.c`):
 
-1. **Bootstrap** — `EngineInit` (window + GL context + GLEW), load shaders/textures, create
-   the `Renderer`, build the `LayerStack`, push layers, configure the camera.
-2. **Runtime** — the game loop: compute delta time, `BeginBatch`, `update_layers`,
-   `render_layers`, `EndBatch`/`FlushBatch`, `update_window` (swap + poll).
+1. **Bootstrap** — `EngineInit` (window + GL context + GLEW), create the `Renderer`, load the
+   batch shader (`LoadShader`) and hand it to the renderer (`SetShader`), set the `u_textures`
+   sampler array once, load textures, build the `LayerStack`, push layers, configure the camera.
+2. **Runtime** — the app calls `EngineRun(renderer, stack)`, which owns the frame loop:
+   compute delta time, `setViewProjection(renderer, getPVMat())`, `BeginBatch`,
+   `update_layers`, `render_layers`, `EndBatch`/`FlushBatch` (binds the renderer's shader and
+   uploads `u_ProjectionView`), `update_window` (swap + poll).
 3. **Shutdown** — unload textures, `close_window`, destroy the renderer and the layer stack
    (`EngineShutdown`).
 
@@ -54,17 +57,25 @@ sequenceDiagram
     participant App as main() / testbed
     participant Eng as engine
     App->>Eng: EngineInit(title, w, h)
-    App->>Eng: create Renderer, LayerStack, push layers
+    App->>Eng: create Renderer, LoadShader, SetShader
+    App->>Eng: create LayerStack, push layers
+    App->>Eng: EngineRun(renderer, stack)
     loop every frame (while Running())
-        App->>Eng: get_delta_time()
-        App->>Eng: BeginBatch
-        App->>Eng: update_layers(dt)
-        App->>Eng: render_layers()
-        App->>Eng: EndBatch / FlushBatch
-        App->>Eng: update_window()
+        Eng->>Eng: get_delta_time()
+        Eng->>Eng: setViewProjection(camera PV)
+        Eng->>Eng: BeginBatch
+        Eng->>Eng: update_layers(dt)
+        Eng->>Eng: render_layers()
+        Eng->>Eng: EndBatch / FlushBatch (bind shader, upload VP, draw)
+        Eng->>Eng: update_window()
     end
     App->>Eng: EngineShutdown()
 ```
+> Note the frame loop lives **inside the engine** (`entry.c:EngineRun`) as of 0.2.x — the app
+> hooks into it through layers. One batch + one view-projection per frame is currently
+> hard-coded there; multi-pass frames (e.g. a screen-space UI pass) will need either a
+> public `setViewProjection` + mid-frame flushes from a layer, or loop ownership returned
+> to the app.
 
 ## 4. Event flow
 
@@ -116,11 +127,25 @@ A 2D **batch renderer** (`renderer/`):
   `DrawColour`) between `BeginBatch` and `EndBatch`, then uploaded and drawn in a single
   `FlushBatch`.
 - Up to `MAX_TEXTURE_SLOTS` textures per batch; a 1×1 white texture in slot 0 lets coloured
-  (untextured) quads share the same shader.
+  (untextured) quads share the same shader. The fragment shader has a single path —
+  `v_colour * texture(...)` — so a flat colour is just a tint of the white texture
+  (`DrawQuad` writes a white tint into every vertex).
 - A new batch starts automatically when the index or texture-slot budget is hit.
-- Uniform locations are cached (`shader.c:GetUniformLocation`).
 - The vertex layout is described declaratively (`buffer.c`, `PUSH_ELEMENT`) and translated to
   `glVertexAttribPointer` calls.
+
+**Shaders** are opaque handles (0.2.5): `LoadShader(path)` returns a `struct Shader*` owning
+a GL program and its **own** uniform-location cache; `setMat4` / `setIntArray` take the
+shader explicitly and upload via DSA (`glProgramUniform*`), so uniforms can be set on any
+shader regardless of which program is bound. `BindShader` skips redundant binds via a
+cached `currently_bound` ID.
+
+**The renderer↔shader connection:** the renderer stores the `Shader*` it draws with
+(`SetShader`) plus a CPU-side `view_projection` snapshot (`setViewProjection`). `FlushBatch`
+re-asserts everything it needs at draw time — binds the shader, uploads `u_ProjectionView`,
+binds the texture slots — so it assumes nothing about state left behind by other systems.
+This is what makes a second shader (e.g. a map shader) possible: every drawing system binds
+its own program immediately before its own draw call.
 
 ## 7. Platform boundary (and the GLFW-weaning plan)
 
@@ -138,7 +163,8 @@ nothing above the boundary names GLFW.
 | Thing | Created by | Freed by | Notes |
 |---|---|---|---|
 | `Window` | `create_window` | `close_window` | single global |
-| `Renderer` | `renderer_create` | `renderer_destroy` | opaque handle; owns GPU buffers, white texture, shader path |
+|| `Renderer` | `renderer_create` | `renderer_destroy` | opaque handle; owns GPU buffers, white texture; *uses* a `Shader` it is handed |
+| `Shader` | `LoadShader` (game) | `FreeShader` — currently called by the renderer's `FreeDraw` | game loads it and hands it over via `SetShader`; note the split ownership — the renderer frees an object it didn't create, so the game must **not** also free it |
 | `LayerStack` | `InitLayerStack` | `destroy_layer_stack` (via `EngineShutdown`) | owns the `Vector`; pops call each layer's onDetach` |
 | Textures | `LoadTexture` | `freeTextures` / testbed unload | tracked in an asset-manager `Vector` |
 | `PhysicsWorld` (prototype) | `physics_create` | `physics_destroy` | not in `main` yet |

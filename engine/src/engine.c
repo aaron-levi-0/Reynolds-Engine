@@ -11,3 +11,5 @@ void EngineDependencies()
 	REYNOLDS_INFO("Status: Using OpenGL %s", glGetString(GL_VERSION));
 	REYNOLDS_INFO("Status: Using CGLM %d.%d.%d", CGLM_VERSION_MAJOR, CGLM_VERSION_MINOR, CGLM_VERSION_PATCH);
 }
+
+//TO-DO: Add error codes and error handling.

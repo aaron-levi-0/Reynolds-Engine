@@ -23,6 +23,5 @@ extern uint32_t CreateShader(char*, char*);
 
 extern void BindShader(struct Shader* shader);
 extern void UnbindShader();
-extern void FreeShader(struct Shader* shader);
 
 #endif

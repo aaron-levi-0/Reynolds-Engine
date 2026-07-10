@@ -9,6 +9,37 @@ All notable changes to Reynolds-Engine are recorded here. The format is loosely 
 - A 2D AABB physics module (`physics.h` / `physics.c`) exists as a prototype patch; it is not
   yet merged into `main`.
 
+## [0.2.5]
+
+### Changed
+- **Shader module rebuilt around opaque `Shader` handles.** `LoadShader(path)` returns a
+  `struct Shader*` holding the GL program **and its own uniform-location cache** (the old
+  file-scope global cache keyed by name alone would return wrong locations once a second
+  shader existed). `setMat4` / `setIntArray` now take the shader explicitly and upload via
+  DSA (`glProgramUniform*`), so uniforms can be set without touching bind state.
+  `BindShader` skips redundant binds via a cached program ID.
+- **Renderer no longer loads its own shader.** `SetShaderPath` → `SetShader(renderer,
+  shader)`: the game loads the batch shader and sets the `u_textures` sampler array once at
+  startup (`testbed.c`). The renderer keeps a CPU-side `view_projection` snapshot
+  (`setViewProjection`), and `FlushBatch` binds the renderer's shader and uploads
+  `u_ProjectionView` immediately before drawing — each flush re-asserts its own state, the
+  prerequisite for multi-shader frames (map shader, screen-space UI pass). Resolves the
+  `entry.c` "move setMat4 to render layer" TO-DO.
+- **Fragment shader reduced to a single path**: `colour = v_colour * texture(...)`. The
+  `index == 0` branch is gone; `DrawQuad` writes a white tint into every vertex, so flat
+  colour = white texture × tint. (Per-quad tinting of textures is now one parameter away.)
+- Renderer internals tidied: `unsigned int` → `uint32_t`; vertex writes factored into
+  `setPosition` / `setTexture` / `setColour` helpers.
+
+### Known issues
+- `FreeShader` releases the uniform cache with a bare `free()` — leaks every entry and its
+  `strdup`'d key. Should call `free_cache()` (`utils/hash.c`), which already exists.
+- `CreateShader` still doesn't check `GL_LINK_STATUS`, and `LoadShader` doesn't guard a
+  failed `parseFile` (NULL sources reach `glShaderSource`).
+- The fragment shader indexes `u_textures[]` with a per-fragment (non-dynamically-uniform)
+  value — GLSL only guarantees this for dynamically uniform indices; works on NVIDIA,
+  undefined on AMD/Intel. A `switch` over the slot index is the portable fix.
+  
 ## [0.2.4]
 
 ### Changed

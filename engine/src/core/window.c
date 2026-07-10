@@ -198,7 +198,7 @@ void close_window()
 	glfwTerminate();
 }
 
-void load_icon(const char* path)
+void LoadIcon(const char* path)
 {
 	int ico_width, ico_height, ico_channels;
 	unsigned char* icon_data = stbi_load(path, &ico_width, &ico_height, &ico_channels, STBI_rgb_alpha);

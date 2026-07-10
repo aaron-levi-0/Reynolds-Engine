@@ -20,7 +20,7 @@ REN_API unsigned int getWindowHeight();
 REN_API void update_window();
 
 REN_API void SetEventCallback(EventCallbackFn );
-REN_API void load_icon(const char* path);
+REN_API void LoadIcon(const char* path);
 
 //#define CREATE_WIN 	create_window("Reynolds Engine", 970, 970)
 

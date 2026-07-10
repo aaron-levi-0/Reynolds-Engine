@@ -8,7 +8,8 @@
 struct Shader;
 
 REN_API struct Shader* LoadShader(const char* filepath);
-REN_API void setIntArray(struct Shader* shader, const char* name, int* array, uint32_t count);
+REN_API void FreeShader(struct Shader* shader);
+REN_API void SetIntArray(struct Shader* shader, const char* name, int* array, uint32_t count);
 REN_API void setMat4(struct Shader* shader, const char* name, mat4 array);
 
 #endif

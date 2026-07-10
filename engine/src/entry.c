@@ -42,7 +42,7 @@ void onWindowClose(Event* e)
 	}
 }
 
-void EngineInit(const char* title, int w, int h)
+void InitEngine(const char* title, int w, int h)
 {
 	ASSERT_FATAL(title, "@engine: window title is NULL!");
 	ASSERT_FATAL(w > 0 && h > 0, "@engine: invalid window dimensions!");
@@ -55,7 +55,6 @@ void EngineInit(const char* title, int w, int h)
 	/* Initialising GLEW*/
     GLenum err = glewInit();
     ASSERT_FATAL(err == GLEW_OK, "GLEW Error: %s", glewGetErrorString(err));
-
 }
 
 LayerStack* InitLayerStack()

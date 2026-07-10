@@ -31,8 +31,48 @@ uniform sampler2D u_textures[32];
 
 out vec4 colour;
 
+# TO-DO: This is a temporary solution to the lack of dynamic indexing in GLSL. We will need to implement a better solution in the future.
+vec4 sampleTexture(int index)
+{
+	switch(index)
+	{
+		case 0: return texture(u_textures[0], v_texcoord);
+		case 1: return texture(u_textures[1], v_texcoord);
+		case 2: return texture(u_textures[2], v_texcoord);
+		case 3: return texture(u_textures[3], v_texcoord);
+		case 4: return texture(u_textures[4], v_texcoord);
+		case 5: return texture(u_textures[5], v_texcoord);
+		case 6: return texture(u_textures[6], v_texcoord);
+		case 7: return texture(u_textures[7], v_texcoord);
+		case 8: return texture(u_textures[8], v_texcoord);
+		case 9: return texture(u_textures[9], v_texcoord);
+		case 10: return texture(u_textures[10], v_texcoord);
+		case 11: return texture(u_textures[11], v_texcoord);
+		case 12: return texture(u_textures[12], v_texcoord);
+		case 13: return texture(u_textures[13], v_texcoord);
+		case 14: return texture(u_textures[14], v_texcoord);
+		case 15: return texture(u_textures[15], v_texcoord);
+		case 16: return texture(u_textures[16], v_texcoord);
+		case 17: return texture(u_textures[17], v_texcoord);
+		case 18: return texture(u_textures[18], v_texcoord);
+		case 19: return texture(u_textures[19], v_texcoord);
+		case 20: return texture(u_textures[20], v_texcoord);
+		case 21: return texture(u_textures[21], v_texcoord);
+		case 22: return texture(u_textures[22], v_texcoord);
+		case 23: return texture(u_textures[23], v_texcoord);
+		case 24: return texture(u_textures[24], v_texcoord);
+		case 25: return texture(u_textures[25], v_texcoord);
+		case 26: return texture(u_textures[26], v_texcoord);
+		case 27: return texture(u_textures[27], v_texcoord);
+		case 28: return texture(u_textures[28], v_texcoord);
+		case 29: return texture(u_textures[29], v_texcoord);
+		case 30: return texture(u_textures[30], v_texcoord);
+		case 31: return texture(u_textures[31], v_texcoord);
+		default: return vec4(1.0, 0.0, 1.0, 1.0);
+}
+
 void main()
 {
 	int index = int(v_index);
-	colour = v_colour * texture(u_textures[index], v_texcoord);
+	colour = v_colour * sampleTexture(index);
 }
