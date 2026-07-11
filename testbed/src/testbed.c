@@ -22,6 +22,10 @@ int main()
 	InitEngine("minesweeper.c", SCREEN_WIDTH, SCREEN_HEIGHT);
     EngineDependencies();
 	LoadIcon(ICON_PATH);
+	
+	struct Font* font = LoadFont("../testbed/res/fonts/cmb10.ttf", 48.0f);
+
+	setFont(font);
 
 	DisplayContext context 	= {0};
 	GameState state 		= {0};

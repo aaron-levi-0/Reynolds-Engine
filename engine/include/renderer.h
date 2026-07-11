@@ -7,6 +7,7 @@
 #include "defines.h"
 #include "layers.h"
 #include "shader.h"
+#include "text.h"
 
 struct Renderer;
 struct Statistics
@@ -29,6 +30,7 @@ REN_API void FlushBatch(struct Renderer* );
 
 REN_API void DrawQuad(struct Renderer* renderer, const vec2 position, const vec2 size, const uint32_t textureID, const vec4 tex_coords);
 REN_API void DrawColour(struct Renderer* renderer, const vec2 position, const vec2 size, const vec4 colour);
+REN_API void DrawText(struct Renderer* renderer, struct Font* font, const char* text, const vec2 position, float size, const vec4 colour);
 
 REN_API uint32_t getDrawCalls(const struct Renderer* r);
 REN_API uint32_t getQuadCount(const struct Renderer* r);

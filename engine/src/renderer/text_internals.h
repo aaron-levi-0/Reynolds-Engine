@@ -16,6 +16,4 @@ struct Font
 	stbtt_bakedchar  chars[NUM_CHARS];		// per-glyph atlas rects + metrics
 };
 
-extern void FreeFont(struct Font* font);
-
 #endif //TEXT_INTERNALS_H

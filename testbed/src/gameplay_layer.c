@@ -15,6 +15,7 @@
 static GameState* g_state = NULL;
 static DisplayContext* context = NULL;
 static struct Renderer* st_render = NULL;
+static struct Font* font = NULL;
 
 static void gameplay_update(float dt)
 {
@@ -43,6 +44,11 @@ static void gameplay_update(float dt)
     }
 }
 
+void setFont(struct Font* f)
+{
+    font = f;
+}
+
 static void gameplay_event(Event* e)
 {
     if (e -> type != MouseButtonPressed)
@@ -60,6 +66,7 @@ static void gameplay_event(Event* e)
 static void gameplay_render()
 {
    	scene_render(st_render, context, g_state);
+    DrawText(st_render, font, "Reynolds", (vec2){-0.5f, 0.0f}, 0.1f, (vec4){0.1f, 0.1f, 0.1f, 1.0f});
 }
 
 Layer create_gameplay_layer(struct Renderer* r, DisplayContext* dc, GameState* state)

@@ -15,6 +15,7 @@
 
 #include "texture.h"
 #include "subTexture.h"
+#include "text.h"
 
 #include "audio.h"
 
