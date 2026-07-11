@@ -110,6 +110,27 @@ void getTextureSize(uint32_t textureID, uint32_t* size)
 	return;
 }
 
+uint32_t rasterize(const uint8_t* pixels, uint32_t width, uint32_t height)
+{
+	ASSERT_FATAL(pixels, "@textures: Rasterizer given NULL pixels.");
+
+	uint32_t textureID;
+	glCreateTextures(GL_TEXTURE_2D, 1, &textureID);
+	glBindTexture(GL_TEXTURE_2D, textureID);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
+
+	struct Texture texture = { .textureID = textureID, .width = width, .height = height };
+	vector_push_back(&AssetManager, &texture);
+
+	return textureID;
+}
+
 void freeTextures()
 {
 	struct Texture* manager = (struct Texture*)AssetManager.data;

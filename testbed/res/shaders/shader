@@ -31,7 +31,7 @@ uniform sampler2D u_textures[32];
 
 out vec4 colour;
 
-# TO-DO: This is a temporary solution to the lack of dynamic indexing in GLSL. We will need to implement a better solution in the future.
+// TO-DO: This is a temporary solution to the lack of dynamic indexing in GLSL. We will need to implement a better solution in the future.
 vec4 sampleTexture(int index)
 {
 	switch(index)
@@ -69,6 +69,7 @@ vec4 sampleTexture(int index)
 		case 30: return texture(u_textures[30], v_texcoord);
 		case 31: return texture(u_textures[31], v_texcoord);
 		default: return vec4(1.0, 0.0, 1.0, 1.0);
+	}
 }
 
 void main()

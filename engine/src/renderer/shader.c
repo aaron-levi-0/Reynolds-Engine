@@ -104,7 +104,7 @@ static uint32_t CompileShader(const char* source, uint32_t type)
 		glGetShaderInfoLog(id, length, &length, message);
 		
 		const char* shader = type == GL_VERTEX_SHADER ? "vertex": "fragment";
-		REYNOLDS_ERROR("@shader: Failed to compile %s", shader);
+		REYNOLDS_ERROR("@shader: Failed to compile %s: %s", shader, message);
 		glDeleteShader(id);
 		return 0;
 	}
@@ -195,7 +195,6 @@ void FreeShader(struct Shader* shader)
 }
 
 //finds uniform in shader and caches value for quick access next call
-
 static int GetUniformLocation(struct Shader* shader, const char* name)
 {
 	int location, cached_location;

@@ -6,6 +6,7 @@
 #include "events/event.h"
 #include "renderer/buffer.h"
 #include "renderer/shader_internals.h"
+#include "renderer/text_internals.h"
 
 struct Renderer* renderer_create() 
 {
@@ -343,6 +344,115 @@ void DrawColour(struct Renderer* renderer, const vec2 position, const vec2 size,
     renderer -> IndexCount += 6;
 	
 	renderer -> stats.QuadCount++;
+}
+
+static void DrawQuadwithTint(struct Renderer* renderer, const vec2 position, const vec2 size, const uint32_t textureID, const vec4 tex_coords, const vec4 tint)
+{
+	if (renderer->IndexCount >= MAX_INDICIES || renderer -> TextureSlotIndex > MAX_TEXTURE_SLOTS - 1) 
+	{
+        EndBatch(renderer);
+        FlushBatch(renderer);
+        BeginBatch(renderer);
+    }
+
+    uint32_t texture_index = 0; //white texture
+	
+	//check if renderer already has the texture loaded
+	for (uint32_t i = 1; i < renderer -> TextureSlotIndex; i++) 
+	{
+		if (renderer -> texture_slots[i] == textureID) 
+		{
+			texture_index = i;
+			break;
+		}
+	}
+	
+	//place texture in renderer texture slot if it is not in already
+	if (texture_index == 0) 
+	{
+		texture_index = renderer -> TextureSlotIndex;
+		renderer -> texture_slots[texture_index] = textureID;
+		renderer -> TextureSlotIndex++;
+	}
+    
+	/** 
+		Note to self, study pointers deeper. Creating a local Vertex pointer means that 
+		dereferencing of renderer only happens once instead of many times. **/
+    Vertex* QuadBufferPtr = renderer -> QuadBufferPtr;
+	
+	/* load data into renderer */
+	
+    //vertex 1
+	setPosition(QuadBufferPtr, position);
+	setTexture(QuadBufferPtr, (vec2){tex_coords[0], tex_coords[1]}, texture_index);
+	setColour(QuadBufferPtr, tint);
+	QuadBufferPtr++;
+	
+	//vertex 2
+	float position0 = position[0] + size[0];
+	float position1 = position[1];
+
+	setPosition(QuadBufferPtr, (vec2){position0, position1});
+	setTexture(QuadBufferPtr, (vec2){tex_coords[2], tex_coords[1]}, texture_index);
+	setColour(QuadBufferPtr, tint);
+	QuadBufferPtr++;
+	
+	//vertex 3
+	position0 = position[0] + size[0];
+	position1 = position[1] + size[1];
+
+	setPosition(QuadBufferPtr, (vec2){position0, position1});
+	setTexture(QuadBufferPtr, (vec2){tex_coords[2], tex_coords[3]}, texture_index);
+	setColour(QuadBufferPtr, tint);
+	QuadBufferPtr++;
+	
+	//vertex 4
+	position0 = position[0];
+	position1 = position[1] + size[1];
+
+	setPosition(QuadBufferPtr, (vec2){position0, position1});
+	setTexture(QuadBufferPtr, (vec2){tex_coords[0], tex_coords[3]}, texture_index);
+	setColour(QuadBufferPtr, tint);
+	QuadBufferPtr++;
+	
+	//update location of renderer quad pointer and increase index count
+    renderer -> QuadBufferPtr = QuadBufferPtr;
+    renderer -> IndexCount += 6;
+	
+	renderer -> stats.QuadCount++;
+}
+
+void DrawText(struct Renderer* renderer, struct Font* font, const char* text,
+              const vec2 position, float size, const vec4 colour)
+{
+	if (!font || !text) return;
+
+	float scale = size / font -> font_size;	// baked pixels → world units
+	float xpos = 0.0f, ypos = 0.0f;				// pen, in baked-pixel space
+
+	for (const char* c = text; *c; c++)
+	{
+		if (*c < FIRST_CHAR || *c >= FIRST_CHAR + NUM_CHARS) continue;
+
+		stbtt_aligned_quad q;
+		stbtt_GetBakedQuad(font -> chars, ATLAS_SIZE, ATLAS_SIZE,
+		                   *c - FIRST_CHAR, &xpos, &ypos, &q, 1);
+
+		/* stb gives a y-DOWN rect around the baseline (q.y0 = top edge, above
+		   baseline, is negative). The world is y-up, so negate y and take the
+		   bottom-left corner. */
+		vec2 quad_pos  = { position[0] + q.x0 * scale,
+		                   position[1] - q.y1 * scale };
+		vec2 quad_size = { (q.x1 - q.x0) * scale,
+		                   (q.y1 - q.y0) * scale };
+
+		/* stb's t runs top-of-atlas → down; the atlas was uploaded first-row-
+		   first, so t maps straight onto GL's v. Bottom-left vertex samples
+		   the glyph's bottom (t1), top-right samples its top (t0). */
+		vec4 tex_coords = { q.s0, q.t1, q.s1, q.t0 };
+
+		DrawQuadwithTint(renderer, quad_pos, quad_size, font -> atlasID, tex_coords, colour);
+	}
 }
 
 void resetStats(struct Renderer* r) 

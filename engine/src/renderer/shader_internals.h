@@ -18,7 +18,6 @@ struct Shader
 	struct cache* uniforms;
 };
 
-extern ShaderProgramSource parseFile(const char*);
 extern uint32_t CreateShader(char*, char*);
 
 extern void BindShader(struct Shader* shader);

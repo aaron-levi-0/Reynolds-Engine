@@ -26,7 +26,7 @@ static void gameplay_update(float dt)
         - If win/lose becomes true: transition to GAME_OVER
     */
 
-    setMousePos();
+    //setMousePos();
     MouseInput(context, g_state);
     KeyInput(g_state);
     scene_update(context, g_state);
