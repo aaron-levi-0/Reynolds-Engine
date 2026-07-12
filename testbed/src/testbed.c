@@ -42,12 +42,14 @@ int main()
 	struct Font* font = LoadFont("../testbed/res/fonts/cmb10.ttf", 48.0f);
 	setFont(font);
 
+	struct UIContext* ui = UICreate(renderer, font);
+
 	/* Initialise Layer Stack and Layers */
 	LayerStack* stack 			= InitLayerStack();
 	Layer render_layer 			= create_render_layer(renderer);
 	Layer camera_layer 			= create_camera_layer();
 	Layer gameplay_layer 		= create_gameplay_layer(renderer, &context, &state); //UNCLEAR: audio layer in gameplay layer or separate from?
-	Layer ui_layer 				= create_ui_layer(renderer, &context, &state);
+	Layer ui_layer 				= create_ui_layer(renderer, &context, &state, ui);
 	Layer close_window_layer 	= {"Window Close Layer", .id = LAYER_WINDOW_CLOSE, .onEvent = onWindowClose};
 	Layer debug_layer 			= create_debug_layer(renderer);
 	
@@ -86,6 +88,7 @@ int main()
 	
 	EngineShutdown();
 	audio_shutdown();
+	UIDestroy(ui);
 	FreeShader(batch_shader);
 	FreeFont(font);
     return 0;

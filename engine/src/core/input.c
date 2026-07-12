@@ -27,3 +27,11 @@ void setMousePos()
 	GLFWwindow* window = (GLFWwindow* )GetNativeWindow();	
 	glfwGetCursorPos(window, &xpos, &ypos);
 }
+
+void getMousePos(double* x, double* y)
+{
+	setMousePos();
+	
+	*x = xpos;
+	*y = ypos;
+}

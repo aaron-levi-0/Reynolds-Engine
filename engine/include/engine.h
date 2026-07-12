@@ -18,6 +18,7 @@
 #include "text.h"
 
 #include "audio.h"
+#include "ui.h"
 
 REN_API void EngineDependencies();
 

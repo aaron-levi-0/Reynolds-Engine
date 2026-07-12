@@ -218,6 +218,32 @@ void setViewProjection(struct Renderer* renderer, mat4 view_projection)
 	glm_mat4_ucopy(view_projection, renderer -> view_projection);
 }
 
+/*
+	Scissor clipping. GL discards fragments outside the scissor rect, but the
+	rect is per-DRAW-CALL state — it cannot change inside a batch. So both
+	functions flush whatever has been queued (drawn with the OLD clip state),
+	change the state, then start a fresh batch for what follows.
+	Coordinates are window pixels, origin bottom-left (glScissor's convention).
+*/
+void SetClipRect(struct Renderer* r, const vec2 position, const vec2 size)
+{
+	EndBatch(r);
+	FlushBatch(r);
+	BeginBatch(r);
+
+	glEnable(GL_SCISSOR_TEST);
+	glScissor((int)position[0], (int)position[1], (int)size[0], (int)size[1]);
+}
+
+void ClearClipRect(struct Renderer* r)
+{
+	EndBatch(r);
+	FlushBatch(r);
+	BeginBatch(r);
+
+	glDisable(GL_SCISSOR_TEST);
+}
+
 static void setPosition(Vertex* vertex, const vec2 position)
 {
 	vertex -> position[0] = position[0];
@@ -237,17 +263,6 @@ static void setColour(Vertex* vertex, const vec4 colour)
 	vertex -> colour[1] = colour[1];
 	vertex -> colour[2] = colour[2];
 	vertex -> colour[3] = colour[3];
-}
-
-static uint32_t getTextureIndex(struct Renderer* r, uint32_t textureID)
-{
-	for (uint32_t i = 0; i < r -> TextureSlotIndex; i++)
-	{
-		if (r -> texture_slots[i] == textureID)
-			return i;
-	}
-
-	return 0;
 }
 
 static void DrawQuadwithTint(struct Renderer* renderer, const vec2 position, const vec2 size, const uint32_t textureID, const vec4 tex_coords, const vec4 tint)
