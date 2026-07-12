@@ -35,6 +35,8 @@ static void gameplay_update(float dt)
 
     if (g_state -> game_state == PLAY)
     {
+        g_state -> elapsed += dt;               // status-bar timer
+        
         g_state -> win = check_win(context, g_state);
 
         if (g_state -> win || g_state -> lose)

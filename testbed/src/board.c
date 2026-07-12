@@ -83,6 +83,7 @@ void init_board_state(DisplayContext* dc, GameState* s, const uint32_t* config)
 	s -> board = calloc(total_cells, sizeof(Tile));
 	ASSERT_FATAL(s -> board, "Failed to initialise board state!\n");
 	
+	s -> elapsed = 0.0f;
 	place_mines(dc, s);
 }
 
@@ -92,5 +93,7 @@ void reset_board(DisplayContext* dc, GameState* s)
 	memset(s -> board, 0, dc -> tiles_y * dc -> tiles_x * sizeof(Tile));
   
 	REYNOLDS_VERBOSE("Resetting board: %d rows, %d cols", dc -> tiles_y, dc -> tiles_x);
+
+	s -> elapsed = 0.0f;
 	place_mines(dc, s);
 }

@@ -46,6 +46,7 @@ struct UIContext
 
 	/* layout pen: cursor_y is the TOP of the next row (rows flow downward) */
 	float    cursor_x, cursor_y, row_w;
+	float    panel_left;			// content left edge; the pen returns here each row
 	uint32_t panel_seed;
 	bool     in_panel;
 
@@ -108,22 +109,31 @@ static bool widget_behaviour(struct UIContext* ui, uint32_t id, float x, float y
 	return inside && ui -> released && ui -> active == id;
 }
 
-/* take one row from the pen; returns its bottom-left y */
-static float next_row(struct UIContext* ui, float h)
+/* allocate the next widget's rect from the pen; consumes UINextWidth (one-shot),
+   records the rect for UISameLine, and resets the pen to the panel's left edge */
+static void next_widget(struct UIContext* ui, float h, float* x, float* y, float* w)
 {
-	float bottom = ui -> cursor_y - h;
-	ui -> cursor_y = bottom - ui -> style.pad * 0.5f;
+	/* default width = whatever remains of the row (shrinks after UISameLine) */
+	float remaining = (ui -> panel_left + ui -> row_w) - ui -> cursor_x;
+	*w = ui -> next_w > 0.0f ? ui -> next_w : remaining;
+	ui -> next_w = 0.0f;
 
-	float w = ui -> next_w > 0.0f ? ui -> next_w : ui -> row_w;
-	ui -> next_w = 0.0f;                      // one-shot
+	*x = ui -> cursor_x;
+	*y = ui -> cursor_y - h;
 
-	return bottom;
+	ui -> last_x = *x;
+	ui -> last_y = *y;
+	ui -> last_w = *w;
+	ui -> last_h = h;
+
+	ui -> cursor_x = ui -> panel_left;			// a normal row starts at the left edge
+	ui -> cursor_y = *y - ui -> style.pad * 0.5f;
 }
 
 void UISameLine(struct UIContext* ui)
 {
-    ui -> cursor_y = ui -> last_y + ui -> last_h;   // back up: next_row() will re-take the same row
     ui -> cursor_x = ui -> last_x + ui -> last_w + ui -> style.pad;
+	ui -> cursor_y = ui -> last_y + ui -> last_h;	// back up to the previous row's top
 }
 
 void UINextWidth(struct UIContext* ui, float w) { ui -> next_w = w; }
@@ -311,9 +321,12 @@ void UIBeginPanel(struct UIContext* ui, const char* title, const vec2 position, 
 	}
 
 	/* the pen starts under the title bar; rows flow downward */
-	ui -> cursor_x = position[0] + ui -> style.pad;
-	ui -> cursor_y = position[1] + size[1] - title_h - ui -> style.pad;
-	ui -> row_w    = size[0] - ui -> style.pad * 2.0f;
+	/* the pen starts under the title bar (undecorated panels have none);
+	   rows flow downward */
+	ui -> panel_left = position[0] + ui -> style.pad;
+	ui -> cursor_x   = ui -> panel_left;
+	ui -> cursor_y   = position[1] + size[1] - (decorated ? title_h : 0.0f) - ui -> style.pad;
+	ui -> row_w      = size[0] - ui -> style.pad * 2.0f;
 }
 
 void UIEndPanel(struct UIContext* ui)
@@ -327,12 +340,12 @@ void UILabel(struct UIContext* ui, const char* text)
 {
 	uint32_t id = hash_id(ui -> panel_seed, text);
 	float h = ui -> style.row_h;
-	float y = next_row(ui, h);
+	float x, y, w;
+	next_widget(ui, h, &x, &y, &w);
 
-	widget_behaviour(ui, id, ui -> cursor_x, y, ui -> row_w, h);	// hover only (tooltips)
-
+	widget_behaviour(ui, id, x, y, w, h);	// hover only (tooltips)
 	DrawText(ui -> r, ui -> font, text,
-	         (vec2){ui -> cursor_x, baseline_in(ui, y, h)},
+	         (vec2){x, baseline_in(ui, y, h)},
 	         ui -> style.text_size, ui -> style.text_colour);
 }
 
@@ -340,19 +353,20 @@ bool UIButton(struct UIContext* ui, const char* label)
 {
 	uint32_t id = hash_id(ui -> panel_seed, label);
 	float h = ui -> style.row_h;
-	float y = next_row(ui, h);
+	float x, y, w;
+	next_widget(ui, h, &x, &y, &w);
 
-	bool click = widget_behaviour(ui, id, ui -> cursor_x, y, ui -> row_w, h);
+	bool click = widget_behaviour(ui, id, x, y, w, h);
 
 	vec4* bg = &ui -> style.widget_bg;
 	if (ui -> active == id && ui -> down)	bg = &ui -> style.widget_active;
 	else if (ui -> hot == id)				bg = &ui -> style.widget_hot;
 
-	DrawColour(ui -> r, (vec2){ui -> cursor_x, y}, (vec2){ui -> row_w, h}, *bg);
+	DrawColour(ui -> r, (vec2){x, y}, (vec2){w, h}, *bg);
 
 	float tw = TextWidth(ui -> font, label, ui -> style.text_size);
 	DrawText(ui -> r, ui -> font, label,
-	         (vec2){ui -> cursor_x + (ui -> row_w - tw) * 0.5f, baseline_in(ui, y, h)},
+	         (vec2){x + (w - tw) * 0.5f, baseline_in(ui, y, h)},
 	         ui -> style.text_size, ui -> style.text_colour);
 
 	return click;
@@ -362,17 +376,18 @@ bool UIImageButton(struct UIContext* ui, const char* id_str, uint32_t textureID,
                    const vec4 tex_coords, float size)
 {
     uint32_t id = hash_id(ui -> panel_seed, id_str);
-    float y = next_row(ui, size);
-    float x = ui -> cursor_x;               // or centred: + (row_w - size) * 0.5f
+	float x, y, w;
+	UINextWidth(ui, size);					// an image button is always square
+	next_widget(ui, size, &x, &y, &w);
 
-    bool click = widget_behaviour(ui, id, x, y, size, size);
+	bool click = widget_behaviour(ui, id, x, y, size, size);
 
     vec4* bg = &ui -> style.widget_bg;
-    if (ui -> active == id && ui -> down)  bg = &ui -> style.widget_active;
-    else if (ui -> hot == id)              bg = &ui -> style.widget_hot;
+	if (ui -> active == id && ui -> down)	bg = &ui -> style.widget_active;
+	else if (ui -> hot == id)				bg = &ui -> style.widget_hot;
 
-    DrawColour(ui -> r, (vec2){x - 2, y - 2}, (vec2){size + 4, size + 4}, *bg);  // bevel/hover ring
-    DrawQuad(ui -> r, (vec2){x, y}, (vec2){size, size}, textureID, tex_coords);
+	DrawColour(ui -> r, (vec2){x - 2, y - 2}, (vec2){size + 4, size + 4}, *bg);	// bevel/hover ring
+	DrawQuad(ui -> r, (vec2){x, y}, (vec2){size, size}, textureID, tex_coords);
 
     return click;
 }
@@ -381,27 +396,28 @@ bool UICheckbox(struct UIContext* ui, const char* label, bool* value)
 {
 	uint32_t id = hash_id(ui -> panel_seed, label);
 	float h = ui -> style.row_h;
-	float y = next_row(ui, h);
+	float x, y, w;
+	next_widget(ui, h, &x, &y, &w);
 
-	bool click = widget_behaviour(ui, id, ui -> cursor_x, y, ui -> row_w, h);
+	bool click = widget_behaviour(ui, id, x, y, w, h);	
 	if (click && value)
 		*value = !*value;
 
 	float box = h * 0.65f;
 	float by  = y + (h - box) * 0.5f;
 
-	DrawColour(ui -> r, (vec2){ui -> cursor_x, by}, (vec2){box, box},
+	DrawColour(ui -> r, (vec2){x, by}, (vec2){box, box},
 	           ui -> hot == id ? ui -> style.widget_hot : ui -> style.widget_bg);
 
 	if (value && *value)
 	{
 		float in = box * 0.25f;
-		DrawColour(ui -> r, (vec2){ui -> cursor_x + in, by + in},
+		DrawColour(ui -> r, (vec2){x + in, by + in},
 		           (vec2){box - in * 2.0f, box - in * 2.0f}, ui -> style.accent);
 	}
 
 	DrawText(ui -> r, ui -> font, label,
-	         (vec2){ui -> cursor_x + box + ui -> style.pad, baseline_in(ui, y, h)},
+	         (vec2){x + box + ui -> style.pad, baseline_in(ui, y, h)},
 	         ui -> style.text_size, ui -> style.text_colour);
 
 	return click;

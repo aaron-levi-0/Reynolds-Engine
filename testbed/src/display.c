@@ -65,7 +65,11 @@ void init_display(DisplayContext* dc)
 	dc -> game_over			= LoadTexture("../testbed/res/game_over.png");
 	dc -> win_overlay		= LoadTexture("../testbed/res/win_overlay.png");
 
-	dc -> sprite_cell_size[0] = 46.0f; 	dc -> sprite_cell_size[1] = 46.0f;
+	// status-bar face button — ADD THESE TWO IMAGES (any square png works)
+	dc -> face_happy		= LoadTexture("../testbed/res/face_happy.png");
+	dc -> face_dead			= LoadTexture("../testbed/res/face_sad.png");
+	
+dc -> sprite_cell_size[0] = 46.0f; 	dc -> sprite_cell_size[1] = 46.0f;
 	dc -> sprite_size[0] = 1.0f; 		dc -> sprite_size[1] = 1.0f;
 
 	for (int id = CLOSED_TILE; id <= BOMB_TILE; id++) 
