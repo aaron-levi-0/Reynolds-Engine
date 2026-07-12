@@ -15,8 +15,19 @@ void debug_update(float deltaTime)
 		REYNOLDS_DEBUG("Draw calls: %d\tQuad count: %d", getDrawCalls(st_render), getQuadCount(st_render));
 }
 
+void debug_render()
+{
+	if(isKeyPressed(KEY_F))
+		return;
+}
+
 Layer create_debug_layer(struct Renderer* r) 
 {
     st_render = r;
-    return (Layer){ .name="Debug Layer", .id=LAYER_DEBUG, .update=debug_update };
+    return (Layer){ 
+		.name = "Debug Layer", 
+		.id = LAYER_DEBUG, 
+		.update = debug_update,
+		.render = debug_render 
+	};
 }

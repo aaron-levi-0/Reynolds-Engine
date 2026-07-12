@@ -44,22 +44,29 @@ static void status_bar()
         if (g_state -> board[i].state == IS_TILE_FLAGGED)
             flags++;
 
+    char mines[8], time_str[8];
+
     snprintf(mines,    sizeof mines,    "%03d", (int)g_state -> num_bombs - flags);
     snprintf(time_str, sizeof time_str, "%03d", (int)g_state -> elapsed);
 
-    vec2 bar_pos = {20.0f, (float)getWindowHeight() - 64.0f};
+    float window_width = (float)getWindowWidth();
+    float window_height = (float)getWindowHeight();
+    float bar_height = window_height * 0.125f;
 
-    UIBeginPanel(g_ui, "##statusbar", bar_pos, (vec2){200.0f, 48.0f});
-    UINextWidth(g_ui, 52.0f);
+    vec2 bar_pos = {0, window_height - bar_height};
+
+    UIBeginPanel(g_ui, "##statusbar", bar_pos, (vec2){window_width, bar_height});
+    UINextWidth(g_ui, window_width/3.0f);
     UILabel(g_ui, mines);
     UISameLine(g_ui);
     
     /* immediate mode: the face is re-chosen from game state every frame */
     uint32_t face = g_state -> lose ? context -> face_dead : context -> face_happy;
-    if (UIImageButton(g_ui, "face", face, (vec4){0.0f, 0.0f, 1.0f, 1.0f}, 32.0f))
+    if (UIImageButton(g_ui, "face", face, (vec4){0.0f, 0.0f, 1.0f, 1.0f}, bar_height * 0.9f))
         g_state -> game_state = RESTART;        // display.c's scene_update handles the reset
+
     UISameLine(g_ui);
-    UINextWidth(g_ui, 52.0f);
+    UINextWidth(g_ui, window_width/3.0f);
     UILabel(g_ui, time_str);
 
     UIEndPanel(g_ui);

@@ -36,7 +36,7 @@ static void gameplay_update(float dt)
     if (g_state -> game_state == PLAY)
     {
         g_state -> elapsed += dt;               // status-bar timer
-        
+
         g_state -> win = check_win(context, g_state);
 
         if (g_state -> win || g_state -> lose)
@@ -70,7 +70,6 @@ static void gameplay_render()
 {
     setViewProjection(st_render, getPVMat());
    	scene_render(st_render, context, g_state);
-    DrawText(st_render, font, "Reynolds", (vec2){-0.5f, 0.0f}, 0.1f, (vec4){0.1f, 0.1f, 0.1f, 1.0f});
 }
 
 Layer create_gameplay_layer(struct Renderer* r, DisplayContext* dc, GameState* state)

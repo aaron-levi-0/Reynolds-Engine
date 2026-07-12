@@ -309,9 +309,10 @@ void UIBeginPanel(struct UIContext* ui, const char* title, const vec2 position, 
 
 	float title_h = ui -> style.row_h;
 
+	DrawColour(ui -> r, position, size, ui -> style.panel_bg);
+	
 	if (decorated)
 	{
-		DrawColour(ui -> r, position, size, ui -> style.panel_bg);
 		DrawColour(ui -> r, (vec2){position[0], position[1] + size[1] - title_h},
 				(vec2){size[0], title_h}, ui -> style.title_bg);
 		DrawText(ui -> r, ui -> font, title,
