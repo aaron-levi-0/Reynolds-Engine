@@ -337,17 +337,36 @@ void UIEndPanel(struct UIContext* ui)
 
 /* ---------------- widgets ---------------- */
 
-void UILabel(struct UIContext* ui, const char* text)
+void UILabel( struct UIContext* ui, const char* text, UIAlignment alignment)
 {
-	uint32_t id = hash_id(ui -> panel_seed, text);
-	float h = ui -> style.row_h;
-	float x, y, w;
-	next_widget(ui, h, &x, &y, &w);
+    uint32_t id = hash_id(ui->panel_seed, text);
+    float h = ui->style.row_h;
+    float x, y, w;
 
-	widget_behaviour(ui, id, x, y, w, h);	// hover only (tooltips)
-	DrawText(ui -> r, ui -> font, text,
-	         (vec2){x, baseline_in(ui, y, h)},
-	         ui -> style.text_size, ui -> style.text_colour);
+    next_widget(ui, h, &x, &y, &w);
+    widget_behaviour(ui, id, x, y, w, h);
+
+    float text_width = TextWidth(
+        ui->font,
+        text,
+        ui->style.text_size
+    );
+
+    float text_x = x;
+
+    if (alignment == UI_ALIGN_CENTER)
+        text_x += (w - text_width) * 0.5f;
+    else if (alignment == UI_ALIGN_RIGHT)
+        text_x += w - text_width;
+
+    DrawText(
+        ui->r,
+        ui->font,
+        text,
+        (vec2){text_x, baseline_in(ui, y, h)},
+        ui->style.text_size,
+        ui->style.text_colour
+    );
 }
 
 bool UIButton(struct UIContext* ui, const char* label)

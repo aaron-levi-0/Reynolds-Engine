@@ -47,6 +47,13 @@ typedef struct
 	float tooltip_delay;		// seconds hovering before the tooltip shows
 } UIStyle;
 
+typedef enum
+{
+    UI_ALIGN_LEFT,
+    UI_ALIGN_CENTER,
+    UI_ALIGN_RIGHT
+} UIAlignment;
+
 REN_API struct UIContext* UICreate(struct Renderer* renderer, struct Font* font);
 REN_API void UIDestroy(struct UIContext* ui);
 REN_API UIStyle* UIGetStyle(struct UIContext* ui);		// tweak colours/sizes in place
@@ -68,7 +75,7 @@ REN_API void UISameLine(struct UIContext* ui);
 REN_API void UIBeginPanel(struct UIContext* ui, const char* title, const vec2 position, const vec2 size);
 REN_API void UIEndPanel(struct UIContext* ui);
 
-REN_API void UILabel(struct UIContext* ui, const char* text);
+REN_API void UILabel(struct UIContext* ui, const char* text, UIAlignment alignment);
 REN_API bool UIButton(struct UIContext* ui, const char* label);		// true on click (release over the button)
 REN_API bool UICheckbox(struct UIContext* ui, const char* label, bool* value);
 REN_API bool UIImageButton(struct UIContext* ui, const char* id_str, uint32_t textureID, const vec4 tex_coords, float size);

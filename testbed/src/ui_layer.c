@@ -55,19 +55,33 @@ static void status_bar()
 
     vec2 bar_pos = {0, window_height - bar_height};
 
+    UIStyle* style = UIGetStyle(g_ui);
+
+    style -> panel_bg[3] = 1.0f;
+
+    style->text_size = bar_height * 0.42f;
+    style->row_h = bar_height - style->pad * 2.0f;
+
+    float content_width = window_width - style->pad * 2.0f;
+    float column_width = (content_width - style->pad * 2.0f) / 3.0f;
+
     UIBeginPanel(g_ui, "##statusbar", bar_pos, (vec2){window_width, bar_height});
-    UINextWidth(g_ui, window_width/3.0f);
-    UILabel(g_ui, mines);
+    
+    UINextWidth(g_ui, column_width);
+    UILabel(g_ui, mines, UI_ALIGN_CENTER);
     UISameLine(g_ui);
     
     /* immediate mode: the face is re-chosen from game state every frame */
     uint32_t face = g_state -> lose ? context -> face_dead : context -> face_happy;
+
     if (UIImageButton(g_ui, "face", face, (vec4){0.0f, 0.0f, 1.0f, 1.0f}, bar_height * 0.9f))
         g_state -> game_state = RESTART;        // display.c's scene_update handles the reset
 
+    UINextWidth(g_ui, column_width);
+
     UISameLine(g_ui);
-    UINextWidth(g_ui, window_width/3.0f);
-    UILabel(g_ui, time_str);
+    UINextWidth(g_ui, column_width);
+    UILabel(g_ui, time_str, UI_ALIGN_CENTER);
 
     UIEndPanel(g_ui);
 }
@@ -75,7 +89,6 @@ static void status_bar()
 static void ui_render()
 {
    	ui_scene_render(st_render, context, g_state); // menus, options, overlays
-
     UIBeginFrame(g_ui, g_dt);                  // flush world, switch to screen space
 
     if (g_state -> board && (g_state -> scene & ALL_BOARDS))
@@ -90,6 +103,7 @@ Layer create_ui_layer(struct Renderer* r, DisplayContext* dc, GameState* state, 
     g_state = state;
     context = dc;
     g_ui = ui;
+    
     Layer ui_layer = {
         .name   = "UI Layer",
         .id     = LAYER_UI,  
