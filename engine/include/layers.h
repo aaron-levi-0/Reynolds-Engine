@@ -23,7 +23,7 @@ typedef struct {
     void* data;
     void (*onDetatch)(void* );          // Function pointer for layer attachment
     void (*update)(float deltaTime);    // Function pointer for updating the layer
-    void (*render)();                   // Function pointer for rendering the layer
+    void (*render)();         // Function pointer for rendering the layer
     void (*onEvent)(Event* e);          // Function pointer for handling events
     LayerID id;                         // Unique identifier for the layer
     bool event_enabled;
@@ -34,12 +34,12 @@ typedef Vector LayerStack;
 REN_API LayerStack* create_layer_stack();
 REN_API void destroy_layer_stack(LayerStack* );
 
-REN_API void push_layer(LayerStack* , Layer );
+REN_API void push_layer(LayerStack* stack, Layer layer);
 
-REN_API void enable_layer_event(Layer* );
-REN_API void disable_layer_event(Layer* );
+REN_API void enable_layer_event(Layer* layer);
+REN_API void disable_layer_event(Layer* layer);
 
-REN_API void update_layers(LayerStack* , float);
-REN_API void render_layers(LayerStack* );
+REN_API void update_layers(LayerStack* stack, float dt);
+REN_API void render_layers(LayerStack* stack);
 
 #endif // LAYERS_H

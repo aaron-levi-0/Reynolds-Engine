@@ -40,6 +40,8 @@ static uint8_t* read_entire_file(const char* path, size_t* out_size)
 struct Font* LoadFont(const char* ttf_path, float font_size)
 {
 	size_t   ttf_size;
+	init_asset_manager();
+
 	uint8_t* ttf = read_entire_file(ttf_path, &ttf_size);
 	if (!ttf) return NULL;
 

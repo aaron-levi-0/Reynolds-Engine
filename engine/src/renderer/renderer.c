@@ -113,7 +113,7 @@ static void MallocDraw(struct Renderer* renderer)
 
 	/* Textures */
 	
-	//1x1 white texture
+	//1x1 white texture //UNCLEAR: should this be in the texture module instead? 
 	init_asset_manager();
 	create_texture(&renderer -> WhiteTexture);
 	renderer -> texture_slots[0] = renderer -> WhiteTexture;

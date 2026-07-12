@@ -1,6 +1,7 @@
 #include "gameplay_layer.h"
 
 #include <entry.h>          // bool Minimised
+#include <Camera/camera.h>     // getPVMat()
 
 #include "common.h"
 #include "game_logic.h"     // check_win()
@@ -65,6 +66,7 @@ static void gameplay_event(Event* e)
 
 static void gameplay_render()
 {
+    setViewProjection(st_render, getPVMat());
    	scene_render(st_render, context, g_state);
     DrawText(st_render, font, "Reynolds", (vec2){-0.5f, 0.0f}, 0.1f, (vec4){0.1f, 0.1f, 0.1f, 1.0f});
 }

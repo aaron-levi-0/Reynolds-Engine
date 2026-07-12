@@ -79,7 +79,6 @@ void EngineRun(struct Renderer* renderer, LayerStack* stack)
 		if(!Minimised())
 		{
 			render_clear();		
-			setViewProjection(renderer, getPVMat());
 
 			BeginBatch(renderer);
 			update_layers(stack, timestep);

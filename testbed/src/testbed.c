@@ -55,10 +55,10 @@ int main()
 	
 	push_layer(stack, render_layer);
 	push_layer(stack, close_window_layer);
-	push_layer(stack, gameplay_layer);
-	push_layer(stack, ui_layer);
 	push_layer(stack, camera_layer);
 	push_layer(stack, debug_layer);
+	push_layer(stack, ui_layer);
+	push_layer(stack, gameplay_layer); //First to be rendered, last to be updated
 	
 	/* Setup orthographic camera */
 	float aspect_ratio = (float)getWindowWidth()/(float)getWindowHeight();

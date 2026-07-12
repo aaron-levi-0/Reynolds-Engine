@@ -30,13 +30,14 @@ struct Texture{
 	uint32_t textureID;
 };
 
-Vector AssetManager;
-
-//probs not the best name
+Vector AssetManager; //probs not the best name
+bool manager_ready = false;
 
 void init_asset_manager()
 {
-	 vector_init(&AssetManager, sizeof(struct Texture), INITIAL_CAPACITY);
+	if(manager_ready) return;
+	vector_init(&AssetManager, sizeof(struct Texture), INITIAL_CAPACITY);
+	manager_ready = true;
 }
 
 void create_texture(uint32_t* white_texture)
@@ -53,7 +54,8 @@ void setWhiteTexture(uint32_t colour)
 static uint32_t load_texture(const char* path, uint32_t filter, uint32_t wrap)
 {
 	int width, height, BPP;
-	
+	init_asset_manager();
+
 	stbi_set_flip_vertically_on_load(true);
 		
 	uint32_t textureID;
@@ -113,6 +115,7 @@ void getTextureSize(uint32_t textureID, uint32_t* size)
 uint32_t CreateTextureFromPixels(const uint8_t* pixels, uint32_t width, uint32_t height)
 {
 	ASSERT_FATAL(pixels, "@textures: Texture given NULL pixels.");
+	init_asset_manager();
 
 	uint32_t textureID;
 	glCreateTextures(GL_TEXTURE_2D, 1, &textureID);
@@ -141,4 +144,5 @@ void freeTextures()
 	}
 
 	free_vector(&AssetManager);
+	manager_ready = false; //TO-DO: do only when free_vector is successful
 }
