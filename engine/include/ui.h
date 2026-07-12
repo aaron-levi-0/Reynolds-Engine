@@ -61,6 +61,8 @@ REN_API bool UIWantsMouse(struct UIContext* ui);
 
 REN_API void UIBeginFrame(struct UIContext* ui, float dt);
 REN_API void UIEndFrame(struct UIContext* ui);
+REN_API void UINextWidth(struct UIContext* ui, float w);	// next widget's width (0 = default row width)
+REN_API void UISameLine(struct UIContext* ui);
 
 /* position = bottom-left corner, size = width/height, both in pixels. */
 REN_API void UIBeginPanel(struct UIContext* ui, const char* title, const vec2 position, const vec2 size);
@@ -69,6 +71,7 @@ REN_API void UIEndPanel(struct UIContext* ui);
 REN_API void UILabel(struct UIContext* ui, const char* text);
 REN_API bool UIButton(struct UIContext* ui, const char* label);		// true on click (release over the button)
 REN_API bool UICheckbox(struct UIContext* ui, const char* label, bool* value);
+REN_API bool UIImageButton(struct UIContext* ui, const char* id_str, uint32_t textureID, const vec4 tex_coords, float size);
 REN_API void UITooltip(struct UIContext* ui, const char* text);		// attaches to the PREVIOUS widget
 
 /* Scrollable region inside a panel. `scroll` is caller-owned state (px,

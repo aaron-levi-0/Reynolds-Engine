@@ -2,6 +2,7 @@
 
 #include <logging.h>
 #include "display.h" 
+#include "common.h"
 
 /*
     The LayerStack holds layers by value, so per-instance state can't live in
@@ -36,33 +37,29 @@ static void ui_event(Event* e)
 
 static void ui_render()
 {
+    char mines[8], time_str[8];
+    
    	ui_scene_render(st_render, context, g_state); // menus, options, overlays
 
     /* ---- immediate-mode UI demo panel ---- */
     UIBeginFrame(g_ui, g_dt);
+    
+    //snprintf(mines, sizeof mines, "%03d", mines_left);
+   // snprintf(time_str, sizeof time_str, "%03d", seconds);
 
-    UIBeginPanel(g_ui, "Reynolds UI", (vec2){20.0f, 20.0f}, (vec2){280.0f, 250.0f});
+    vec2 bar_pos = {20, getWindowHeight() - 64};
 
-    UILabel(g_ui, "It is alive.");
+    UIBeginPanel(g_ui, "##statusbar", bar_pos, (vec2){bar_w, 44.0f});
 
-    if (UIButton(g_ui, "Log a message"))
-        REYNOLDS_INFO("@ui demo: button clicked!");
-    UITooltip(g_ui, "Writes a line to the console");
-
-    UICheckbox(g_ui, "A checkbox", &demo_checkbox);
-    UITooltip(g_ui, "Stored in a plain bool in ui_layer.c");
-
-    UIBeginScroll(g_ui, "demo_scroll", 90.0f, &demo_scroll);
-    UILabel(g_ui, "Scroll item 1");
-    UILabel(g_ui, "Scroll item 2");
-    UILabel(g_ui, "Scroll item 3");
-    UILabel(g_ui, "Scroll item 4");
-    UILabel(g_ui, "Scroll item 5");
-    UILabel(g_ui, "Scroll item 6");
-    UIEndScroll(g_ui);
+    UINextWidth(g_ui, 60.0f);  UILabel(g_ui, mines);
+    UISameLine(g_ui);
+    UINextWidth(g_ui, 32.0f);
+    if (UIImageButton(g_ui, "smiley", context -> texture, smiley_uv, 32.0f))
+        reset_game(context, g_state);
+    UISameLine(g_ui);
+    UINextWidth(g_ui, 60.0f);  UILabel(g_ui, time_str);
 
     UIEndPanel(g_ui);
-
     UIEndFrame(g_ui);
 }
 

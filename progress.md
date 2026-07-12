@@ -30,10 +30,5 @@ together and [`docs/adr/`](docs/adr/) for the decisions behind them.
 
 ## Near-term focus
 
-1. **Screen-space UI pass**: make `setViewProjection` public and let a UI layer flush
-   mid-frame and switch to a screen ortho matrix; flip `render_layers` to bottom → top so
-   overlays draw last (on top).
-2. **Immediate-mode UI module** on top of text + tint: buttons, panels, labels, tooltips
-   (hot/active IDs); scissor-rect support in the renderer for scroll lists.
-3. Finish `handled` event consumption (input-only) and retire the coarse
-4. Make `CMakeLists.txt` actually link GLFW/GLEW/cglm and build on Linux.
+1. Finish `handled` event consumption (input-only) and retire the coarse
+2. Make `CMakeLists.txt` actually link GLFW/GLEW/cglm and build on Linux.

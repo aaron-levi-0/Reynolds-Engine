@@ -58,6 +58,9 @@ struct UIContext
 	/* tooltip (drawn last, in UIEndFrame, so it sits on top of everything) */
 	uint32_t    last_id;
 	const char* tooltip_text;
+
+	float last_x, last_y, last_w, last_h;    // rect of the widget just submitted
+	float next_w;                             // 0 = default (full row width)
 };
 
 /* ---------------- helpers ---------------- */
@@ -110,8 +113,20 @@ static float next_row(struct UIContext* ui, float h)
 {
 	float bottom = ui -> cursor_y - h;
 	ui -> cursor_y = bottom - ui -> style.pad * 0.5f;
+
+	float w = ui -> next_w > 0.0f ? ui -> next_w : ui -> row_w;
+	ui -> next_w = 0.0f;                      // one-shot
+
 	return bottom;
 }
+
+void UISameLine(struct UIContext* ui)
+{
+    ui -> cursor_y = ui -> last_y + ui -> last_h;   // back up: next_row() will re-take the same row
+    ui -> cursor_x = ui -> last_x + ui -> last_w + ui -> style.pad;
+}
+
+void UINextWidth(struct UIContext* ui, float w) { ui -> next_w = w; }
 
 static float baseline_in(struct UIContext* ui, float row_bottom, float row_h)
 {
@@ -274,6 +289,7 @@ void UIBeginPanel(struct UIContext* ui, const char* title, const vec2 position, 
 		REYNOLDS_WARN("@ui: UIBeginPanel inside another panel — call UIEndPanel first.");
 		return;
 	}
+	bool decorated = !(title[0] == '#' && title[1] == '#');
 
 	ui -> in_panel   = true;
 	ui -> panel_seed = hash_id(0, title);
@@ -283,13 +299,16 @@ void UIBeginPanel(struct UIContext* ui, const char* title, const vec2 position, 
 
 	float title_h = ui -> style.row_h;
 
-	DrawColour(ui -> r, position, size, ui -> style.panel_bg);
-	DrawColour(ui -> r, (vec2){position[0], position[1] + size[1] - title_h},
-	           (vec2){size[0], title_h}, ui -> style.title_bg);
-	DrawText(ui -> r, ui -> font, title,
-	         (vec2){position[0] + ui -> style.pad,
-	                baseline_in(ui, position[1] + size[1] - title_h, title_h)},
-	         ui -> style.text_size, ui -> style.text_colour);
+	if (decorated)
+	{
+		DrawColour(ui -> r, position, size, ui -> style.panel_bg);
+		DrawColour(ui -> r, (vec2){position[0], position[1] + size[1] - title_h},
+				(vec2){size[0], title_h}, ui -> style.title_bg);
+		DrawText(ui -> r, ui -> font, title,
+				(vec2){position[0] + ui -> style.pad,
+						baseline_in(ui, position[1] + size[1] - title_h, title_h)},
+				ui -> style.text_size, ui -> style.text_colour);
+	}
 
 	/* the pen starts under the title bar; rows flow downward */
 	ui -> cursor_x = position[0] + ui -> style.pad;
@@ -337,6 +356,25 @@ bool UIButton(struct UIContext* ui, const char* label)
 	         ui -> style.text_size, ui -> style.text_colour);
 
 	return click;
+}
+
+bool UIImageButton(struct UIContext* ui, const char* id_str, uint32_t textureID,
+                   const vec4 tex_coords, float size)
+{
+    uint32_t id = hash_id(ui -> panel_seed, id_str);
+    float y = next_row(ui, size);
+    float x = ui -> cursor_x;               // or centred: + (row_w - size) * 0.5f
+
+    bool click = widget_behaviour(ui, id, x, y, size, size);
+
+    vec4* bg = &ui -> style.widget_bg;
+    if (ui -> active == id && ui -> down)  bg = &ui -> style.widget_active;
+    else if (ui -> hot == id)              bg = &ui -> style.widget_hot;
+
+    DrawColour(ui -> r, (vec2){x - 2, y - 2}, (vec2){size + 4, size + 4}, *bg);  // bevel/hover ring
+    DrawQuad(ui -> r, (vec2){x, y}, (vec2){size, size}, textureID, tex_coords);
+
+    return click;
 }
 
 bool UICheckbox(struct UIContext* ui, const char* label, bool* value)
