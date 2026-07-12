@@ -22,10 +22,6 @@ int main()
 	InitEngine("minesweeper.c", SCREEN_WIDTH, SCREEN_HEIGHT);
     EngineDependencies();
 	LoadIcon(ICON_PATH);
-	
-	struct Font* font = LoadFont("../testbed/res/fonts/cmb10.ttf", 48.0f);
-
-	setFont(font);
 
 	DisplayContext context 	= {0};
 	GameState state 		= {0};
@@ -42,6 +38,9 @@ int main()
 		samplers[i] = i;
 		
 	SetIntArray(batch_shader, "u_textures", samplers, MAX_TEXTURE_SLOTS);
+
+	struct Font* font = LoadFont("../testbed/res/fonts/cmb10.ttf", 48.0f);
+	setFont(font);
 
 	/* Initialise Layer Stack and Layers */
 	LayerStack* stack 			= InitLayerStack();
@@ -88,6 +87,6 @@ int main()
 	EngineShutdown();
 	audio_shutdown();
 	FreeShader(batch_shader);
-
+	FreeFont(font);
     return 0;
 }

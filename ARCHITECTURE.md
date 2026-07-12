@@ -7,8 +7,9 @@
 ## 1. Big picture
 
 Reynolds is a **2D batch-rendered** engine driven by a **layer stack** and a synchronous
-**event system**. The host application (e.g. `testbed/`) owns `main()` and the game loop; the
-engine provides windowing, rendering, input, camera, and utilities as a static library.
+**event system**. The host application (e.g. `testbed/`) owns `main()` and bootstraps, then
+hands control to the engine's frame loop (`EngineRun`); the engine provides windowing,
+rendering, input, camera, and utilities as a static library.
 
 ```
 testbed (game)  ── uses ──>  engine (static lib)  ── uses ──>  GLFW · GLEW · OpenGL · cglm
@@ -24,7 +25,7 @@ engine/
     utils/          vector.h ...
   src/
     core/         window, input, layers, timestep, logging
-    renderer/     renderer, buffer, shader, texture, subTexture, camera
+    renderer/     renderer, buffer, shader, texture, subTexture, text, camera
     events/       event types + dispatch
     platform/     platform.h (platform boundary)
     utils/        vector, hash
@@ -42,9 +43,10 @@ public header and fully defined in a private one — so games hold a handle, not
 
 The application drives three phases (see `testbed/src/testbed.c`):
 
-1. **Bootstrap** — `EngineInit` (window + GL context + GLEW), create the `Renderer`, load the
+1. **Bootstrap** — `InitEngine` (window + GL context + GLEW), create the `Renderer`, load the
    batch shader (`LoadShader`) and hand it to the renderer (`SetShader`), set the `u_textures`
-   sampler array once, load textures, build the `LayerStack`, push layers, configure the camera.
+   sampler array once, load textures and fonts (`LoadFont` — after `create_render_layer`, see
+   CHANGELOG 0.2.6 known issues), build the `LayerStack`, push layers, configure the camera.
 2. **Runtime** — the app calls `EngineRun(renderer, stack)`, which owns the frame loop:
    compute delta time, `setViewProjection(renderer, getPVMat())`, `BeginBatch`,
    `update_layers`, `render_layers`, `EndBatch`/`FlushBatch` (binds the renderer's shader and
@@ -56,7 +58,7 @@ The application drives three phases (see `testbed/src/testbed.c`):
 sequenceDiagram
     participant App as main() / testbed
     participant Eng as engine
-    App->>Eng: EngineInit(title, w, h)
+    App->>Eng: InitEngine(title, w, h)
     App->>Eng: create Renderer, LoadShader, SetShader
     App->>Eng: create LayerStack, push layers
     App->>Eng: EngineRun(renderer, stack)
@@ -76,6 +78,13 @@ sequenceDiagram
 > hard-coded there; multi-pass frames (e.g. a screen-space UI pass) will need either a
 > public `setViewProjection` + mid-frame flushes from a layer, or loop ownership returned
 > to the app.
+
+**Text** (0.2.6): `LoadFont` bakes an ASCII glyph atlas on the CPU (stb_truetype coverage →
+RGBA white-with-alpha) and uploads it via `CreateTextureFromPixels` (`texture.c` — create-texture-from-
+pixels). `DrawText` walks the string with `stbtt_GetBakedQuad` and emits one tinted quad
+per glyph into the ordinary batch (`DrawQuadwithTint`), so text costs the same as sprites
+and shares the batch shader. `TextWidth` measures strings for layout. Positions are
+baseline-based; glyphs are baked at one pixel size per `Font`.
 
 ## 4. Event flow
 
@@ -163,8 +172,9 @@ nothing above the boundary names GLFW.
 | Thing | Created by | Freed by | Notes |
 |---|---|---|---|
 | `Window` | `create_window` | `close_window` | single global |
-|| `Renderer` | `renderer_create` | `renderer_destroy` | opaque handle; owns GPU buffers, white texture; *uses* a `Shader` it is handed |
-| `Shader` | `LoadShader` (game) | `FreeShader` — currently called by the renderer's `FreeDraw` | game loads it and hands it over via `SetShader`; note the split ownership — the renderer frees an object it didn't create, so the game must **not** also free it |
+| `Renderer` | `renderer_create` | render layer's `onDetach` (`FreeDraw` + `free`) when the stack is destroyed | opaque handle; owns GPU buffers, white texture; *uses* a `Shader` it is handed (public `renderer_destroy` removed in 0.2.6) |
+| `Shader` | `LoadShader` (game) | `FreeShader` (game, at shutdown) | creator frees (0.2.6); the renderer only holds a pointer and NULLs it in `FreeDraw` |
+| `Font` | `LoadFont` (game) | `FreeFont` (game, at shutdown) | creator frees; the atlas texture itself is registered with the asset manager and freed by `freeTextures` |
 | `LayerStack` | `InitLayerStack` | `destroy_layer_stack` (via `EngineShutdown`) | owns the `Vector`; pops call each layer's onDetach` |
 | Textures | `LoadTexture` | `freeTextures` / testbed unload | tracked in an asset-manager `Vector` |
 | `PhysicsWorld` (prototype) | `physics_create` | `physics_destroy` | not in `main` yet |

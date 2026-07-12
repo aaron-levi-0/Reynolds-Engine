@@ -9,6 +9,47 @@ All notable changes to Reynolds-Engine are recorded here. The format is loosely 
 - A 2D AABB physics module (`physics.h` / `physics.c`) exists as a prototype patch; it is not
   yet merged into `main`.
 
+## [0.2.6]
+
+### Added
+- **Text rendering** (`text.h`, `text.c`, `text_internals.h`): `LoadFont(path, px)` reads a
+  `.ttf`, bakes an ASCII glyph atlas with stb_truetype (512×512 coverage, expanded to RGBA
+  white-with-alpha), and uploads it as a normal batch texture. `DrawText` emits one tinted
+  quad per glyph through the existing batch; `TextWidth` measures strings for layout.
+  `struct Font` follows the opaque-handle pattern. First font asset:
+  `testbed/res/text/cmb10.ttf`.
+- `rasterize(pixels, w, h)` in `texture.c` — creates a GL texture from a CPU pixel buffer
+  (clamp-to-edge): the file-less sibling of `LoadTexture`, used for the font atlas.
+- Internal `DrawQuadwithTint` — textured quad with a per-quad colour multiplier (glyph
+  colouring via the 0.2.5 `v_colour * texture(...)` shader path).
+
+### Fixed
+- `FreeShader` frees the uniform cache with `free_cache()` (was a bare `free()` — leaked
+  every entry and key).
+- `CreateShader` now checks `GL_LINK_STATUS` (new `linkProgram`) and logs the info log;
+  `LoadShader` guards a failed `parseFile` instead of passing NULL sources to GL.
+- Shader compile errors now include the driver's info-log message (was logging only the
+  stage name).
+- Fragment shader indexes the sampler array through a constant-index `switch`
+  (`sampleTexture`) — portable to AMD/Intel; magenta fallback for invalid slots. Also fixed
+  a missing closing brace and a `#`-style comment that broke compilation.
+- Shader ownership untangled: the renderer no longer frees the `Shader` it is handed — the
+  game calls `FreeShader` at shutdown; the renderer itself is freed via the render layer's
+  `onDetach` (public `renderer_destroy` removed).
+
+### Known issues
+- `DrawQuadwithTint` duplicates ~70 lines of `DrawQuad`; collapse to one implementation
+  (make `DrawQuad` a thin wrapper passing a white tint).
+- Loading a font **before** `create_render_layer` pushes the atlas into an uninitialised
+  asset-manager vector — the registration is lost and the atlas leaks at shutdown. Make
+  `init_asset_manager` lazy (guard flag, call from `load_texture`/`rasterize`) or document
+  the ordering.
+- `TextWidth` has no public declaration; `rasterize` uploads pixels rather than rasterising
+  (naming), and arguably belongs in the public API for the upcoming map palette texture.
+- `DrawText` collides with a `windows.h` macro if any translation unit ever includes both.
+- Text is ASCII-only (32–126) at a single baked size; `DrawText` positions from the
+  baseline. SDF baking is the planned upgrade for zoomable world-space text (map labels).
+
 ## [0.2.5]
 
 ### Changed

@@ -79,7 +79,7 @@ struct Font* LoadFont(const char* ttf_path, float font_size)
 	}
 	free(coverage);
 
-	font -> atlasID = rasterize(rgba, ATLAS_SIZE, ATLAS_SIZE);
+	font -> atlasID = CreateTextureFromPixels(rgba, ATLAS_SIZE, ATLAS_SIZE);
 	free(rgba);								// GPU has its own copy now
 
 	REYNOLDS_INFO("@text: loaded %s at %.0fpx", ttf_path, font_size);

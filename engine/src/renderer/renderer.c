@@ -239,111 +239,15 @@ static void setColour(Vertex* vertex, const vec4 colour)
 	vertex -> colour[3] = colour[3];
 }
 
-//unable to pass by reference, position loses structure? also note texcoords structure is {(x,y)_beginning, (x,y)_end} // can use tex size instead?
-void DrawQuad(struct Renderer* renderer, const vec2 position, const vec2 size, const uint32_t textureID, const vec4 tex_coords) 
+static uint32_t getTextureIndex(struct Renderer* r, uint32_t textureID)
 {
-	const vec4 white = {1.0f, 1.0f, 1.0f, 1.0f};
-
-    if (renderer->IndexCount >= MAX_INDICIES || renderer -> TextureSlotIndex > MAX_TEXTURE_SLOTS - 1) 
+	for (uint32_t i = 0; i < r -> TextureSlotIndex; i++)
 	{
-        EndBatch(renderer);
-        FlushBatch(renderer);
-        BeginBatch(renderer);
-    }
-
-    uint32_t texture_index = 0; //white texture
-	
-	//check if renderer already has the texture loaded
-	for (uint32_t i = 1; i < renderer -> TextureSlotIndex; i++) 
-	{
-		if (renderer -> texture_slots[i] == textureID) 
-		{
-			texture_index = i;
-			break;
-		}
+		if (r -> texture_slots[i] == textureID)
+			return i;
 	}
-	
-	//place texture in renderer texture slot if it is not in already
-	if (texture_index == 0) 
-	{
-		texture_index = renderer -> TextureSlotIndex;
-		renderer -> texture_slots[texture_index] = textureID;
-		renderer -> TextureSlotIndex++;
-	}
-    
-	/** 
-		Note to self, study pointers deeper. Creating a local Vertex pointer means that 
-		dereferencing of renderer only happens once instead of many times. **/
-    Vertex* QuadBufferPtr = renderer -> QuadBufferPtr;
-	
-	/* load data into renderer */
-	
-    //vertex 1
-	setPosition(QuadBufferPtr, position);
-	setTexture(QuadBufferPtr, (vec2){tex_coords[0], tex_coords[1]}, texture_index);
-	setColour(QuadBufferPtr, white);
-	QuadBufferPtr++;
-	
-	//vertex 2
-	float position0 = position[0] + size[0];
-	float position1 = position[1];
 
-	setPosition(QuadBufferPtr, (vec2){position0, position1});
-	setTexture(QuadBufferPtr, (vec2){tex_coords[2], tex_coords[1]}, texture_index);
-	setColour(QuadBufferPtr, white);
-	QuadBufferPtr++;
-	
-	//vertex 3
-	position0 = position[0] + size[0];
-	position1 = position[1] + size[1];
-
-	setPosition(QuadBufferPtr, (vec2){position0, position1});
-	setTexture(QuadBufferPtr, (vec2){tex_coords[2], tex_coords[3]}, texture_index);
-	setColour(QuadBufferPtr, white);
-	QuadBufferPtr++;
-	
-	//vertex 4
-	position0 = position[0];
-	position1 = position[1] + size[1];
-
-	setPosition(QuadBufferPtr, (vec2){position0, position1});
-	setTexture(QuadBufferPtr, (vec2){tex_coords[0], tex_coords[3]}, texture_index);
-	setColour(QuadBufferPtr, white);
-	QuadBufferPtr++;
-	
-	//update location of renderer quad pointer and increase index count
-    renderer -> QuadBufferPtr = QuadBufferPtr;
-    renderer -> IndexCount += 6;
-	
-	renderer -> stats.QuadCount++;
-}
-
-void DrawColour(struct Renderer* renderer, const vec2 position, const vec2 size, const vec4 colour) 
-{
-    if (renderer -> IndexCount >= MAX_INDICIES) 
-	{
-        EndBatch(renderer);
-        FlushBatch(renderer);
-        BeginBatch(renderer);
-    }
-
-    uint32_t texture_index = 0; //white texture
-
-    Vertex* QuadBufferPtr = renderer -> QuadBufferPtr;
-
-    for (int i = 0; i < 4; i++) 
-	{
-        QuadBufferPtr -> position[0] = position[0] + (i == 1 || i == 2 ? size[0] : 0);
-        QuadBufferPtr -> position[1] = position[1] + (i >= 2 ? size[1] : 0);
-        setColour(QuadBufferPtr, colour);
-        QuadBufferPtr -> textureID = (float)texture_index; // texture index of 0 draws colour as stated in shader
-        QuadBufferPtr++;
-    }
-
-    renderer -> QuadBufferPtr = QuadBufferPtr;
-    renderer -> IndexCount += 6;
-	
-	renderer -> stats.QuadCount++;
+	return 0;
 }
 
 static void DrawQuadwithTint(struct Renderer* renderer, const vec2 position, const vec2 size, const uint32_t textureID, const vec4 tex_coords, const vec4 tint)
@@ -416,6 +320,41 @@ static void DrawQuadwithTint(struct Renderer* renderer, const vec2 position, con
 	QuadBufferPtr++;
 	
 	//update location of renderer quad pointer and increase index count
+    renderer -> QuadBufferPtr = QuadBufferPtr;
+    renderer -> IndexCount += 6;
+	
+	renderer -> stats.QuadCount++;
+}
+
+//unable to pass by reference, position loses structure? also note texcoords structure is {(x,y)_beginning, (x,y)_end} // can use tex size instead?
+void DrawQuad(struct Renderer* renderer, const vec2 position, const vec2 size, const uint32_t textureID, const vec4 tex_coords) 
+{
+	const vec4 white = {1.0f, 1.0f, 1.0f, 1.0f};
+	DrawQuadwithTint(renderer, position, size, textureID, tex_coords, white);
+}
+
+void DrawColour(struct Renderer* renderer, const vec2 position, const vec2 size, const vec4 colour) 
+{
+    if (renderer -> IndexCount >= MAX_INDICIES) 
+	{
+        EndBatch(renderer);
+        FlushBatch(renderer);
+        BeginBatch(renderer);
+    }
+
+    uint32_t texture_index = 0; //white texture
+
+    Vertex* QuadBufferPtr = renderer -> QuadBufferPtr;
+
+    for (int i = 0; i < 4; i++) 
+	{
+        QuadBufferPtr -> position[0] = position[0] + (i == 1 || i == 2 ? size[0] : 0);
+        QuadBufferPtr -> position[1] = position[1] + (i >= 2 ? size[1] : 0);
+        setColour(QuadBufferPtr, colour);
+        QuadBufferPtr -> textureID = (float)texture_index; // texture index of 0 draws colour as stated in shader
+        QuadBufferPtr++;
+    }
+
     renderer -> QuadBufferPtr = QuadBufferPtr;
     renderer -> IndexCount += 6;
 	

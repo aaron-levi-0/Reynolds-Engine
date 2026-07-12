@@ -18,7 +18,7 @@ together and [`docs/adr/`](docs/adr/) for the decisions behind them.
 | Time / delta | ✅ | `timestep.c` |
 | Logging | ✅ | `logging.c` (levels, colour, `get_log_level()`) |
 | Event system + input | 🟡 | `Event` is now a value-type **tagged union** (ADR-0007); per-category shared objects removed. Layers still **poll** input (ADR-0006); `handled` consumption is input-only (ADR-0002). Buffering / event queue still to come |
-| Text / font rendering | 📦 | stb_truetype vendored; no engine wrapper yet |
+| Text / font rendering | 🟡 | `text.{h,c}` (0.2.6): `LoadFont` atlas bake, `DrawText` through the batch, `TextWidth`. ASCII-only, one baked size per font, baseline positioning. To come: `TextWidth` export, screen-space UI pass, SDF for zoomable map labels |
 | Audio | 🟡 | miniaudio wrapped in `audio.{h,c}` — init/shutdown, SFX one-shots, looping music, master volume (ADR-0005) |
 | Physics | 🧪  | 2D AABB rigid-body module exists as a patch; not merged to `main` |
 | UI | 🟡 | Testbed UI layer (`testbed/src/ui_layer.c`); no engine-level UI yet |
@@ -30,10 +30,10 @@ together and [`docs/adr/`](docs/adr/) for the decisions behind them.
 
 ## Near-term focus
 
-1. Wire **text** (stb_truetype) into engine modules now that the
-   library is vendored.
-2. Finish `handled` event consumption (input-only) and retire the coarse
-   `disable_layer_event` workaround where it applies.
-3. Introduce engine key codes and translate GLFW → engine in `window.c` (ADR-0004), so input
-   stops naming `GLFW_KEY_*`.
+1. **Screen-space UI pass**: make `setViewProjection` public and let a UI layer flush
+   mid-frame and switch to a screen ortho matrix; flip `render_layers` to bottom → top so
+   overlays draw last (on top).
+2. **Immediate-mode UI module** on top of text + tint: buttons, panels, labels, tooltips
+   (hot/active IDs); scissor-rect support in the renderer for scroll lists.
+3. Finish `handled` event consumption (input-only) and retire the coarse
 4. Make `CMakeLists.txt` actually link GLFW/GLEW/cglm and build on Linux.

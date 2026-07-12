@@ -110,9 +110,9 @@ void getTextureSize(uint32_t textureID, uint32_t* size)
 	return;
 }
 
-uint32_t rasterize(const uint8_t* pixels, uint32_t width, uint32_t height)
+uint32_t CreateTextureFromPixels(const uint8_t* pixels, uint32_t width, uint32_t height)
 {
-	ASSERT_FATAL(pixels, "@textures: Rasterizer given NULL pixels.");
+	ASSERT_FATAL(pixels, "@textures: Texture given NULL pixels.");
 
 	uint32_t textureID;
 	glCreateTextures(GL_TEXTURE_2D, 1, &textureID);
